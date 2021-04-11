@@ -28,5 +28,9 @@ public class BaseController {
         return baseService.insertUser(userModel);
     }
 
+    @GetMapping("/api/main")
+    public String main(){
+        return "main";
+    }
 
 }
