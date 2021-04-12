@@ -29,6 +29,7 @@ public class BaseController {
     }
 
     @GetMapping("/api/main")
+    @CrossOrigin
     public String main(){
         return "main";
     }
