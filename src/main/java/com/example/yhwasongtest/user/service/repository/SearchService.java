@@ -1,6 +1,4 @@
-package com.example.yhwasongtest.service.repository;
-
-import com.example.yhwasongtest.service.impl.SearchServiceImpl;
+package com.example.yhwasongtest.user.service.repository;
 
 import javax.naming.directory.SearchResult;
 import java.io.IOException;

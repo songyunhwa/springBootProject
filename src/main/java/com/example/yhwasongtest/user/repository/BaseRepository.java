@@ -1,6 +1,6 @@
-package com.example.yhwasongtest.repository;
+package com.example.yhwasongtest.user.repository;
 
-import com.example.yhwasongtest.model.BaseQuestion;
+import com.example.yhwasongtest.user.model.BaseQuestion;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

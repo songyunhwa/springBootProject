@@ -1,4 +1,4 @@
-package com.example.yhwasongtest.model;
+package com.example.yhwasongtest.user.model;
 
 import javax.persistence.*;
 
@@ -9,6 +9,7 @@ public class UserModel{
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
     public String name;
+    //public String password;
     public String tel;
     public UserModel(){
     }
@@ -31,4 +32,5 @@ public class UserModel{
     public void setTel(String tel) {
         this.tel = tel;
     }
+
 }

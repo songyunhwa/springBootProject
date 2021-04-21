@@ -1,10 +1,9 @@
-package com.example.yhwasongtest.controller;
+package com.example.yhwasongtest.user.controller;
 
-import com.example.yhwasongtest.model.BaseQuestion;
-import com.example.yhwasongtest.model.UserModel;
-import com.example.yhwasongtest.service.impl.BaseServiceImpl;
+import com.example.yhwasongtest.user.model.BaseQuestion;
+import com.example.yhwasongtest.user.model.UserModel;
+import com.example.yhwasongtest.user.service.impl.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

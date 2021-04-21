@@ -1,4 +1,4 @@
-package com.example.yhwasongtest.model;
+package com.example.yhwasongtest.user.model;
 
 import javax.persistence.*;
 

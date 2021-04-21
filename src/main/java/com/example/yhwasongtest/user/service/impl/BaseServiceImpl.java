@@ -1,18 +1,22 @@
-package com.example.yhwasongtest.service.impl;
+package com.example.yhwasongtest.user.service.impl;
 
-import com.example.yhwasongtest.model.BaseQuestion;
-import com.example.yhwasongtest.model.UserModel;
-import com.example.yhwasongtest.repository.BaseRepository;
-import com.example.yhwasongtest.repository.UserRepository;
-import com.example.yhwasongtest.service.repository.BaseService;
+import com.example.yhwasongtest.user.model.BaseQuestion;
+import com.example.yhwasongtest.user.model.UserModel;
+import com.example.yhwasongtest.user.repository.BaseRepository;
+import com.example.yhwasongtest.user.repository.UserRepository;
+import com.example.yhwasongtest.user.service.repository.BaseService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.util.*;
 
 @Service
 public class BaseServiceImpl implements BaseService {
@@ -44,6 +48,32 @@ public class BaseServiceImpl implements BaseService {
         Optional<UserModel> userModelOptional = userRepository.findAllByName(userModel.getName());
         if(!userModelOptional.isPresent()) userRepository.save(userModel);
         return userModelOptional.get();
+    }
+
+    public String getToken(String id, String password) throws Exception{
+
+        ObjectMapper mapper = new ObjectMapper();
+        JSONObject object = new JSONObject();
+        Map<String, String> map = new HashMap<String, String>();
+        object.put("typ", "JWT");
+        object.put("alg", "HS256");
+        String bytes = mapper.writeValueAsString(object);
+        String headerResult = Base64.getUrlEncoder().encodeToString(bytes.getBytes());
+        headerResult = headerResult.replaceAll("=", "");
+
+        JSONObject object1 = new JSONObject();
+        object1.put("iss", "mapyhwasong.com");
+        object1.put("exp", "1485270000000");
+        object1.put("https://github.com/songyunhwa/springBootProject_back", true);
+        object1.put("userId", id);
+        object1.put("password", password);
+        String bytes1 = mapper.writeValueAsString(object1);
+        String bodyResult = Base64.getUrlEncoder().encodeToString(bytes1.getBytes());
+        bodyResult = bodyResult.replaceAll("=", "");
+
+        String passwordHashed = BCrypt.hashpw(headerResult + "." + bodyResult, BCrypt.gensalt());
+
+        return passwordHashed;
     }
 /*
     @Override
