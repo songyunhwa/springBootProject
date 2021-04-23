@@ -1,21 +1,24 @@
 package com.example.yhwasongtest.youtube.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
-public class PlaceModel{
+@Entity
+@Table(name = "place")
+public class PlaceModel implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     public String placeName; // 장소 이름
     public String area;      // 지역
 
+    /*
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false,name = "youtubeModel")
     YoutubeModel youtubeModel;
-
+*/
     public void setId(long id) {
         this.id = id;
     }

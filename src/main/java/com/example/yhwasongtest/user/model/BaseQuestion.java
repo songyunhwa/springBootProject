@@ -1,10 +1,11 @@
 package com.example.yhwasongtest.user.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "question")
-public class BaseQuestion{
+public class BaseQuestion implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

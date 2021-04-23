@@ -1,39 +1,26 @@
 package com.example.yhwasongtest.youtube.model;
 
-import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-public class YoutubeModel{
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "youtube")
+@Getter
+@Setter
+public class YoutubeModel implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    public String title;
-    public String youtuberName;
-    public String contents;
+    public String publishedAt; //나온 시간
+    public String channelId;    // 유투버 아이디
+    public String channelTitle; // 유투버 이름
+    public String videoId; // 동영상 아이디
+    public String title;       //동영상 제목
+    public String description;  // 동영상 설명
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setYoutuberName(String youtuberName) {
-        this.youtuberName = youtuberName;
-    }
-
-    public String getYoutuberName() {
-        return youtuberName;
-    }
-
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
-
-    public String getContents() {
-        return contents;
-    }
 }

@@ -1,19 +1,36 @@
 package com.example.yhwasongtest.user.model;
 
+import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
+
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "user")
-public class UserModel{
+@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = {"id"}))
+public class UserModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
+
+    @Column(nullable = false)
     public String name;
-    //public String password;
-    public String tel;
+
+    @Column(nullable = false)
+    public String password;
+
     public UserModel(){
     }
-    public UserModel(String name) {
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -21,16 +38,11 @@ public class UserModel{
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getTel() {
-        return tel;
+    public String getPassword() {
+        return password;
     }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
 }
