@@ -31,15 +31,15 @@ public class BaseController {
     }
 
     @PostMapping(value = "/user")
-    public UserModel insertUser(@RequestParam(name = "name",required = false) String name,
-                                @RequestParam(name = "password",required = false) String password) throws Exception {
+    public UserModel insertUser(@RequestParam(name = "name",required = true) String name,
+                                @RequestParam(name = "password",required = true) String password) throws Exception {
 
         return baseService.insertUser(name, password);
     }
 
     @GetMapping(value = "/login")
-    public UserModel login(@RequestParam(name = "name",required = false) String name,
-                           @RequestParam(name = "password",required = false) String password,
+    public UserModel login(@RequestParam(name = "name",required = true) String name,
+                           @RequestParam(name = "password",required = true) String password,
                            HttpServletRequest request,
                            HttpServletResponse response) throws  Exception {
         return baseService.login(name, password, request ,response);
