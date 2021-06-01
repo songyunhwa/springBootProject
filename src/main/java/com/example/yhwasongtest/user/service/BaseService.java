@@ -1,43 +1,39 @@
-package com.example.yhwasongtest.user.service.impl;
+package com.example.yhwasongtest.user.service;
 
 import com.example.yhwasongtest.user.model.BaseQuestion;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.repository.BaseRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
-import com.example.yhwasongtest.user.service.repository.BaseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.apache.catalina.User;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.util.*;
 
 @Service
-public class BaseServiceImpl implements BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
+public class BaseService{
+    private static final Logger logger = LoggerFactory.getLogger(BaseService.class);
 
     private BaseRepository baseRepository;
     private UserRepository userRepository;
 
     @Autowired
-    public BaseServiceImpl(BaseRepository baseRepository,
-                           UserRepository userRepository){
+    public BaseService(BaseRepository baseRepository,
+                       UserRepository userRepository){
         this.baseRepository = baseRepository;
         this.userRepository = userRepository;
     }
 
-    @Override
+
     public BaseQuestion insertQuestion(BaseQuestion baseQuestion){
 
         List<BaseQuestion> baseQuestionOptional = baseRepository.findAllById(baseQuestion.getId());
@@ -49,85 +45,8 @@ public class BaseServiceImpl implements BaseService {
             return baseRepository.save(base);
     }
 
-    @Override
-    public UserModel insertUser(String name , String password) {
-
-        UserModel userModel = new UserModel();
-        userModel.setName(name);
-        userModel.setPassword(password);
-
-        Optional<UserModel> userModelOptional = userRepository.findAllByName(userModel.getName());
-        if (!userModelOptional.isPresent()) {
-            try {
-                String resultToken = getToken(userModel.getName(), userModel.getPassword());
-                resultToken = getHashed(resultToken);
-                logger.info(" Hashed Password : " , resultToken);
-
-                userModel.setPassword(resultToken);
-                userRepository.save(userModel);
 
 
-            }catch (Exception e) {
-                logger.info("Exception ===>   ", e);
-            }
-        }
-        return userModel;
-    }
-
-    public String getToken(String id, String password) throws Exception{
-
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, String> object = new HashMap<String, String>();
-        object.put("typ", "JWT");
-        object.put("alg", "HS256");
-        String bytes = mapper.writeValueAsString(object);
-        String headerResult = Base64.getUrlEncoder().encodeToString(bytes.getBytes());
-        headerResult = headerResult.replaceAll("=", "");
-
-        Map<String, String> object1 = new HashMap<String, String>();
-        object1.put("iss", "mapyhwasong.com");
-        object1.put("exp", "1485270000000");
-        object1.put("https://github.com/songyunhwa/springBootProject_back", "true");
-        object1.put("userId", id);
-        object1.put("password", password);
-        String bytes1 = mapper.writeValueAsString(object1);
-        String bodyResult = Base64.getUrlEncoder().encodeToString(bytes1.getBytes());
-        bodyResult = bodyResult.replaceAll("=", "");
-
-        return headerResult + "." + bodyResult;
-    }
-    public String getHashed(String password){
-        String passwordHashed = BCrypt.hashpw(password, BCrypt.gensalt());
-        return passwordHashed;
-    }
-
-    public UserModel login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception{
-
-        String resultToken = getToken(name, password);
-
-        UserModel user = new UserModel();
-        List<UserModel> userModelList = userRepository.findByName(name);
-
-        HttpSession session = request.getSession();
-
-        if(userModelList != null) {
-            for (UserModel userModel : userModelList) {
-                if (BCrypt.checkpw(resultToken, userModel.getPassword())){
-                    user.setId(userModel.getId());
-                    user.setName(userModel.getName());
-                    user.setPassword(userModel.getPassword());
-
-                    session.setAttribute("login", user.toString());
-                    logger.info("Session ==> ", user.toString());
-                }
-            }
-        }
-
-        if(user == null) {
-            response.sendRedirect("/");
-        }
-        return user;
-    }
 /*
     @Override
     public void getYoutubeApi(String nextToken){

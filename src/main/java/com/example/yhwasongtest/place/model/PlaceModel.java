@@ -1,8 +1,13 @@
-package com.example.yhwasongtest.youtube.model;
+package com.example.yhwasongtest.place.model;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "place")
 public class PlaceModel implements Serializable {
@@ -11,35 +16,15 @@ public class PlaceModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    public String placeName; // 장소 이름
-    public String area;      // 지역
+    public String name; // 장소 이름
+    public String area; // 지역
+    public String url;  // 주문 페이지 (있다면)
+    public String number; // 폰 번호
 
     /*
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false,name = "youtubeModel")
     YoutubeModel youtubeModel;
-*/
-    public void setId(long id) {
-        this.id = id;
-    }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setPlaceName(String placeName) {
-        this.placeName = placeName;
-    }
-
-    public String getPlaceName() {
-        return placeName;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
-
-    public String getArea() {
-        return area;
-    }
+     */
 }

@@ -1,18 +1,12 @@
 package com.example.yhwasongtest.youtube.controller;
 
-import com.example.yhwasongtest.user.model.BaseQuestion;
-import com.example.yhwasongtest.user.service.impl.BaseServiceImpl;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.service.YoutubeService;
-import com.google.api.services.youtube.model.SearchResult;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/api/v1")
