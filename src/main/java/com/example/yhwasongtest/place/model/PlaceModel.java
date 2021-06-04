@@ -20,11 +20,6 @@ public class PlaceModel implements Serializable {
     public String area; // 지역
     public String url;  // 주문 페이지 (있다면)
     public String number; // 폰 번호
+    private String subCategory; // CategoryModel 과 연결
 
-    /*
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false,name = "youtubeModel")
-    YoutubeModel youtubeModel;
-
-     */
 }

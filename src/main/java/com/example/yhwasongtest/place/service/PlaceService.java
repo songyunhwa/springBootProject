@@ -1,5 +1,7 @@
 package com.example.yhwasongtest.place.service;
 
+import com.example.yhwasongtest.place.model.CategoryModel;
+import com.example.yhwasongtest.place.repository.CategoryRepository;
 import com.example.yhwasongtest.place.repository.PlaceRepository;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
@@ -7,9 +9,9 @@ import com.example.yhwasongtest.place.repository.ReviewRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PlaceService {
@@ -17,6 +19,7 @@ public class PlaceService {
 
     private PlaceRepository placeRepository;
     private ReviewRepository reviewRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository, ReviewRepository reviewRepository) {
@@ -24,15 +27,27 @@ public class PlaceService {
         this.reviewRepository = reviewRepository;
     }
 
+    public PlaceModel getPlace(String name) {
+        return this.placeRepository.findByName(name);
+    }
+
+    public List<PlaceModel> getPlaceListBySubCategory(String category) {
+        return this.placeRepository.findBySubCategory(category);
+    }
+
     public PlaceModel putPlace(PlaceModel placeModel) throws Exception {
+        if(placeModel.getSubCategory() == null){
+            throw new Exception("sub_category 가 없습니다.");
+        }
         PlaceModel existPlace = placeRepository.findByName(placeModel.getName());
-        if (existPlace == null)
+        if (existPlace == null) {
             return placeRepository.save(placeModel);
-        else {
+        } else {
             existPlace.setArea(placeModel.getArea());
             existPlace.setName(placeModel.getName());
             existPlace.setNumber(placeModel.getNumber());
             existPlace.setUrl(placeModel.getUrl());
+            existPlace.setSubCategory(placeModel.getSubCategory());
             placeRepository.save(existPlace);
 
             return existPlace;

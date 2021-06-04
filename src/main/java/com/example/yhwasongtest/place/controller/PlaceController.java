@@ -26,6 +26,12 @@ public class PlaceController {
         this.placeService = placeService;
     }
 
+    @PostMapping(value = "/place")
+    public ResponseEntity getPlace(String name) {
+        PlaceModel placeModel = placeService.getPlace(name);
+        return new ResponseEntity<>(placeModel, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @PostMapping(value = "/place")
     public ResponseEntity putPlace(HttpServletRequest request, @RequestBody PlaceModel model) {
