@@ -6,6 +6,7 @@ import com.example.yhwasongtest.user.repository.BaseRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.User;
+import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +35,6 @@ public class BaseService{
     }
 
 
-    public BaseQuestion insertQuestion(BaseQuestion baseQuestion){
-
-        List<BaseQuestion> baseQuestionOptional = baseRepository.findAllById(baseQuestion.getId());
-
-            BaseQuestion base = new BaseQuestion(baseQuestion.getTitle(), baseQuestion.getContent());
-            if(baseQuestionOptional.size() > 0) base.setId(baseQuestionOptional.get(0).getId());
-            else base.setId(99);
-
-            return baseRepository.save(base);
-    }
 
 
 

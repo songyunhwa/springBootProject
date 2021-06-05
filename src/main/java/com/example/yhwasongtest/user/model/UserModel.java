@@ -1,102 +1,63 @@
 package com.example.yhwasongtest.user.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Transient;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+@Data
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "user")
+public class UserModel {
+        @Id
+        @GeneratedValue
+        private Long id;
+        private String email;    //이메일
+        private String password; //패스워드
+        private String role;     //권한
 
+        public UserModel(String email, String password, String role){
+                this.email = email;
+                this.password = password;
+                this.role = role;
+        }
 
-@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = {"id"}))
-public class UserModel implements UserDetails{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
+        public Long getId() {
+                return id;
+        }
 
-    @Column(nullable = false)
-    public String userName;
+        public void setId(Long id) {
+                this.id = id;
+        }
 
-    @Column(nullable = false)
-    public String password;
+        public String getEmail() {
+                return email;
+        }
 
-    @Column(nullable = false)
-    public boolean admin;
+        public void setEmail(String email) {
+                this.email = email;
+        }
 
-    @Column(nullable = false)
-    public String email;
+        public String getPassword() {
+                return password;
+        }
 
-    @Column(nullable = false)
-    String authority;
+        public void setPassword(String password) {
+                this.password = password;
+        }
 
-    private Collection<? extends GrantedAuthority> authorities;
+        public String getRole() {
+                return role;
+        }
 
-
-    public String getAuthority(){
-        return this.authority;
-    }
-
-    public void setAuthority(String s) {
-        this.authority = s;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
-    }
-
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setUserName(String name) {
-        this.userName = name;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.userName;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+        public void setRole(String role) {
+                this.role = role;
+        }
 }

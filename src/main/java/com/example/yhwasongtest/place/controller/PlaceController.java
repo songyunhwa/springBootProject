@@ -1,5 +1,6 @@
 package com.example.yhwasongtest.place.controller;
 
+import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.place.service.PlaceService;
@@ -26,24 +27,25 @@ public class PlaceController {
         this.placeService = placeService;
     }
 
-    @PostMapping(value = "/place")
-    public ResponseEntity getPlace(String name) {
+    @PostMapping(value = "/place/{name}")
+    public ResponseEntity getPlace(@PathVariable String name) {
         PlaceModel placeModel = placeService.getPlace(name);
         return new ResponseEntity<>(placeModel, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+
     @PostMapping(value = "/place")
-    public ResponseEntity putPlace(HttpServletRequest request, @RequestBody PlaceModel model) {
-        if (request.getSession().getAttribute("login") == null) {
-            return new ResponseEntity("로그인이 안됬습니다.", HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity putPlace(@RequestBody PlaceDto model) {
+
         String result = "";
         PlaceModel placeModel = new PlaceModel();
         try {
 
             placeModel.setName(model.getName()); // 장소 이름
             placeModel.setArea(model.getArea()); // 지역
+            placeModel.setNumber(model.getNumber());
+            placeModel.setUrl(model.getUrl());
+            placeModel.setSubCategory(model.getSubCategory());
 
             placeModel = placeService.putPlace(placeModel);
 
@@ -56,23 +58,16 @@ public class PlaceController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping(value = "/place/{name}")
-    public ResponseEntity deletePlace(HttpServletRequest request,
-                                      @RequestParam(name = "name",required = true) String name) {
-        if (request.getSession().getAttribute("login") == null) {
-            return new ResponseEntity("로그인이 안됬습니다.", HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity deletePlace(@PathVariable(name = "name",required = true) String name) {
+
         placeService.deletePlace(name);
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @PostMapping(value = "/place/review")
-    public ResponseEntity putReview(HttpServletRequest request, ReviewModel review) {
-        if (request.getSession().getAttribute("login") == null) {
-            return new ResponseEntity("로그인이 안됬습니다.", HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity putReview(@RequestBody ReviewModel review) {
+
         try {
             ReviewModel reviewModel = placeService.putReview(review);
 
@@ -83,15 +78,11 @@ public class PlaceController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @DeleteMapping(value = "/place/review")
-    public ResponseEntity deleteReview(HttpServletRequest request,
+    public ResponseEntity deleteReview(
                                        @RequestParam(name = "userName",required = true) String userName,
                                        @RequestParam(name = "placeName",required = true) String placeName
                                        ) {
-        if (request.getSession().getAttribute("login") == null) {
-            return new ResponseEntity("로그인이 안됬습니다.", HttpStatus.UNAUTHORIZED);
-        }
         placeService.deleteReview(userName, placeName);
         return new ResponseEntity(HttpStatus.OK);
     }

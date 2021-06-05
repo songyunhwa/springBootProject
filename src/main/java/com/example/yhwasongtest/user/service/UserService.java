@@ -1,19 +1,22 @@
 package com.example.yhwasongtest.user.service;
 
+import com.example.yhwasongtest.user.dto.UserModelDto;
+import com.example.yhwasongtest.user.model.CustomUserDetails;
 import com.example.yhwasongtest.user.model.UserModel;
-import com.example.yhwasongtest.user.repository.BaseRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.catalina.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,85 +24,63 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
+@Slf4j
 @Service
-public class UserService {
-
+public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepository;
 
-    private BaseService baseService;
-    private BaseRepository baseRepository;
-    private UserRepository userRepository;
-
-    @Autowired
-    public UserService(BaseRepository baseRepository,
-                       UserRepository userRepository,
-                       BaseService baseService){
-        this.baseRepository = baseRepository;
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.baseService = baseService;
     }
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        //여기서 받은 유저 패스워드와 비교하여 로그인 인증
+         UserModel user = userRepository.findByEmail(email);
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        logger.info(userDetails.toString());
+        return userDetails;
+    }
+    /**
+     * 회원정보 저장
+     *
+     * @param infoDto 회원정보가 들어있는 DTO
+     * @return 저장되는 회원의 PK
+     */
+    public Long save(UserModelDto infoDto) throws Exception{
+        //BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        //infoDto.setPassword(encoder.encode(infoDto.getPassword()));
+        try {
+            UserModel userModel = insertUser(infoDto);
 
-
-    public UserModel login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception{
-
-        String resultToken = getToken(name, password);
-
-        UserModel userModel = userRepository.findByName(name);
-
-        HttpSession session = request.getSession();
-
-        if(userModel != null) {
-                if (BCrypt.checkpw(resultToken, userModel.getPassword())){
-
-                    List<GrantedAuthority> authorities = new ArrayList<>();
-                    authorities.add(new SimpleGrantedAuthority(userModel.getAuthority()));
-                    userModel.setAuthorities(authorities);
-
-                    session.setAttribute("login", userModel);
-
-                    return userModel;
-                }
-
+            userRepository.save(userModel);
+            return userModel.getId();
+        }catch (Exception e) {
+            throw new Exception();
         }
-
-        return null;
     }
 
+    public UserModel insertUser(UserModelDto userModelDto) throws Exception{
+        Optional<UserModel> userModelOptional = userRepository.findAllByEmail(userModelDto.getEmail());
 
-    public UserModel insertUser(UserModel userModel) throws Exception{
-        Optional<UserModel> userModelOptional = userRepository.findAllByName(userModel.getUsername());
         if (!userModelOptional.isPresent()) {
             try {
-                String resultToken = getToken(userModel.getUsername(), userModel.getPassword());
+
+                String resultToken = getToken(userModelDto.getEmail(), userModelDto.getPassword());
                 resultToken = getHashed(resultToken);
+
                 logger.info(" Hashed Password : ", resultToken);
-
-                userModel.setPassword(resultToken);
-                userModel.setAuthority("ROLE_USER");
-                userRepository.save(userModel);
-
-
+                UserModel userModel = new UserModel(userModelDto.getEmail(), resultToken, "ROLE_USER");
+                return userModel;
             } catch (Exception e) {
                 logger.info("Exception ===>   ", e);
             }
+            ;
         }
+        UserModel userModel = userRepository.findByEmail(userModelDto.getEmail());
+        userModel.setEmail(userModelDto.getEmail());
+
         return userModel;
-    }
-
-    public UserModel updateUser(UserModel userModel) throws Exception {
-        UserModel user = userRepository.findByName(userModel.getUsername());
-
-        String resultToken = getToken(user.getUsername(), user.getPassword());
-        if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
-            String requestToken = getToken(userModel.getUsername(), userModel.getPassword());
-            requestToken = getHashed(requestToken);
-
-            user.setPassword(requestToken);
-
-        }
-        user.setEmail(userModel.getEmail());
-        userRepository.save(user);
-        return user;
     }
 
     public String getToken(String id, String password) throws Exception{
@@ -127,6 +108,26 @@ public class UserService {
     public String getHashed(String password){
         String passwordHashed = BCrypt.hashpw(password, BCrypt.gensalt());
         return passwordHashed;
+    }
+
+    public UserModel login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception{
+
+        String resultToken = getToken(name, password);
+
+        UserModel userModel = userRepository.findByEmail(name);
+
+        HttpSession session = request.getSession();
+
+        if(userModel != null) {
+            if (BCrypt.checkpw(resultToken, userModel.getPassword())){
+                session.setAttribute("login", userModel);
+
+                return userModel;
+            }
+
+        }
+
+        return null;
     }
 
 }

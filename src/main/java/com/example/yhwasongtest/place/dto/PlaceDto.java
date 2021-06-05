@@ -1,20 +1,6 @@
-package com.example.yhwasongtest.place.model;
+package com.example.yhwasongtest.place.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.persistence.*;
-import java.io.Serializable;
-
-@Getter
-@Setter
-@Entity
-@Table(name = "place")
-public class PlaceModel implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+public class PlaceDto {
 
     public String name; // 장소 이름
     public String area; // 지역
@@ -22,36 +8,36 @@ public class PlaceModel implements Serializable {
     public String number; // 폰 번호
     private String subCategory; // CategoryModel 과 연결
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setArea(String area) {
-        this.area = area;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getArea() {
         return area;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setArea(String area) {
+        this.area = area;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getNumber() {
         return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getSubCategory() {
