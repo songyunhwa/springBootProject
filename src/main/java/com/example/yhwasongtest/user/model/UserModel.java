@@ -19,12 +19,12 @@ public class UserModel {
         @Id
         @GeneratedValue
         private Long id;
-        private String email;    //이메일
+        private String username;    //이메일
         private String password; //패스워드
         private String role;     //권한
 
         public UserModel(String email, String password, String role){
-                this.email = email;
+                this.username = email;
                 this.password = password;
                 this.role = role;
         }
@@ -37,12 +37,12 @@ public class UserModel {
                 this.id = id;
         }
 
-        public String getEmail() {
-                return email;
+        public String getUsername() {
+                return username;
         }
 
-        public void setEmail(String email) {
-                this.email = email;
+        public void setUsername(String email) {
+                this.username = email;
         }
 
         public String getPassword() {

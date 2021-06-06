@@ -40,11 +40,9 @@ public class YoutubeController {
 
     }
 
-    @GetMapping(value="/mango")
-    public String getSearchMango(HttpSession session,
-                                   @RequestParam(name = "location",required = true) String location) throws Exception{
-        logger.info(session.getId());
-        logger.info(String.valueOf(session.getAttribute("login")));
+    @RequestMapping(method = RequestMethod.GET, value = "/mango")
+    public String getSearchMango(@RequestParam( name = "location",required = true) String location) throws Exception{
+
         String result = "";
         try {
             result = youtubeService.getSearchMango(location);

@@ -1,22 +1,21 @@
 package com.example.yhwasongtest.user.service;
 
 import com.example.yhwasongtest.user.dto.UserModelDto;
+import com.example.yhwasongtest.user.model.Authority;
 import com.example.yhwasongtest.user.model.CustomUserDetails;
 import com.example.yhwasongtest.user.model.UserModel;
+import com.example.yhwasongtest.user.repository.AuthorityRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,18 +28,43 @@ import java.util.*;
 public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
+        this.authorityRepository = authorityRepository;
     }
+
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        //여기서 받은 유저 패스워드와 비교하여 로그인 인증
-         UserModel user = userRepository.findByEmail(email);
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        logger.info(userDetails.toString());
-        return userDetails;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserModel user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException(username + "is not found.");
+        }
+
+        CustomUserDetails quickGuideUser = new CustomUserDetails();
+        quickGuideUser.setUsername(user.getUsername());
+        quickGuideUser.setPassword(user.getPassword());
+        quickGuideUser.setAuthorities(getAuthorities(username));
+        quickGuideUser.setEnabled(true);
+        quickGuideUser.setAccountNonExpired(true);
+        quickGuideUser.setAccountNonLocked(true);
+        quickGuideUser.setCredentialsNonExpired(true);
+
+        return quickGuideUser;
     }
+
+    public Collection<GrantedAuthority> getAuthorities(String username) {
+        List<Authority> authList = authorityRepository.findByUsername(username);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Authority authority : authList) {
+            authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
+        }
+        return authorities;
+    }
+
+
     /**
      * 회원정보 저장
      *
@@ -61,7 +85,7 @@ public class UserService implements UserDetailsService {
     }
 
     public UserModel insertUser(UserModelDto userModelDto) throws Exception{
-        Optional<UserModel> userModelOptional = userRepository.findAllByEmail(userModelDto.getEmail());
+        Optional<UserModel> userModelOptional = userRepository.findAllByUsername(userModelDto.getEmail());
 
         if (!userModelOptional.isPresent()) {
             try {
@@ -77,9 +101,7 @@ public class UserService implements UserDetailsService {
             }
             ;
         }
-        UserModel userModel = userRepository.findByEmail(userModelDto.getEmail());
-        userModel.setEmail(userModelDto.getEmail());
-
+        UserModel userModel = userRepository.findByUsername(userModelDto.getEmail());
         return userModel;
     }
 
@@ -114,7 +136,7 @@ public class UserService implements UserDetailsService {
 
         String resultToken = getToken(name, password);
 
-        UserModel userModel = userRepository.findByEmail(name);
+        UserModel userModel = userRepository.findByUsername(name);
 
         HttpSession session = request.getSession();
 

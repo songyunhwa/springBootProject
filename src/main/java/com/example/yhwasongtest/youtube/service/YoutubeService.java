@@ -47,6 +47,7 @@ public class YoutubeService {
             throw new Exception("message is not exist.");
         } else {
             result = searchMango.searchMango(location);
+            System.out.println(result);
         }
         return result;
     }

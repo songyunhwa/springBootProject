@@ -33,7 +33,6 @@ public class PlaceController {
         return new ResponseEntity<>(placeModel, HttpStatus.OK);
     }
 
-
     @PostMapping(value = "/place")
     public ResponseEntity putPlace(@RequestBody PlaceDto model) {
 
@@ -87,4 +86,9 @@ public class PlaceController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @GetMapping(value = "/location")
+    public ResponseEntity getLocation(){
+        String result = placeService.getLocation();
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

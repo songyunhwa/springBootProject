@@ -32,6 +32,37 @@ public class searchMango {
         br.close();
 
         String result = response.toString();
+
+        int cnt =0;
+        String subResult = "";
+        int startIndex =0;
+        int endIndex =-1;
+        while(startIndex != -1 && cnt <100) {
+            String start= "<figcaption>";
+            startIndex = result.indexOf(start, endIndex);
+
+             String end ="</figcaption>";
+             endIndex = result.indexOf(end, startIndex);
+
+             if(startIndex > -1 && endIndex > -1 && endIndex - startIndex <1000) {
+                 String sub = result.substring(startIndex, endIndex);
+
+                 String h2 =" <h2 class=\"title\">";
+                 //가게명명 추출.
+                 int start_title= sub.indexOf(h2);
+                 int end_title=sub.indexOf("\\");
+
+                 if(start_title > -1 && end_title > -1 && end_title - start_title <1000) {
+                     sub = sub.substring(start_title+h2.length() , end_title);
+                     subResult += sub;
+                     cnt++;
+                 }
+             }else break;
+
+
+        }
+        return subResult;
+        /*
         result = result.replaceAll(" ", "");
 
         int start = 0;
@@ -52,7 +83,7 @@ public class searchMango {
 
         } while (subString != null && data < 20);
 
-        return arrayList.toString();
+        return arrayList.toString(); */
     }
 
 }

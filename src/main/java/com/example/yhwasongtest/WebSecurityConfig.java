@@ -2,6 +2,7 @@ package com.example.yhwasongtest;
 
 import com.example.yhwasongtest.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
 
@@ -31,12 +33,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // 2
 
             http.csrf().disable();		//로그인 창
             http.authorizeRequests()
-                    .antMatchers("/api/v1/login", "/api/v1/user").anonymous()
-                    .antMatchers("/api/v1/place/**").permitAll()
+                    .antMatchers("/api/v1/**").permitAll()
                     .antMatchers("/admin/**").hasRole("ADMIN") // '/admin/*' 요청은 ADMIN 권한을 가진 사용자만 접근 가능
-                    .anyRequest().authenticated(); // 그 외 모든 요청은 인증된 사용자만 접근 가능
-
-
+                    .anyRequest().authenticated()
+                    .and()
+                    .formLogin()
+                    .loginPage("/login")
+                    .usernameParameter("username")
+                    .passwordParameter("password")
+                    .permitAll()
+                    .and()
+                    .logout()
+                    .permitAll();
 
     }
 
@@ -47,6 +55,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // 2
      */
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
+        auth.userDetailsService(userService).passwordEncoder(encoder());
     }
+
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }
