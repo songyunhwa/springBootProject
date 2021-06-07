@@ -17,7 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -71,7 +73,7 @@ public class UserService implements UserDetailsService {
      * @param infoDto 회원정보가 들어있는 DTO
      * @return 저장되는 회원의 PK
      */
-    public Long save(UserModelDto infoDto) throws Exception{
+    public Long save(UserModelDto infoDto) throws Exception {
         //BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         //infoDto.setPassword(encoder.encode(infoDto.getPassword()));
         try {
@@ -79,12 +81,12 @@ public class UserService implements UserDetailsService {
 
             userRepository.save(userModel);
             return userModel.getId();
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new Exception();
         }
     }
 
-    public UserModel insertUser(UserModelDto userModelDto) throws Exception{
+    public UserModel insertUser(UserModelDto userModelDto) throws Exception {
         Optional<UserModel> userModelOptional = userRepository.findAllByUsername(userModelDto.getEmail());
 
         if (!userModelOptional.isPresent()) {
@@ -95,6 +97,7 @@ public class UserService implements UserDetailsService {
 
                 logger.info(" Hashed Password : ", resultToken);
                 UserModel userModel = new UserModel(userModelDto.getEmail(), resultToken, "ROLE_USER");
+
                 return userModel;
             } catch (Exception e) {
                 logger.info("Exception ===>   ", e);
@@ -105,7 +108,7 @@ public class UserService implements UserDetailsService {
         return userModel;
     }
 
-    public String getToken(String id, String password) throws Exception{
+    public String getToken(String id, String password) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> object = new HashMap<String, String>();
@@ -127,12 +130,13 @@ public class UserService implements UserDetailsService {
 
         return headerResult + "." + bodyResult;
     }
-    public String getHashed(String password){
+
+    public String getHashed(String password) {
         String passwordHashed = BCrypt.hashpw(password, BCrypt.gensalt());
         return passwordHashed;
     }
 
-    public UserModel login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public UserModel login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String resultToken = getToken(name, password);
 
@@ -140,9 +144,18 @@ public class UserService implements UserDetailsService {
 
         HttpSession session = request.getSession();
 
-        if(userModel != null) {
-            if (BCrypt.checkpw(resultToken, userModel.getPassword())){
+        if (userModel != null) {
+            if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
                 session.setAttribute("login", userModel);
+
+                // 쿠키 설정
+                Cookie cookie = new Cookie("loginCookie", userModel.getUsername());
+                cookie.setMaxAge(60 * 60 * 24 * 7);
+                response.addCookie(cookie);
+
+                // 세션 유효시간 설정
+                Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
+                this.keepLogin(userModel.getUsername(), session.getId(), date);
 
                 return userModel;
             }
@@ -150,6 +163,44 @@ public class UserService implements UserDetailsService {
         }
 
         return null;
+    }
+
+    public void logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+
+        Object obj = session.getAttribute("login");
+        if (obj != null) {
+            UserModel vo = (UserModel) obj;
+
+            session.removeAttribute("login");
+            session.invalidate();// 세션 전체를 날려버림
+
+            Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
+            if (loginCookie != null) {
+                loginCookie.setPath("/");
+                loginCookie.setMaxAge(0);
+                response.addCookie(loginCookie);
+
+                // 사용자 테이블에서도 유효기간을 현재시간으로 다시 세팅해줘야함.
+                Date date = new Date(System.currentTimeMillis());
+                this.keepLogin(vo.getUsername(), session.getId(), date);
+            }
+        }
+
+    }
+
+    public void keepLogin(String username, String sessionId, Date date) {
+
+        UserModel userModel = userRepository.findByUsername(username);
+        if (userModel != null) {
+            userModel.setSessionId(sessionId);
+            userModel.setDate(date);
+            userRepository.save(userModel);
+        }
+    }
+
+    public UserModel getUserBySessionId(String sessionId) {
+        UserModel userModel = userRepository.findBySessionId(sessionId);
+        return userModel;
     }
 
 }
