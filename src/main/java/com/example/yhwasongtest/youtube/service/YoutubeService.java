@@ -31,12 +31,18 @@ public class YoutubeService {
         return youtubemodel;
     }
 
-    public boolean getSearchYoutube(String msg) throws Exception {
-        boolean result = false;
+    public String getSearchYoutube(String msg) {
+        String result = "";
         if(msg == null) {
-            throw new Exception("message is not exist.");
+            System.err.println("getSearchYoutube Error ==> "+ "message is not exist.");
+            return "message is not exist.";
         } else {
-            result = searchService.searchYoutube(msg);
+            try {
+            result = searchService.searchYoutube(msg, null);
+            } catch (Exception error) {
+                System.err.println("getSearchYoutube Error ==> "+ error);
+
+            }
         }
         return result;
     }

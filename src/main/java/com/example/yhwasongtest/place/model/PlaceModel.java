@@ -1,10 +1,13 @@
 package com.example.yhwasongtest.place.model;
 
+import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +24,27 @@ public class PlaceModel implements Serializable {
     public String url;  // 주문 페이지 (있다면)
     public String number; // 폰 번호
     private String subCategory; // CategoryModel 과 연결
+
+    @Transient
+    private List<YoutubeModel> youtube; // 유투브 모델과 연결
+
+    public List<YoutubeModel> getYoutube() {
+        return youtube;
+    }
+
+    public void setYoutube(List<YoutubeModel> youtube) {
+        this.youtube = youtube;
+    }
+
+    public void setYoutube(YoutubeModel youtube) {
+        if(this.youtube == null){
+            this.youtube = new ArrayList<>();
+        }
+        if(!this.youtube.contains(youtube)){
+            this.youtube.add(youtube);
+        }
+    }
+
 
     public void setName(String name) {
         this.name = name;

@@ -25,17 +25,14 @@ public class YoutubeController {
     }
 
     @GetMapping(value="/youtube")
-    public boolean getSearchYoutube(HttpSession session,
-                                               @RequestParam(name = "msg",required = true) String msg) throws Exception{
+    public String getSearchYoutube(HttpSession session,
+                                               @RequestParam(name = "msg",required = true) String msg){
         logger.info(session.getId());
         logger.info(String.valueOf(session.getAttribute("login")));
-        boolean result = false;
-        try {
-            result = youtubeService.getSearchYoutube(msg);
-        } catch (Exception error) {
-            System.err.println("getSearchYoutube Error ==> "+ error);
+        String result = "";
 
-        }
+            result = youtubeService.getSearchYoutube(msg);
+
         return result;
 
     }

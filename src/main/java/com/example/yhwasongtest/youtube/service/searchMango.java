@@ -37,7 +37,7 @@ public class searchMango {
         String subResult = "";
         int startIndex =0;
         int endIndex =-1;
-        while(startIndex != -1 && cnt <100) {
+        while(startIndex != -1 && cnt <1000) {
             String start= "<figcaption>";
             startIndex = result.indexOf(start, endIndex);
 
@@ -50,9 +50,9 @@ public class searchMango {
                  String h2 =" <h2 class=\"title\">";
                  //가게명명 추출.
                  int start_title= sub.indexOf(h2);
-                 int end_title=sub.indexOf("\\");
+                 int end_title=sub.indexOf("</h2>");
 
-                 if(start_title > -1 && end_title > -1 && end_title - start_title <1000) {
+                 if(start_title > -1 && end_title > -1 ) {
                      sub = sub.substring(start_title+h2.length() , end_title);
                      subResult += sub;
                      cnt++;

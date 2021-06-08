@@ -1,10 +1,14 @@
 package com.example.yhwasongtest.youtube.service;
 
+import com.example.yhwasongtest.place.model.PlaceModel;
+import com.example.yhwasongtest.place.repository.PlaceRepository;
+import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +28,14 @@ import java.util.Properties;
  */
 @Service
 public class SearchYoutube {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SearchYoutube.class);
 
     @Autowired
     YoutubeRepository youtubeRepository;
+
+    @Autowired
+    PlaceService placeService;
+
 
     public void SearchService(YoutubeRepository youtubeRepository) {
         this.youtubeRepository = youtubeRepository;
@@ -34,8 +43,8 @@ public class SearchYoutube {
 
     private static String PROPERTIES_FILENAME = "youtube.properties";
 
-    public boolean searchYoutube(String msg) throws IOException, JSONException {
-
+    public String searchYoutube(String msg, String nextToken) throws Exception {
+        String result = "";
         Properties properties = new Properties();
         try {
             InputStream in = SearchYoutube.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
@@ -52,9 +61,8 @@ public class SearchYoutube {
         String apiurl = "https://www.googleapis.com/youtube/v3/search";
         apiurl += "?key=" + apiKey;
         apiurl += "&part=snippet&type=video&maxResults=20&videoEmbeddable=true";
-        apiurl += "&q="+ URLEncoder.encode(msg,"UTF-8");
+        apiurl += "&q="+ URLEncoder.encode(msg+" 디저트","UTF-8");
 
-        String nextToken = null;
         if(nextToken != null) {
             apiurl +="&pageToken=" + nextToken;
         }
@@ -84,7 +92,6 @@ public class SearchYoutube {
 
         for(int t=0; t<jsonArray.length(); t++) {
             JSONObject item = jsonArray.getJSONObject(t);
-
             JSONObject snippet = item.getJSONObject("snippet");
 
             String publishedAt = snippet.getString("publishedAt");
@@ -92,24 +99,75 @@ public class SearchYoutube {
             String title = snippet.getString("title");
             String description = snippet.getString("description");
             String channelTitle = snippet.getString("channelTitle");
+
+            snippet = item.getJSONObject("id");
             String videoId = snippet.getString("videoId");
+
+            result += description + "\n";
+
+            // 같은 채널명이 아니면 continue;
+            if(channelTitle.equals(msg)){
+                continue;
+            }
 
             YoutubeModel youtubeModel = new YoutubeModel();
             youtubeModel.setPublishedAt(publishedAt);
             youtubeModel.setChannelId(channelId);
-            youtubeModel.setVideoId(videoId);
             youtubeModel.setTitle(title);
             youtubeModel.setDescription(description);
             youtubeModel.setChannelTitle(channelTitle);
-
+            youtubeModel.setVideoId(videoId);
+            /*
+            // placeModel 에 description 붙이기
+            try {
+                putDescription(description, youtubeModel);
+            }catch (Exception e){
+                logger.info("SearchYoutube error => " , e.toString());
+                continue;
+            }
+            */
             youtubeRepository.save(youtubeModel);
+
+
         }
 
+
         //if(nextToken != null) {
-        //    searchYoutube(msg);
+        //    searchYoutube(msg, nextToken);
         //}
 
-        return true;
+        return result;
+    }
+
+    public void putDescription(String description, YoutubeModel youtubeModel) throws Exception{
+
+        String start_pattern="'";  // => 유투브마다 다를 것. 패턴이.
+        String end_pattern="'";
+
+        int startIndex =0;
+        int endIndex =-1;
+        while(startIndex != -1) {
+            startIndex = description.indexOf(start_pattern, endIndex+1);
+            if (startIndex == -1) {
+                if (start_pattern == "'") {
+                    start_pattern = "["; end_pattern = "]";
+                    startIndex = description.indexOf(start_pattern, endIndex);
+                } else {
+                    start_pattern = "'"; end_pattern = "'";
+                    startIndex = description.indexOf(start_pattern, endIndex);
+                }
+            }
+            endIndex = description.indexOf(end_pattern, startIndex+1);
+
+            if (startIndex > -1 && endIndex > -1 && endIndex - startIndex < 100) {
+                String name = description.substring(startIndex+1, endIndex);
+                PlaceModel placeModel = new PlaceModel();
+                placeModel.setName(name);
+                placeModel.setYoutube(youtubeModel);
+                placeModel.setSubCategory("dessert");
+                placeService.putPlace(placeModel);
+            }
+        }
     }
 
 
