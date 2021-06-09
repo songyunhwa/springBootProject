@@ -31,14 +31,14 @@ public class YoutubeService {
         return youtubemodel;
     }
 
-    public String getSearchYoutube(String msg) {
+    public String getSearchYoutube(String msg, String category) {
         String result = "";
         if(msg == null) {
             System.err.println("getSearchYoutube Error ==> "+ "message is not exist.");
             return "message is not exist.";
         } else {
             try {
-            result = searchService.searchYoutube(msg, null);
+            result = searchService.searchYoutube(msg, category, null);
             } catch (Exception error) {
                 System.err.println("getSearchYoutube Error ==> "+ error);
 

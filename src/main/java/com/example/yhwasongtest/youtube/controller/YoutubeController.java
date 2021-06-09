@@ -26,12 +26,13 @@ public class YoutubeController {
 
     @GetMapping(value="/youtube")
     public String getSearchYoutube(HttpSession session,
-                                               @RequestParam(name = "msg",required = true) String msg){
+                                   @RequestParam(name = "msg",required = true) String msg,
+                                   @RequestParam(name = "category",required = true) String category){
         logger.info(session.getId());
         logger.info(String.valueOf(session.getAttribute("login")));
         String result = "";
 
-            result = youtubeService.getSearchYoutube(msg);
+            result = youtubeService.getSearchYoutube(msg, category);
 
         return result;
 

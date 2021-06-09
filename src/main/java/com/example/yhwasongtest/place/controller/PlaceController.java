@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/api/v1")
@@ -91,4 +93,18 @@ public class PlaceController {
         String result = placeService.getLocation();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    public void addView(@CookieValue(name = "login", defaultValue = "null") String cookie,
+                             @RequestParam(name = "id") long id,
+                             @RequestParam(name = "placeName") String placeName,
+                             HttpServletResponse response){
+        // 쿠키에 아이디가 없다면 추가해주기.
+        if(!cookie.contains("loginCookie" + placeName)){
+            cookie += id + "/";
+            placeService.addView(placeName);
+        }
+        response.addCookie(new Cookie("loginCookie" +placeName, cookie));
+
+    }
+
 }

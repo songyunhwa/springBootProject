@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -43,7 +45,7 @@ public class SearchYoutube {
 
     private static String PROPERTIES_FILENAME = "youtube.properties";
 
-    public String searchYoutube(String msg, String nextToken) throws Exception {
+    public String searchYoutube(String msg, String category, String nextToken) throws Exception {
         String result = "";
         Properties properties = new Properties();
         try {
@@ -60,29 +62,30 @@ public class SearchYoutube {
 
         String apiurl = "https://www.googleapis.com/youtube/v3/search";
         apiurl += "?key=" + apiKey;
-        apiurl += "&part=snippet&type=video&maxResults=20&videoEmbeddable=true";
-        apiurl += "&q="+ URLEncoder.encode(msg+" 디저트","UTF-8");
+        apiurl += "&part=snippet&type=video&maxResults=50&videoEmbeddable=true";
+        apiurl += "&q=" + URLEncoder.encode(msg + " " + category, "UTF-8");
+        apiurl += "&fields=items(id,snippet(description,publishedAt,channelId,title,channelTitle))";
 
-        if(nextToken != null) {
-            apiurl +="&pageToken=" + nextToken;
+        if (nextToken != null) {
+            apiurl += "&pageToken=" + nextToken;
         }
         //https://www.youtube.com/watch?v=qhnAsRwed5s URL 로 나중에 이동할때 하는 방식
         URL url = new URL(apiurl);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
         String inputLine;
         StringBuffer response = new StringBuffer();
 
-        while((inputLine = br.readLine()) != null) {
+        while ((inputLine = br.readLine()) != null) {
             response.append(inputLine + '\n');
         }
         br.close();
 
         JSONObject jsonObject = new JSONObject(response.toString());
 
-        if(jsonObject.has("nextPageToken")){
+        if (jsonObject.has("nextPageToken")) {
             nextToken = jsonObject.getString("nextPageToken");
         } else {
             nextToken = null;
@@ -90,23 +93,31 @@ public class SearchYoutube {
 
         JSONArray jsonArray = jsonObject.getJSONArray("items");
 
-        for(int t=0; t<jsonArray.length(); t++) {
+        for (int t = 0; t < jsonArray.length(); t++) {
             JSONObject item = jsonArray.getJSONObject(t);
             JSONObject snippet = item.getJSONObject("snippet");
 
+            String description = snippet.getString("description");
             String publishedAt = snippet.getString("publishedAt");
             String channelId = snippet.getString("channelId");
             String title = snippet.getString("title");
-            String description = snippet.getString("description");
             String channelTitle = snippet.getString("channelTitle");
 
             snippet = item.getJSONObject("id");
             String videoId = snippet.getString("videoId");
 
-            result += description + "\n";
+            YoutubeModel existYoutube = youtubeRepository.findByVideoId(videoId);
+            // 이미 youtube가 등록되어있다면 continue
+            if(existYoutube != null)
+                continue;
+
+            /// description 에 ' 와 [ 가 없다면 continue;
+            ArrayList<String> store;
+            store = getDescription(apiKey, videoId);
+            if(store.size() == 0) continue;
 
             // 같은 채널명이 아니면 continue;
-            if(channelTitle.equals(msg)){
+            if (channelTitle.equals(msg)) {
                 continue;
             }
 
@@ -117,59 +128,76 @@ public class SearchYoutube {
             youtubeModel.setDescription(description);
             youtubeModel.setChannelTitle(channelTitle);
             youtubeModel.setVideoId(videoId);
-            /*
-            // placeModel 에 description 붙이기
-            try {
-                putDescription(description, youtubeModel);
-            }catch (Exception e){
-                logger.info("SearchYoutube error => " , e.toString());
-                continue;
-            }
-            */
             youtubeRepository.save(youtubeModel);
 
 
+            // placeModel 에 description 붙이기
+            try {
+                putDescription(store, youtubeModel, category);
+            } catch (Exception e) {
+                logger.info("SearchYoutube error => ", e.toString());
+                continue;
+            }
         }
 
 
-        //if(nextToken != null) {
-        //    searchYoutube(msg, nextToken);
-        //}
+        if(nextToken != null) {
+            searchYoutube(msg, category, nextToken);
+        }
 
         return result;
     }
 
-    public void putDescription(String description, YoutubeModel youtubeModel) throws Exception{
+    public void putDescription(ArrayList<String> store, YoutubeModel youtubeModel, String category) throws Exception {
 
-        String start_pattern="'";  // => 유투브마다 다를 것. 패턴이.
-        String end_pattern="'";
-
-        int startIndex =0;
-        int endIndex =-1;
-        while(startIndex != -1) {
-            startIndex = description.indexOf(start_pattern, endIndex+1);
-            if (startIndex == -1) {
-                if (start_pattern == "'") {
-                    start_pattern = "["; end_pattern = "]";
-                    startIndex = description.indexOf(start_pattern, endIndex);
-                } else {
-                    start_pattern = "'"; end_pattern = "'";
-                    startIndex = description.indexOf(start_pattern, endIndex);
-                }
+        for(String name : store) {
+            PlaceModel placeModel = placeService.getPlace(name);
+            if (placeModel == null) {
+                placeModel = new PlaceModel();
+                placeModel.setName(name.replace(" ", ""));
+                placeModel.setSubCategory(category);
             }
-            endIndex = description.indexOf(end_pattern, startIndex+1);
-
-            if (startIndex > -1 && endIndex > -1 && endIndex - startIndex < 100) {
-                String name = description.substring(startIndex+1, endIndex);
-                PlaceModel placeModel = new PlaceModel();
-                placeModel.setName(name);
-                placeModel.setYoutube(youtubeModel);
-                placeModel.setSubCategory("dessert");
-                placeService.putPlace(placeModel);
-            }
+            placeModel.setYoutube(youtubeModel);
+            placeService.putPlace(placeModel); // 관계 맞는지 확인
         }
     }
 
+    public ArrayList<String> getDescription(String apiKey, String videoId) throws Exception {
+
+
+        String apiurl = "https://www.googleapis.com/youtube/v3/videos";
+        apiurl += "?key=" + apiKey;
+        apiurl += "&part=snippet";
+        apiurl += "&id=" + videoId;
+        apiurl += "&fields=items(snippet(description))";
+
+        URL url = new URL(apiurl);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+
+        ArrayList<String> store = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = br.readLine()) != null) {
+            response.append(inputLine + '\n');
+            if(inputLine.contains("'")) {
+                int start = inputLine.indexOf("'");
+                int end = inputLine.indexOf("'", start +1);
+                if (start > -1 && end > -1 && end - start < 100)
+                    store.add(inputLine.substring(start+1, end));
+            }
+            if(inputLine.contains("[")) {
+                int start = inputLine.indexOf("[");
+                int end = inputLine.indexOf("]", start +1);
+                if (start > -1 && end > -1 && end - start < 100)
+                    store.add(inputLine.substring(start+1, end));
+            }
+        }
+        br.close();
+        return store;
+    }
 
 
 }

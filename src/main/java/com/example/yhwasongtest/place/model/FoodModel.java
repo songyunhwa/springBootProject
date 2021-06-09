@@ -9,15 +9,14 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Entity
-@Table(name = "category")
-public class CategoryModel implements Serializable {
+@Table(name = "food")
+public class FoodModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String mainCategory;    //  종류 ( 한식 양식 중식 디저트
-    private String middleCategory;
+
     private String subCategory;     // 음식 이름
-    private String country;         //나라
+    private String included;    // 포함 글자
 
 }

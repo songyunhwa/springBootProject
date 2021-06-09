@@ -1,5 +1,6 @@
 package com.example.yhwasongtest.youtube.model;
 
+import com.example.yhwasongtest.place.model.PlaceModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,13 +9,14 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "youtube")
-@Getter
-@Setter
 public class YoutubeModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @Column(name = "place_id")
+    private int placeId;
 
     public String publishedAt; //나온 시간
     public String channelId;    // 유투버 아이디
@@ -22,6 +24,14 @@ public class YoutubeModel implements Serializable {
     public String title;       //동영상 제목
     public String description;  // 동영상 설명
     public String videoId; // 동영상 id
+
+    public int getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(int placeId) {
+        this.placeId = placeId;
+    }
 
     public String getVideoId() {
         return videoId;

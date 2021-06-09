@@ -48,19 +48,30 @@ public class PlaceService {
         if(placeModel.getSubCategory() == null){
             throw new Exception("sub_category 가 없습니다.");
         }
-        PlaceModel existPlace = placeRepository.findByName(placeModel.getName());
-        if (existPlace == null) {
-            return placeRepository.save(placeModel);
-        } else {
-            existPlace.setArea(placeModel.getArea());
-            existPlace.setName(placeModel.getName());
-            existPlace.setNumber(placeModel.getNumber());
-            existPlace.setUrl(placeModel.getUrl());
-            existPlace.setSubCategory(placeModel.getSubCategory());
-            placeRepository.save(existPlace);
-
-            return existPlace;
+        if(placeModel.getName() == null){
+            throw new Exception("name 이 없습니다.");
         }
+        PlaceModel existPlace = placeRepository.findByName(placeModel.getName());
+        if(existPlace == null)
+            existPlace = new PlaceModel();
+
+        existPlace.setName(placeModel.getName());
+        existPlace.setSubCategory(placeModel.getSubCategory());
+
+        if(placeModel.getView()>0) placeModel.setView(0);
+        else existPlace.setView(placeModel.getView());
+        if(placeModel.getRecommend()>0) placeModel.setRecommend(0);
+        else existPlace.setRecommend(placeModel.getRecommend());
+        if(placeModel.getArea()==null) existPlace.setArea("");
+        else existPlace.setArea(placeModel.getArea());
+        if(placeModel.getNumber()==null) existPlace.setNumber("");
+        else existPlace.setNumber(placeModel.getNumber());
+        if(placeModel.getUrl()==null) existPlace.setUrl("");
+        else existPlace.setUrl(placeModel.getUrl());
+
+        placeRepository.save(existPlace);
+
+        return existPlace;
     }
 
     public void deletePlace(String name) {
@@ -119,6 +130,20 @@ public class PlaceService {
             System.out.println(e);
         }
         return null;
+    }
+
+    public void addRecommend(String placeName){
+        PlaceModel placeModel = placeRepository.findByName(placeName);
+        placeModel.setRecommend(placeModel.getRecommend()+1);
+        placeRepository.save(placeModel);
+
+    }
+
+    public void addView(String placeName){
+        PlaceModel placeModel = placeRepository.findByName(placeName);
+        placeModel.setView(placeModel.getView()+1);
+        placeRepository.save(placeModel);
+
     }
 
 }
