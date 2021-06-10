@@ -1,9 +1,13 @@
 package com.example.yhwasongtest.youtube.service;
 
+import com.example.yhwasongtest.place.model.PlaceModel;
+import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class YoutubeService {
@@ -11,12 +15,15 @@ public class YoutubeService {
     private YoutubeRepository youtubeRepostiory;
     private SearchYoutube searchService;
     private searchMango searchMango;
+    private PlaceService placeService;
 
     @Autowired
-    public YoutubeService(YoutubeRepository youtubeRepostiory, SearchYoutube searchService, searchMango searchMango){
+    public YoutubeService(YoutubeRepository youtubeRepostiory, SearchYoutube searchService, searchMango searchMango,
+                          PlaceService placeService){
         this.youtubeRepostiory = youtubeRepostiory;
         this.searchService = searchService;
         this.searchMango = searchMango;
+        this.placeService = placeService;
     }
 
     @Autowired
@@ -39,6 +46,13 @@ public class YoutubeService {
         } else {
             try {
             result = searchService.searchYoutube(msg, category, null);
+
+            // 분류하기
+            List<PlaceModel> placeModelList = placeService.getPlaceListBySubCategory("etc");
+            if(placeModelList!=null){
+            placeService.getDessertCategory();
+            placeService.getFoodCategory();
+            }
             } catch (Exception error) {
                 System.err.println("getSearchYoutube Error ==> "+ error);
 

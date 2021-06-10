@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1")
@@ -27,6 +28,11 @@ public class PlaceController {
     @Autowired
     public PlaceController(PlaceService placeService) {
         this.placeService = placeService;
+    }
+
+    @GetMapping(value = "/place")
+    public List<PlaceModel> getCategory(@RequestParam(name = "category",required = true) String category){
+        return placeService.getPlaceListBySubCategory(category);
     }
 
     @PostMapping(value = "/place/{name}")
@@ -66,28 +72,6 @@ public class PlaceController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PostMapping(value = "/place/review")
-    public ResponseEntity putReview(@RequestBody ReviewModel review) {
-
-        try {
-            ReviewModel reviewModel = placeService.putReview(review);
-
-            return new ResponseEntity<>(reviewModel, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.info("PlaceController.js : putReview exception cause :" , e.toString());
-            return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @DeleteMapping(value = "/place/review")
-    public ResponseEntity deleteReview(
-                                       @RequestParam(name = "userName",required = true) String userName,
-                                       @RequestParam(name = "placeName",required = true) String placeName
-                                       ) {
-        placeService.deleteReview(userName, placeName);
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
     @GetMapping(value = "/location")
     public ResponseEntity getLocation(){
         String result = placeService.getLocation();
@@ -105,6 +89,12 @@ public class PlaceController {
         }
         response.addCookie(new Cookie("loginCookie" +placeName, cookie));
 
+    }
+
+    @GetMapping(value = "/classification")
+    public void setClassification() {
+        placeService.getFoodCategory();
+        placeService.getDessertCategory();
     }
 
 }

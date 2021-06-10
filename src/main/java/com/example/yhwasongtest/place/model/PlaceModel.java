@@ -55,15 +55,6 @@ public class PlaceModel implements Serializable {
         this.youtube = youtube;
     }
 
-    public void setYoutube(YoutubeModel youtube) {
-        if(this.youtube == null){
-            this.youtube = new ArrayList<>();
-        }
-        if(!this.youtube.contains(youtube)){
-            this.youtube.add(youtube);
-        }
-    }
-
 
     public void setName(String name) {
         this.name = name;

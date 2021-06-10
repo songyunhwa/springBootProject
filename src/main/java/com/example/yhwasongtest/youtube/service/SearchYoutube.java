@@ -64,7 +64,7 @@ public class SearchYoutube {
         apiurl += "?key=" + apiKey;
         apiurl += "&part=snippet&type=video&maxResults=50&videoEmbeddable=true";
         apiurl += "&q=" + URLEncoder.encode(msg + " " + category, "UTF-8");
-        apiurl += "&fields=items(id,snippet(description,publishedAt,channelId,title,channelTitle))";
+        apiurl += "&field=items(id,snippet(description,publishedAt,channelId,title,channelTitle))";
 
         if (nextToken != null) {
             apiurl += "&pageToken=" + nextToken;
@@ -108,18 +108,19 @@ public class SearchYoutube {
 
             YoutubeModel existYoutube = youtubeRepository.findByVideoId(videoId);
             // 이미 youtube가 등록되어있다면 continue
-            if(existYoutube != null)
+            if (existYoutube != null)
                 continue;
 
             /// description 에 ' 와 [ 가 없다면 continue;
             ArrayList<String> store;
             store = getDescription(apiKey, videoId);
-            if(store.size() == 0) continue;
+            if (store.size() == 0) continue;
 
             // 같은 채널명이 아니면 continue;
-            if (channelTitle.equals(msg)) {
-                continue;
-            }
+             if (!channelTitle.contains(msg)) {
+                 continue;
+             }
+
 
             YoutubeModel youtubeModel = new YoutubeModel();
             youtubeModel.setPublishedAt(publishedAt);
@@ -128,6 +129,7 @@ public class SearchYoutube {
             youtubeModel.setDescription(description);
             youtubeModel.setChannelTitle(channelTitle);
             youtubeModel.setVideoId(videoId);
+
             youtubeRepository.save(youtubeModel);
 
 
@@ -141,7 +143,7 @@ public class SearchYoutube {
         }
 
 
-        if(nextToken != null) {
+        if (nextToken != null) {
             searchYoutube(msg, category, nextToken);
         }
 
@@ -150,14 +152,16 @@ public class SearchYoutube {
 
     public void putDescription(ArrayList<String> store, YoutubeModel youtubeModel, String category) throws Exception {
 
-        for(String name : store) {
+        for (String name : store) {
             PlaceModel placeModel = placeService.getPlace(name);
             if (placeModel == null) {
                 placeModel = new PlaceModel();
                 placeModel.setName(name.replace(" ", ""));
                 placeModel.setSubCategory(category);
             }
-            placeModel.setYoutube(youtubeModel);
+            ArrayList<YoutubeModel> youtubeModels = new ArrayList<YoutubeModel>();
+            youtubeModels.add(youtubeModel);
+            placeModel.setYoutube(youtubeModels);
             placeService.putPlace(placeModel); // 관계 맞는지 확인
         }
     }
@@ -182,17 +186,28 @@ public class SearchYoutube {
 
         while ((inputLine = br.readLine()) != null) {
             response.append(inputLine + '\n');
-            if(inputLine.contains("'")) {
-                int start = inputLine.indexOf("'");
-                int end = inputLine.indexOf("'", start +1);
-                if (start > -1 && end > -1 && end - start < 100)
-                    store.add(inputLine.substring(start+1, end));
+            int end = -1;
+            int start =0;
+            if (inputLine.contains("'")) {
+                while (start != -1) {
+                    start = inputLine.indexOf("'", end + 1);
+                    end = inputLine.indexOf("'", start + 1);
+                    if(end == -1 )break;
+                    if (start > -1 && end > -1 && end - start < 100)
+                        store.add(inputLine.substring(start + 1, end));
+
+                }
             }
-            if(inputLine.contains("[")) {
-                int start = inputLine.indexOf("[");
-                int end = inputLine.indexOf("]", start +1);
-                if (start > -1 && end > -1 && end - start < 100)
-                    store.add(inputLine.substring(start+1, end));
+            end = -1;
+            start =0;
+            if (inputLine.contains("[")) {
+                while (start != -1) {
+                    start = inputLine.indexOf("[", end + 1);
+                    end = inputLine.indexOf("]", start + 1);
+                    if(end == -1 )break;
+                    if (start > -1 && end > -1 && end - start < 100)
+                        store.add(inputLine.substring(start + 1, end));
+                }
             }
         }
         br.close();

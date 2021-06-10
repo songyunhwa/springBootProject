@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // 2
     protected void configure(HttpSecurity http) throws Exception { // 5
 
             http.csrf().disable();		//로그인 창
+
             http.authorizeRequests()
                     .antMatchers("/api/v1/**").permitAll()
                     .antMatchers("/admin/**").hasRole("ADMIN") // '/admin/*' 요청은 ADMIN 권한을 가진 사용자만 접근 가능
@@ -39,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // 2
                     .and()
                     .formLogin()
                     .loginPage("/login")
-                    .usernameParameter("username")
+                    .usernameParameter("email")
                     .passwordParameter("password")
                     .permitAll()
                     .and()

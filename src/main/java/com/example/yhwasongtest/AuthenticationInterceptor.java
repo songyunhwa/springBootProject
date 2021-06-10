@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 
 // 로그인처리를 담당하는 인터셉터
 public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
-
+/*
 
     private final UserService userService;
 
@@ -54,5 +54,5 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
                            ModelAndView modelAndView) throws Exception {
         super.postHandle(request, response, handler, modelAndView);
     }
-
+*/
 }
