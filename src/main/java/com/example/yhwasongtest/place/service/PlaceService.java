@@ -1,15 +1,23 @@
 package com.example.yhwasongtest.place.service;
 
+import com.example.yhwasongtest.common.FileSecurity;
 import com.example.yhwasongtest.place.model.*;
 import com.example.yhwasongtest.place.repository.*;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,28 +29,22 @@ public class PlaceService {
     private static final Logger logger = LoggerFactory.getLogger(PlaceService.class);
 
     private PlaceRepository placeRepository;
-    private ReviewRepository reviewRepository;
-    private CategoryRepository categoryRepository;
     private LocationRepository locationRepository;
     private FoodRepository foodRepository;
     private DessertRepository dessertRepository;
-    private RecommendRepository recommendRepository;
+    private PictureRepository pictureRepository;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository,
-                        ReviewRepository reviewRepository,
-                        CategoryRepository categoryRepository,
                         LocationRepository locationRepository,
                         FoodRepository foodRepository,
                         DessertRepository dessertRepository,
-                        RecommendRepository recommendRepository) {
+                        PictureRepository pictureRepository) {
         this.placeRepository = placeRepository;
-        this.reviewRepository = reviewRepository;
-        this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
         this.foodRepository = foodRepository;
         this.dessertRepository = dessertRepository;
-        this.recommendRepository = recommendRepository;
+        this.pictureRepository = pictureRepository;
     }
 
     public PlaceModel getPlace(String name) {
@@ -182,6 +184,52 @@ public class PlaceService {
             }
             placeRepository.saveAll(placeModelList);
         }
+    }
+
+    public long saveFile(MultipartFile file) throws Exception{
+        String orgname = file.getOriginalFilename();
+        String filename = new FileSecurity().md5(orgname);
+
+        Path rootpath = Paths.get("upload-dir");
+        Path path = rootpath.resolve(filename); // 고정된 루트 경로에 부분경로 추가
+        String savePath = path.toString();
+
+        if (!new File(savePath).exists()) {
+            try{
+                new File(savePath).mkdir();
+            }
+            catch(Exception e){
+                e.getStackTrace();
+            }
+        }
+        String filePath = savePath + "\\" + filename;
+        file.transferTo(new File(filePath));
+
+        PictureModel pictureModel = new PictureModel();
+        pictureModel.setOriginFileName(orgname);
+        pictureModel.setFileName(filename);
+        pictureModel.setFilePath(filePath);
+        pictureRepository.save(pictureModel);
+
+        pictureModel = pictureRepository.findByOriginFileName(orgname);
+        return pictureModel.getId();
+    }
+
+    public Resource loadFile(String filename) {
+        try {
+            Path rootpath = Paths.get("upload-dir");
+            Path path = rootpath.resolve(filename); // 고정된 루트 경로에 부분경로 추가
+            Resource resource = new UrlResource(path.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                return null;
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 

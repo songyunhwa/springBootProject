@@ -1,4 +1,26 @@
 <template>
+    <div id="app">
+        <router-link to="/">홈페이지</router-link>
+        <router-link to="/list">리스트페이지</router-link>
+        <router-view/>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'App',
+  data(){
+    return {
+    }
+  },
+  components: {
+  }
+}
+</script>
+
+<!--
+<router-link :to="{ name: 'Login' }">Login</router-link>
+<template>
   <div>
     Search
     <select name="search" onchange="handleOnChange(this)">
@@ -54,3 +76,4 @@ export default {
 }
 
 </script>
+-->

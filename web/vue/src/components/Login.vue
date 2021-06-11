@@ -1,4 +1,18 @@
 <template>
+    <div>
+        <h1>Welcome to Home!</h1>
+        <img src="../assets/logo.png">
+    </div>
+</template>
+<script>
+export default {
+name:'Login'
+}
+</script>
+
+<!--
+const Login = {
+<template>
   <div>
       <h2>Log In</h2>
       <form @submit="onSubmit">
@@ -62,3 +76,4 @@ export default {
 <style>
 
 </style>
+-->

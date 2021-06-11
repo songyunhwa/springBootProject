@@ -7,6 +7,7 @@ public class PlaceDto {
     public String url;  // 주문 페이지 (있다면)
     public String number; // 폰 번호
     private String subCategory; // CategoryModel 과 연결
+    private Long fileId; // 파일 아이디
 
     public String getName() {
         return name;
@@ -46,5 +47,13 @@ public class PlaceDto {
 
     public void setSubCategory(String subCategory) {
         this.subCategory = subCategory;
+    }
+
+    public Long getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Long fileId) {
+        this.fileId = fileId;
     }
 }

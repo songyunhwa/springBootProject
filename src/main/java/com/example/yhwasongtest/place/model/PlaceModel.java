@@ -15,77 +15,59 @@ public class PlaceModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    public String name; // 장소 이름
+    private String name; // 장소 이름
 
-    @Column(nullable = true)
-    public String area; // 지역
+    private String area; // 지역
 
-    @Column(nullable = true)
-    public String url;  // 주문 페이지 (있다면)
+    private String url;  // 주문 페이지 (있다면)
 
-    @Column(nullable = true)
-    public String number; // 폰 번호
+    private String number; // 폰 번호
 
-    public String subCategory; // CategoryModel 과 연결
+    private String subCategory; // CategoryModel 과 연결
 
     @Column(columnDefinition ="0")
-    public int recommend; // 추천수
+    private int recommend; // 추천수
 
     @Column(columnDefinition ="0")
-    public int view; // 조회수
+    private int view; // 조회수
 
     @Transient
     @OneToMany(mappedBy="place", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name="place_id")
     private List<YoutubeModel> youtube = new ArrayList<>(); // 유투브 모델과 연결
 
-    public int getRecommend() {
-        return recommend;
-    }
-
-    public void setRecommend(int recommend) {
-        this.recommend = recommend;
-    }
-
-    public List<YoutubeModel> getYoutube() {
-        return youtube;
-    }
-
-    public void setYoutube(List<YoutubeModel> youtube) {
-        this.youtube = youtube;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private Long fileId;
 
     public String getName() {
         return name;
     }
 
-    public void setArea(String area) {
-        this.area = area;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getArea() {
         return area;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setArea(String area) {
+        this.area = area;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getNumber() {
         return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getSubCategory() {
@@ -96,11 +78,35 @@ public class PlaceModel implements Serializable {
         this.subCategory = subCategory;
     }
 
+    public int getRecommend() {
+        return recommend;
+    }
+
+    public void setRecommend(int recommend) {
+        this.recommend = recommend;
+    }
+
     public int getView() {
         return view;
     }
 
     public void setView(int view) {
         this.view = view;
+    }
+
+    public List<YoutubeModel> getYoutube() {
+        return youtube;
+    }
+
+    public void setYoutube(List<YoutubeModel> youtube) {
+        this.youtube = youtube;
+    }
+
+    public Long getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Long fileId) {
+        this.fileId = fileId;
     }
 }
