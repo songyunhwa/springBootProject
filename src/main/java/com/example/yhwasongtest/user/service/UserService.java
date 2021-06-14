@@ -1,5 +1,6 @@
 package com.example.yhwasongtest.user.service;
 
+import com.example.yhwasongtest.common.JwtUtil;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.Authority;
 import com.example.yhwasongtest.user.model.CustomUserDetails;
@@ -10,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +26,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.net.URI;
 import java.util.*;
 
 @Slf4j
@@ -32,7 +36,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
+    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository ) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
     }
@@ -136,7 +140,7 @@ public class UserService implements UserDetailsService {
         return passwordHashed;
     }
 
-    public UserModel login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ResponseEntity login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String resultToken = getToken(name, password);
 
@@ -145,6 +149,7 @@ public class UserService implements UserDetailsService {
         HttpSession session = request.getSession();
 
         if (userModel != null) {
+            //if (userModel.getPassword().equals(resultToken)) {
             if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
                 session.setAttribute("login", userModel);
 
@@ -157,12 +162,21 @@ public class UserService implements UserDetailsService {
                 Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
                 this.keepLogin(userModel.getUsername(), session.getId(), date);
 
-                return userModel;
+                /*
+                // 토큰 생성
+                String accessToken = JwtUtil.createToken(userModel.getId(), userModel.getUsername());
+                String url ="/session";
+                return ResponseEntity.created(new URI(url)).body(SessionResponseDto
+                        .builder()
+                        .email(userModel.getUsername())
+                        .token(accessToken)
+                        .build()); */
+                return new ResponseEntity(userModel, HttpStatus.OK);
             }
 
         }
 
-        return null;
+        return new ResponseEntity(userModel, HttpStatus.BAD_REQUEST);
     }
 
     public void logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
@@ -198,9 +212,12 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public UserModel getUserBySessionId(String sessionId) {
+    public UserModel checkLogin(String sessionId) {
         UserModel userModel = userRepository.findBySessionId(sessionId);
-        return userModel;
+        Date date = new Date();
+        if(userModel.getDate().before(date))
+            return userModel;
+        else return null;
     }
 
 }

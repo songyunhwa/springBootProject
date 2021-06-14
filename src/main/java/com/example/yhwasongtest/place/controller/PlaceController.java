@@ -54,17 +54,20 @@ public class PlaceController {
     }
 
     @PostMapping(value = "/place")
-    public ResponseEntity putPlace(@RequestBody PlaceDto model) {
+    public ResponseEntity putPlace(@RequestParam("file") MultipartFile file, @RequestBody PlaceDto model) {
 
         String result = "";
         PlaceModel placeModel = new PlaceModel();
         try {
+            if(!file.isEmpty()){
+                model.setFileId(placeService.saveFile(file));
+            }
+
             placeModel.setName(model.getName()); // 장소 이름
             placeModel.setArea(model.getArea()); // 지역
             placeModel.setNumber(model.getNumber());
             placeModel.setUrl(model.getUrl());
             placeModel.setSubCategory(model.getSubCategory());
-            placeModel.setFileId(model.getFileId());
 
             placeModel = placeService.putPlace(placeModel);
 
@@ -74,17 +77,6 @@ public class PlaceController {
             System.err.println("putPlace Error ==> " + error);
             return new ResponseEntity<>(placeModel, HttpStatus.BAD_REQUEST);
 
-        }
-    }
-
-    @PostMapping(value = "/place")
-    public ResponseEntity putPlace(@RequestParam("file") MultipartFile file, @RequestBody PlaceDto model) {
-        try {
-            model.setFileId(placeService.saveFile(file));
-            return this.putPlace(model);
-        } catch (Exception error) {
-            System.err.println("putPlace Error ==> " + error);
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -10,6 +10,8 @@ import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping(value = "/api/v1")
 public class BaseController {
 
@@ -37,11 +40,15 @@ public class BaseController {
 
     }
     @RequestMapping(method = RequestMethod.POST, value = "/user")
-    public String signup(@RequestBody  UserModelDto infoDto) throws Exception{ // 회원 추가
-        userService.save(infoDto);
-        return infoDto.getEmail();
-
+    public ResponseEntity signup(@RequestBody  UserModelDto infoDto){ // 회원 추가
+        try {
+            userService.save(infoDto);
+            return new ResponseEntity<>(infoDto.getEmail(), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
     @GetMapping(value = "/logout")
     public String logoutPage(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
@@ -51,14 +58,29 @@ public class BaseController {
         return "redirect:/api/v1/login";
     }
 
-    @PreAuthorize("isAnonymous()")
     @GetMapping(value = "/login")
-    public UserModel login(@RequestParam(name = "email", required = true) String email,
+    public ResponseEntity login(@RequestParam(name = "email", required = true) String email,
                            @RequestParam(name = "password", required = true) String password,
                            HttpServletRequest request,
-                           HttpServletResponse response) throws Exception {
-        return userService.login(email, password, request, response);
+                           HttpServletResponse response) {
+        try {
+            ResponseEntity responseEntity = userService.login(email, password, request, response);
+            return  responseEntity;
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
+
+    @GetMapping(value = "/login/check")
+    public ResponseEntity checkLogin(@RequestParam(name = "id", required = true) String sessionId) {
+        try {
+            UserModel userModel = userService.checkLogin(sessionId);
+            return  new ResponseEntity<>(userModel, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @GetMapping("/")
     public String userAccess(UserModel model, Authentication authentication) {
@@ -66,5 +88,6 @@ public class BaseController {
         CustomUserDetails userDetail = (CustomUserDetails)authentication.getPrincipal();  //userDetail 객체를 가져옴
         return "user_access";
     }
+
 
 }

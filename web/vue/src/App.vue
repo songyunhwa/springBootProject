@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <router-link to="/">홈페이지</router-link>
-        <router-link to="/list">리스트페이지</router-link>
+        <router-link to="/login"><button>로그인</button></router-link>
+        <router-link to="/name"><button>이름</button></router-link>
         <router-view/>
   </div>
 </template>

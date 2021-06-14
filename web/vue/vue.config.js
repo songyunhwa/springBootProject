@@ -3,7 +3,7 @@ module.exports = {
     indexPath: "../static/index.html",
     devServer: {
         proxy: {
-            '/api': {
+            '/api/v1': {
                 target: "http://localhost:9000",
                 ws: true,
                 changeOrigin: true

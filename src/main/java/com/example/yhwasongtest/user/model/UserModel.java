@@ -63,4 +63,12 @@ public class UserModel {
         public void setRole(String role) {
                 this.role = role;
         }
+
+        public String getSessionId() {
+                return sessionId;
+        }
+
+        public void setSessionId(String sessionId) {
+                this.sessionId = sessionId;
+        }
 }
