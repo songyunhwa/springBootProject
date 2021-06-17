@@ -47,7 +47,12 @@ public class PlaceService {
         this.pictureRepository = pictureRepository;
     }
 
-    public PlaceModel getPlace(String name) {
+    public List<PlaceModel> getPlace() {
+        List<PlaceModel> placeModelList = this.placeRepository.findByViewAndSubCategory();
+        return placeModelList;
+    }
+
+    public PlaceModel getPlaceByName(String name) {
         return this.placeRepository.findByName(name);
     }
 
@@ -68,9 +73,6 @@ public class PlaceService {
         if (placeModel.getName() == null) {
             throw new Exception("name 이 없습니다.");
         }
-        if (placeModel.getYoutube().size() == 0) {
-            throw new Exception("youtube 가 없습니다.");
-        }
 
         // 이름이 영어면 저장 x
         String pattern = "/^[a-zA-Z]*$/";
@@ -83,9 +85,8 @@ public class PlaceService {
 
             existPlace.setName(placeModel.getName());
             existPlace.setSubCategory("etc");
-            List<YoutubeModel> youtubeModels = placeModel.getYoutube();
-            existPlace.setYoutube(youtubeModels);
             existPlace.setView(1);
+            existPlace.setYoutubes(placeModel.getYoutubes());
 
             if (placeModel.getRecommend() > 0) placeModel.setRecommend(0);
             else existPlace.setRecommend(placeModel.getRecommend());
@@ -95,15 +96,13 @@ public class PlaceService {
             else existPlace.setNumber(placeModel.getNumber());
             if (placeModel.getUrl() == null) existPlace.setUrl("");
             else existPlace.setUrl(placeModel.getUrl());
-
-            placeRepository.save(existPlace);
         } else {
             // 있는 장소라면 view +1
+            existPlace.setYoutubes(placeModel.getYoutubes());
             existPlace.setView(existPlace.getView() + 1);
-            List<YoutubeModel> existYoutubes = existPlace.getYoutube();
-            existYoutubes.add(placeModel.getYoutube().get(0));
-            placeRepository.save(existPlace);
         }
+
+        placeRepository.save(existPlace);
 
         return existPlace;
     }

@@ -31,10 +31,11 @@ public class PlaceModel implements Serializable {
     @Column(columnDefinition ="0")
     private int view; // 조회수
 
-    @Transient
-    @OneToMany(mappedBy="place", fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-    @JoinColumn(name="place_id")
-    private List<YoutubeModel> youtube = new ArrayList<>(); // 유투브 모델과 연결
+    @OneToMany(targetEntity = YoutubeModel.class,
+                cascade = CascadeType.ALL,
+                fetch = FetchType.EAGER,
+                mappedBy = "place")
+    private List<YoutubeModel> youtubes = new ArrayList<>(); // 유투브 모델과 연결
 
     private Long fileId;
 
@@ -94,19 +95,23 @@ public class PlaceModel implements Serializable {
         this.view = view;
     }
 
-    public List<YoutubeModel> getYoutube() {
-        return youtube;
-    }
-
-    public void setYoutube(List<YoutubeModel> youtube) {
-        this.youtube = youtube;
-    }
-
     public Long getFileId() {
         return fileId;
     }
 
     public void setFileId(Long fileId) {
         this.fileId = fileId;
+    }
+
+    public List<YoutubeModel> getYoutubes() {
+        return youtubes;
+    }
+
+    public void setYoutubes(List<YoutubeModel> youtubes) {
+        this.youtubes = youtubes;
+    }
+
+    public void setYoutube(YoutubeModel youtube) {
+        this.youtubes.add(youtube);
     }
 }

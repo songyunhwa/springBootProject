@@ -15,7 +15,10 @@ public interface PlaceRepository extends JpaRepository<PlaceModel, Long> {
     List<PlaceModel> findByArea(String area);
     List<PlaceModel> findByNameContaining(String name);
 
-    @Query(value = "SELECT * FROM place p WHERE p.sub_category != 'etc' Order By p.view Desc" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM ( SELECT * FROM test.place p WHERE p.sub_category != 'etc' ORDER By p.view Desc ) AS places GROUP By places.view, places.sub_category" ,nativeQuery = true)
+    List<PlaceModel> findByViewAndSubCategory();
+
+    @Query(value = "SELECT * FROM test.place p WHERE p.sub_category != 'etc' Order By p.view Desc" ,nativeQuery = true)
     List<PlaceModel> findByExceptEtcSubCategory();
 
 

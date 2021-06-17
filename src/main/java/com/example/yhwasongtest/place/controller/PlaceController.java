@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,13 +44,21 @@ public class PlaceController {
     }
 
     @GetMapping(value = "/place")
-    public List<PlaceModel> getCategory(@RequestParam(name = "category",required = true) String category){
-        return placeService.getPlaceListBySubCategory(category);
+    public List<PlaceModel> getPlace(){
+        List<PlaceModel> placeModels = placeService.getPlace();
+        return placeModels;
+    }
+
+
+    @GetMapping(value = "/place/{category}")
+    public List<PlaceModel> getPlaceByCategory(@PathVariable String category){
+        List<PlaceModel> placeModels = placeService.getPlaceListBySubCategory(category);
+        return placeModels;
     }
 
     @PostMapping(value = "/place/{name}")
-    public ResponseEntity getPlace(@PathVariable String name) {
-        PlaceModel placeModel = placeService.getPlace(name);
+    public ResponseEntity getPlaceByName(@PathVariable String name) {
+        PlaceModel placeModel = placeService.getPlaceByName(name);
         return new ResponseEntity<>(placeModel, HttpStatus.OK);
     }
 
@@ -114,7 +123,7 @@ public class PlaceController {
 
     public ResponseEntity getFile(String placeName) {
         try{
-        PlaceModel placeModel = placeService.getPlace(placeName);
+        PlaceModel placeModel = placeService.getPlaceByName(placeName);
         if (placeModel.getFileId() == null)
             return null;
 

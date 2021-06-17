@@ -1,11 +1,14 @@
 package com.example.yhwasongtest.youtube.model;
 
 import com.example.yhwasongtest.place.model.PlaceModel;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "youtube")
@@ -15,9 +18,6 @@ public class YoutubeModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(name = "place_id")
-    private int placeId;
-
     public String publishedAt; //나온 시간
     public String channelId;    // 유투버 아이디
     public String channelTitle; // 유투버 이름
@@ -25,13 +25,14 @@ public class YoutubeModel implements Serializable {
     public String description;  // 동영상 설명
     public String videoId; // 동영상 id
 
-    public int getPlaceId() {
-        return placeId;
-    }
-
-    public void setPlaceId(int placeId) {
-        this.placeId = placeId;
-    }
+    @ManyToOne(
+            targetEntity = PlaceModel.class
+            ,cascade = CascadeType.ALL
+            ,fetch = FetchType.LAZY
+            ,optional = false
+    )
+    @JoinColumn(name="place_id")
+    private PlaceModel place;
 
     public String getVideoId() {
         return videoId;
@@ -79,5 +80,13 @@ public class YoutubeModel implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public PlaceModel getPlace() {
+        return place;
+    }
+
+    public void setPlace(PlaceModel place) {
+        this.place = place;
     }
 }

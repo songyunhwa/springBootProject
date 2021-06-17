@@ -6,11 +6,9 @@ import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -37,6 +35,9 @@ public class SearchYoutube {
 
     @Autowired
     PlaceService placeService;
+
+    @Autowired
+    PlaceRepository placeRepository;
 
 
     public void SearchService(YoutubeRepository youtubeRepository) {
@@ -130,22 +131,19 @@ public class SearchYoutube {
             youtubeModel.setChannelTitle(channelTitle);
             youtubeModel.setVideoId(videoId);
 
-            youtubeRepository.save(youtubeModel);
-
-
             // placeModel 에 description 붙이기
             try {
                 putDescription(store, youtubeModel, category);
+
             } catch (Exception e) {
                 logger.info("SearchYoutube error => ", e.toString());
                 continue;
             }
         }
 
-
-        if (nextToken != null) {
-            searchYoutube(msg, category, nextToken);
-        }
+        //if (nextToken != null) {
+        //    searchYoutube(msg, category, nextToken);
+        //}
 
         return result;
     }
@@ -153,17 +151,30 @@ public class SearchYoutube {
     public void putDescription(ArrayList<String> store, YoutubeModel youtubeModel, String category) throws Exception {
 
         for (String name : store) {
-            PlaceModel placeModel = placeService.getPlace(name);
+            PlaceModel placeModel = placeService.getPlaceByName(name);
             if (placeModel == null) {
                 placeModel = new PlaceModel();
                 placeModel.setName(name.replace(" ", ""));
                 placeModel.setSubCategory(category);
+                placeModel.setView(1);
+                placeModel.setRecommend(0);
+                placeModel.setArea("");
+                placeModel.setNumber("");
+                placeModel.setUrl("");
+            } else {
+                // 있는 장소라면 view +1
+                placeModel.setView(placeModel.getView() + 1);
             }
-            ArrayList<YoutubeModel> youtubeModels = new ArrayList<YoutubeModel>();
-            youtubeModels.add(youtubeModel);
-            placeModel.setYoutube(youtubeModels);
-            placeService.putPlace(placeModel); // 관계 맞는지 확인
+            youtubeModel.setPlace(placeModel);
+
+            if(placeModel.getYoutubes() != null)
+                placeModel.getYoutubes().add(youtubeModel);
+            else placeModel.setYoutubes(new ArrayList<>());
+
+             placeRepository.save(placeModel);
+
         }
+
     }
 
     public ArrayList<String> getDescription(String apiKey, String videoId) throws Exception {
