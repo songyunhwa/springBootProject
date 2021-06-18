@@ -34,8 +34,6 @@ export default {
   },
   methods: {
     Login() {
-      console.log(this.$cookies.get('sessionId'));
-
       if(this.$cookies.get('sessionId')!=null){
         this.url = `${resourceHost}/login/check?id=${this.$cookies.get('sessionId')}`
       }else {
@@ -47,19 +45,14 @@ export default {
       return axios
           .get(this.url)
           .then(({data}) => {
-            // http 요청 헤더
-            //axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
-            console.log(this.url)
-            console.log('data');
-
-            this.$cookies.set('sessionId', data.sessionId);
-            this.$cookies.set('email', data.username);
-            console.log(this.$cookies.get('sessionId'));
-            this.$router.push({ path: 'home' });
+            if(this.$cookies.get('sessionId') == null) {
+              this.$cookies.set('sessionId', data.sessionId);
+              this.$cookies.set('email', data.username);
+            }
+            this.$router.push({ path: '/' });
 
           })
           .catch(()=>{
-            console.log("지워짐");
             if(this.$cookies.get('sessionId') != null)
               this.$cookies.remove('sessionId');
       })

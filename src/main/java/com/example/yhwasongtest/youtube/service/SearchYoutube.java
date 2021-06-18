@@ -141,9 +141,9 @@ public class SearchYoutube {
             }
         }
 
-        //if (nextToken != null) {
-        //    searchYoutube(msg, category, nextToken);
-        //}
+        if (nextToken != null) {
+            searchYoutube(msg, category, nextToken);
+        }
 
         return result;
     }
@@ -168,7 +168,8 @@ public class SearchYoutube {
             youtubeModel.setPlace(placeModel);
 
             if(placeModel.getYoutubes() != null)
-                placeModel.getYoutubes().add(youtubeModel);
+                if(!placeModel.getYoutubes().contains(youtubeModel))
+                    placeModel.getYoutubes().add(youtubeModel);
             else placeModel.setYoutubes(new ArrayList<>());
 
              placeRepository.save(placeModel);

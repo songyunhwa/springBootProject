@@ -7,6 +7,11 @@ import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
+import com.example.yhwasongtest.youtube.model.YoutubeModel;
+import com.mysql.cj.xdevapi.JsonArray;
+import com.mysql.cj.xdevapi.JsonValue;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +23,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping(value = "/api/v1")
 public class PlaceController {
@@ -44,9 +54,38 @@ public class PlaceController {
     }
 
     @GetMapping(value = "/place")
-    public List<PlaceModel> getPlace(){
-        List<PlaceModel> placeModels = placeService.getPlace();
-        return placeModels;
+    public ResponseEntity getPlace(){
+
+        try {
+            List<PlaceModel> placeModels = placeService.getPlace();
+
+            JSONArray jsonArray = new JSONArray();
+            for (PlaceModel placeModel : placeModels) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", placeModel.getName());
+                jsonObject.put("area", placeModel.getArea());
+                jsonObject.put("url", placeModel.getUrl());
+                jsonObject.put("number", placeModel.getNumber());
+                jsonObject.put("subCategory", placeModel.getSubCategory());
+                jsonObject.put("recommend", placeModel.getRecommend());
+                jsonObject.put("view", placeModel.getView());
+                jsonObject.put("fileId", placeModel.getFileId());
+
+                String str= ""; // place 에 간 유투브들
+                List<YoutubeModel> youtubes = new ArrayList<>();
+                youtubes = placeModel.getYoutubes();
+                for(YoutubeModel youtube : youtubes){
+                    str += "#"+youtube.getChannelTitle();
+                }
+                jsonObject.put("youtube", str);
+                jsonArray.put(jsonObject);
+            }
+
+            return  new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 

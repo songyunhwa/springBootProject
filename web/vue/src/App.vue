@@ -1,19 +1,34 @@
 <template>
     <div id="app">
+      <div v-if="email==null">
         <router-link to="/login"><button>로그인</button></router-link>
-        <router-link to="/name"><button>이름</button></router-link>
-        <router-view/>
+      </div>
+      <div v-else>
+        <router-link to="/logout"><button>로그아웃</button></router-link>
+      </div>
+      <router-link to="/name"><button>찜한 장소</button></router-link>
+      <router-link to="/youtube"></router-link>
+      <router-view/>
   </div>
 </template>
 
 <script>
 export default {
   name: 'App',
-  data(){
-    return {
-    }
+  data: () => ({
+    email: '',
+    password: '',
+    url: ''
+  }),
+  created() {
+    this.email = this.$cookies.get('email');
   },
-  components: {
+  methods:{
+    checkEmail() {
+      if(this.email == null)
+        return false
+      else return true;
+    }
   }
 }
 </script>
