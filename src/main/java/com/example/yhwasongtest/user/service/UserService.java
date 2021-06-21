@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository ) {
+    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
     }
@@ -151,12 +151,17 @@ public class UserService implements UserDetailsService {
         if (userModel != null) {
             //if (userModel.getPassword().equals(resultToken)) {
             if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
-                session.setAttribute("login", userModel);
-
                 // 쿠키 설정
                 Cookie cookie = new Cookie("loginCookie", userModel.getUsername());
                 cookie.setMaxAge(60 * 60 * 24 * 7);
                 response.addCookie(cookie);
+
+                // 세션 설정
+                session.setAttribute("login", userModel);
+                session.setAttribute("id",  userModel.getId());
+                session.setAttribute("email", userModel.getUsername());
+                session.setAttribute("auth", userModel.getRole());
+                session.setMaxInactiveInterval(1800); //30분
 
                 // 세션 유효시간 설정
                 Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
@@ -179,25 +184,19 @@ public class UserService implements UserDetailsService {
         return new ResponseEntity(userModel, HttpStatus.BAD_REQUEST);
     }
 
-    public void logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
 
-        Object obj = session.getAttribute("login");
-        if (obj != null) {
-            UserModel vo = (UserModel) obj;
+        request.getSession().invalidate();
 
-            session.removeAttribute("login");
-            session.invalidate();// 세션 전체를 날려버림
+        Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
+        if (loginCookie != null) {
+            loginCookie.setPath("/");
+            loginCookie.setMaxAge(0);
+            response.addCookie(loginCookie);
 
-            Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
-            if (loginCookie != null) {
-                loginCookie.setPath("/");
-                loginCookie.setMaxAge(0);
-                response.addCookie(loginCookie);
-
-                // 사용자 테이블에서도 유효기간을 현재시간으로 다시 세팅해줘야함.
-                Date date = new Date(System.currentTimeMillis());
-                this.keepLogin(vo.getUsername(), session.getId(), date);
-            }
+            // 사용자 테이블에서도 유효기간을 현재시간으로 다시 세팅해줘야함.
+            Date date = new Date(System.currentTimeMillis());
+            this.keepLogin(loginCookie.getValue(), null, date);
         }
 
     }
@@ -215,7 +214,7 @@ public class UserService implements UserDetailsService {
     public UserModel checkLogin(String sessionId) {
         UserModel userModel = userRepository.findBySessionId(sessionId);
         Date date = new Date();
-        if(userModel.getDate().before(date))
+        if (userModel.getDate().before(date))
             return userModel;
         else return null;
     }

@@ -1,6 +1,6 @@
 import Login from './components/Login'
 import Home from './views/Home'
-import Youtube from './components/Youtube'
+import Logout from "@/components/Logout";
 import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
@@ -13,8 +13,8 @@ const routes = [
         component: Login,
     },
     {
-        path: "/youtube",
-        component: Youtube,
+        path: "/logout",
+        component: Logout,
     }
 ];
 

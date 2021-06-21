@@ -50,10 +50,10 @@ public class BaseController {
     }
 
     @GetMapping(value = "/logout")
-    public String logoutPage(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
-        userService.logout(session, request, response);
+        userService.logout(request, response);
 
         return "redirect:/api/v1/login";
     }
