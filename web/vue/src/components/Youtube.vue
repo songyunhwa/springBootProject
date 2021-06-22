@@ -39,8 +39,4 @@ export default {
 }
 </script>
 <style>
- .youtube{
-   width: 50px;
-   height: 100%;
- }
 </style>

@@ -6,18 +6,21 @@
       <input placeholder="Enter your password" v-model="password">
       <button type="button" @click="Login">Login</button>
     </form>
+    {{ result }}
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+
 const resourceHost = "http://localhost:9000/api/v1"
 export default {
   name: 'Login',
   data: () => ({
     email: '',
     password: '',
-    url: ''
+    url: '',
+    result: ''
   }),
   state: {
     accessToken: null,
@@ -28,15 +31,12 @@ export default {
       state.accessToken = accessToken
       localStorage.accessToken = accessToken
     },
-    logout(state) {
-      state.accessToken = null
-    },
   },
   methods: {
     Login() {
-      if(this.$cookies.get('sessionId')!=null){
+      if (this.$cookies.get('sessionId') != null) {
         this.url = `${resourceHost}/login/check?id=${this.$cookies.get('sessionId')}`
-      }else {
+      } else {
         if (!this.email || !this.password) {
           alert("Your email or password is empty.");
         }
@@ -45,40 +45,20 @@ export default {
       return axios
           .get(this.url)
           .then(({data}) => {
-            if(this.$cookies.get('sessionId') == null) {
+            if (this.$cookies.get('sessionId') == null) {
               this.$cookies.set('sessionId', data.sessionId);
               this.$cookies.set('email', data.username);
             }
-            this.$router.push({ path: '/' });
+            this.$router.push({path: '/'});
 
           })
-          .catch(()=>{
-            if(this.$cookies.get('sessionId') != null)
+          .catch(() => {
+            this.result = "로그인에 실패했습니다. 다시 시도해주세요"
+            if (this.$cookies.get('sessionId') != null)
               this.$cookies.remove('sessionId');
-      })
+          })
     },
-    LOGOUT({commit}) {
-      commit("LOGOUT")
-    },
-
   },
 
 }
 </script>
-<!--
-
-
-
-redirect() {
-        const { search } = window.location
-        const tokens = search.replace(/^\?/, "").split("&")
-        const { returnPath } = tokens.reduce((qs, tkn) => {
-          const pair = tkn.split("=")
-          qs[pair[0]] = decodeURIComponent(pair[1])
-          return qs
-        }, {})
-
-        // 리다이렉트 처리
-        this.$router.push(returnPath)
-      },
--->
