@@ -25,19 +25,23 @@ public class PlaceModel implements Serializable {
 
     private String subCategory; // CategoryModel 과 연결
 
-    @Column(columnDefinition ="0")
+    @Column(columnDefinition = "0")
     private int recommend; // 추천수
 
-    @Column(columnDefinition ="0")
+    @Column(columnDefinition = "0")
     private int view; // 조회수
 
     @OneToMany(targetEntity = YoutubeModel.class,
-                cascade = CascadeType.ALL,
-                fetch = FetchType.EAGER,
-                mappedBy = "place")
+            cascade = CascadeType.MERGE,
+            fetch = FetchType.EAGER,
+            mappedBy = "place")
     private List<YoutubeModel> youtubes = new ArrayList<>(); // 유투브 모델과 연결
 
     private Long fileId;
+
+    public long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;

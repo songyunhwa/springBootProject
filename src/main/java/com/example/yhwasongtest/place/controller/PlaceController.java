@@ -1,15 +1,12 @@
 package com.example.yhwasongtest.place.controller;
 
-import com.example.yhwasongtest.common.FileSecurity;
+import com.example.yhwasongtest.common.CommonCode;
 import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
-import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
-import com.mysql.cj.xdevapi.JsonArray;
-import com.mysql.cj.xdevapi.JsonValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -19,22 +16,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
@@ -59,27 +48,7 @@ public class PlaceController {
         try {
             List<PlaceModel> placeModels = placeService.getPlace();
 
-            JSONArray jsonArray = new JSONArray();
-            for (PlaceModel placeModel : placeModels) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", placeModel.getName());
-                jsonObject.put("area", placeModel.getArea());
-                jsonObject.put("url", placeModel.getUrl());
-                jsonObject.put("number", placeModel.getNumber());
-                jsonObject.put("subCategory", placeModel.getSubCategory());
-                jsonObject.put("recommend", placeModel.getRecommend());
-                jsonObject.put("view", placeModel.getView());
-                jsonObject.put("fileId", placeModel.getFileId());
-
-                String str= ""; // place 에 간 유투브들
-                List<YoutubeModel> youtubes = new ArrayList<>();
-                youtubes = placeModel.getYoutubes();
-                for(YoutubeModel youtube : youtubes){
-                    str += "#"+youtube.getChannelTitle();
-                }
-                jsonObject.put("youtube", str);
-                jsonArray.put(jsonObject);
-            }
+            JSONArray jsonArray = CommonCode.convertToJSON(placeModels);
 
             return  new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         }catch (Exception e) {
@@ -88,17 +57,16 @@ public class PlaceController {
 
     }
 
+    @GetMapping(value = "/place/{msg}")
+    public ResponseEntity getPlaceByCategory(@PathVariable String msg){
+        try {
+            List<PlaceModel> placeModels = placeService.searchPlace(msg);
+            JSONArray jsonArray = CommonCode.convertToJSON(placeModels);
 
-    @GetMapping(value = "/place/{category}")
-    public List<PlaceModel> getPlaceByCategory(@PathVariable String category){
-        List<PlaceModel> placeModels = placeService.getPlaceListBySubCategory(category);
-        return placeModels;
-    }
-
-    @PostMapping(value = "/place/{name}")
-    public ResponseEntity getPlaceByName(@PathVariable String name) {
-        PlaceModel placeModel = placeService.getPlaceByName(name);
-        return new ResponseEntity<>(placeModel, HttpStatus.OK);
+            return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(value = "/place")
@@ -156,6 +124,8 @@ public class PlaceController {
 
     @GetMapping(value = "/classification")
     public void setClassification() {
+        placeService.deletePlaceYoutube();
+        placeService.deletePlaceContaingEng();
         placeService.getFoodCategory();
         placeService.getDessertCategory();
     }

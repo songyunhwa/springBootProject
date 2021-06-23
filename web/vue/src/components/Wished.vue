@@ -19,17 +19,13 @@
 <script>
 import axios from "axios";
 import Youtube from "@/components/Youtube";
-
 export default {
-  name: 'YoutubeList',
+  name: 'WishedList',
   components: {Youtube},
-  props: {
-    msg: Object,
-  },
   data: () => ({
     email: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/place',
+    url: 'http://localhost:9000/api/v1/wished',
     places: [{
       name: '',
       area: '',
@@ -58,21 +54,16 @@ export default {
     object: [],
   }),
   created() {
+    this.email = this.$cookies.get('email');
     this.getYoutube();
   },
   methods: {
     getYoutube() {
-
-      if(this.msg&&this.msg.length>0) {
-        this.url = 'http://localhost:9000/api/v1/place/' + this.msg;
-      }else {
-        this.url = 'http://localhost:9000/api/v1/place';
-      }
-
       return axios
-          .get(this.url)
+          .get(this.url+"?userName="+this.email)
           .then(({data}) => {
             this.places = data;
+
 
             this.places.forEach(place => {
               // 만약 정보가 없으면 - 로 바꾸기

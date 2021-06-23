@@ -27,7 +27,7 @@ public class YoutubeModel implements Serializable {
 
     @ManyToOne(
             targetEntity = PlaceModel.class
-            ,cascade = CascadeType.ALL
+            ,cascade = CascadeType.MERGE
             ,fetch = FetchType.LAZY
             ,optional = false
     )

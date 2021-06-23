@@ -1,6 +1,7 @@
+import Home from "@/views/Home";
 import Login from './components/Login'
-import Home from './views/Home'
 import Logout from "@/components/Logout";
+import WishedHome from "@/views/WishedHome";
 import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
@@ -11,6 +12,10 @@ const routes = [
     {
         path: "/login",
         component: Login,
+    },
+    {
+        path: "/wished",
+        component: WishedHome,
     },
     {
         path: "/logout",

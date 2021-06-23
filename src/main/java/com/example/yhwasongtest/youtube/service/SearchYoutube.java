@@ -19,7 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Prints a list of videos based on a search term.
@@ -151,6 +153,9 @@ public class SearchYoutube {
     public void putDescription(ArrayList<String> store, YoutubeModel youtubeModel, String category) throws Exception {
 
         for (String name : store) {
+            // 이름이 영어면 통과
+            if(Pattern.matches("^[A-Za-z]", name)) continue;
+
             PlaceModel placeModel = placeService.getPlaceByName(name);
             if (placeModel == null) {
                 placeModel = new PlaceModel();
@@ -167,10 +172,23 @@ public class SearchYoutube {
             }
             youtubeModel.setPlace(placeModel);
 
-            if(placeModel.getYoutubes() != null)
-                if(!placeModel.getYoutubes().contains(youtubeModel))
+            // 장소에 들어있지 않는 비디오인지 확인
+            if(placeModel.getYoutubes() != null){
+                boolean get = false;
+                for(YoutubeModel youtube : placeModel.getYoutubes()){
+                    if(youtube.getVideoId().equals(youtubeModel.getVideoId())){
+                        get = true;
+                        break;
+                    }
+                }
+                if(!get){
                     placeModel.getYoutubes().add(youtubeModel);
-            else placeModel.setYoutubes(new ArrayList<>());
+                }
+            }
+            else {
+                List<YoutubeModel> youtubes= new ArrayList<YoutubeModel>();
+                placeModel.setYoutubes(youtubes);
+            }
 
              placeRepository.save(placeModel);
 

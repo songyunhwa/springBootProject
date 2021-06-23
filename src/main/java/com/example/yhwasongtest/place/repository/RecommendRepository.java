@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface RecommendRepository  extends JpaRepository<RecommendModel, Long> {
-    RecommendModel findByPlaceName(String placeName);
+    RecommendModel findByPlaceId(long id);
 
     @Query(value = "SELECT * FROM recommend AS r WHERE :user MEMBER OF r.userList" ,nativeQuery = true)
     List<RecommendModel> findByUser(@Param("user") String user);

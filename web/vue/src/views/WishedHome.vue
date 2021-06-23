@@ -18,38 +18,26 @@
     <div class="title">
       당다라당당에 오신걸 환영합니다! {{ email }}
     </div>
-
-    <div class="search">
-      <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;">
-      <button @click="setMsg">검색</button>
-    </div>
-
+    <wished-list></wished-list>
   </div>
-  <youtube-list :msg="input" ref="list"></youtube-list>
 </template>
 
 <script>
-import YoutubeList from "@/components/YoutubeList";
+import WishedList from "@/components/Wished";
 
 export default {
-  name: 'Home',
-  components: {YoutubeList},
+  name: 'WishedHome',
+  components: {WishedList, },
   data: () => ({
     email: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/place',
-    input: '', // 입력하는 값
-    msg: '',   // 실질적으로 넘어가는 값
+    url: '',
     object: [],
   }),
   created() {
     this.email = this.$cookies.get('email');
   },
-  methods: {
-    setMsg(){
-      this.$refs.list.getYoutube();
-    }
-  }
+
 }
 </script>
 <style>
@@ -88,8 +76,4 @@ button:active {
   box-shadow: inset 1px 1px 1px #DFDFDF;
 }
 
-.search{
-  float: right;
-
-}
 </style>

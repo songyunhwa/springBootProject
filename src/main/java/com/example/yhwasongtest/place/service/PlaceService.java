@@ -20,8 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -58,9 +57,9 @@ public class PlaceService {
 
     public List<PlaceModel> getPlaceListBySubCategory(String category) {
         List<PlaceModel> placeModelList;
-        if(category.equals("all")){
-            placeModelList = this.placeRepository.findByExceptEtcSubCategory();
-        }else {
+        if (category.equals("all")) {
+            placeModelList = this.placeRepository.findByViewAndSubCategory();
+        } else {
             placeModelList = this.placeRepository.findBySubCategoryOrderByViewDesc(category);
         }
         return placeModelList;
@@ -185,7 +184,7 @@ public class PlaceService {
         }
     }
 
-    public long saveFile(MultipartFile file) throws Exception{
+    public long saveFile(MultipartFile file) throws Exception {
         String orgname = file.getOriginalFilename();
         String filename = new FileSecurity().md5(orgname);
 
@@ -194,10 +193,9 @@ public class PlaceService {
         String savePath = path.toString();
 
         if (!new File(savePath).exists()) {
-            try{
+            try {
                 new File(savePath).mkdir();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 e.getStackTrace();
             }
         }
@@ -231,5 +229,52 @@ public class PlaceService {
         return null;
     }
 
+    // 영어 이름 제거
+    public void deletePlaceContaingEng() {
+        List<PlaceModel> places = placeRepository.findByNameContaingEng();
+        for (PlaceModel place : places) {
+            placeRepository.delete(place);
+        }
+    }
+
+    // 유투브 중복인것 제거
+    public void deletePlaceYoutube() {
+        List<PlaceModel> places = placeRepository.findAll();
+        for (PlaceModel place : places) {
+            List<YoutubeModel> youtubeModels = place.getYoutubes();
+
+            if (youtubeModels != null && youtubeModels.size() > 1) {
+                HashSet<YoutubeModel> set = new HashSet<YoutubeModel>();
+                for (int t = 0; t < youtubeModels.size(); t++) {
+                    set.add(youtubeModels.get(t));
+                }
+                youtubeModels.clear();
+                Iterator iter = set.iterator();    // Iterator 사용
+                while (iter.hasNext()) {//값이 있으면 true 없으면 false
+                    youtubeModels.add((YoutubeModel) iter.next());
+                }
+                placeRepository.save(place);
+            }
+        }
+    }
+
+    public List<PlaceModel> searchPlace(String msg) {
+
+        List<PlaceModel> title_places = placeRepository.findByChannelTitle(msg);
+        List<PlaceModel> name_places = placeRepository.findByNameContaing(msg);
+
+        List<PlaceModel> places = new ArrayList<PlaceModel>();
+        name_places.forEach(placeModel -> {
+            if (!places.contains(placeModel))
+                places.add(placeModel);
+        });
+        title_places.forEach(placeModel -> {
+            if (!places.contains(placeModel))
+                places.add(placeModel);
+        });
+
+
+        return places;
+    }
 
 }
