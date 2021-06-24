@@ -3,8 +3,8 @@ package com.example.yhwasongtest.common;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import lombok.AllArgsConstructor;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +34,12 @@ public class CommonCode {
                 subObject.put("videoId", youtube.getVideoId());
                 subObject.put("channelTitle", youtube.getChannelTitle());
                 subObject.put("title", youtube.getTitle());
-                subArray.put(subObject);
+                subArray.add(subObject);
             }
             jsonObject.put("youtube", subArray);
 
 
-            jsonArray.put(jsonObject);
+            jsonArray.add(jsonObject);
         }
         return jsonArray;
     }

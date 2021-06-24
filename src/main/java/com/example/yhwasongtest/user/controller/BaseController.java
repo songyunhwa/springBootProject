@@ -62,9 +62,10 @@ public class BaseController {
     public ResponseEntity login(@RequestParam(name = "email", required = true) String email,
                            @RequestParam(name = "password", required = true) String password,
                            HttpServletRequest request,
-                           HttpServletResponse response) {
+                           HttpServletResponse response,
+                                HttpSession httpSession) {
         try {
-            ResponseEntity responseEntity = userService.login(email, password, request, response);
+            ResponseEntity responseEntity = userService.login(email, password, request, response, httpSession);
             return  responseEntity;
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

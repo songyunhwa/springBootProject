@@ -1,22 +1,20 @@
 package com.example.yhwasongtest.place.service;
 
 import com.example.yhwasongtest.common.CommonCode;
-import com.example.yhwasongtest.place.model.PlaceModel;
-import com.example.yhwasongtest.place.model.RecommendModel;
-import com.example.yhwasongtest.place.model.WishedModel;
-import com.example.yhwasongtest.place.repository.PlaceRepository;
-import com.example.yhwasongtest.place.repository.RecommendRepository;
-import com.example.yhwasongtest.place.repository.WishedRepository;
-import com.example.yhwasongtest.youtube.model.YoutubeModel;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.example.yhwasongtest.place.dto.PointDto;
+import com.example.yhwasongtest.place.model.*;
+import com.example.yhwasongtest.place.repository.*;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 public class RecommendService {
@@ -24,86 +22,162 @@ public class RecommendService {
     private PlaceRepository placeRepository;
     private RecommendRepository recommendRepository;
     private WishedRepository wishedRepository;
-
+    private CategoryRepository categoryRepository;
+    private DessertRepository dessertRepository;
     @Autowired
     public void RecommendService(PlaceRepository placeRepository,
                                  RecommendRepository recommendRepository,
-                                 WishedRepository wishedRepository) {
+                                 WishedRepository wishedRepository,
+                                 CategoryRepository categoryRepository,
+                                 DessertRepository dessertRepository) {
         this.placeRepository = placeRepository;
         this.recommendRepository = recommendRepository;
         this.wishedRepository = wishedRepository;
+        this.categoryRepository = categoryRepository;
+        this.dessertRepository = dessertRepository;
     }
 
-    public void addRecommend(String placeName) {
-        PlaceModel placeModel = placeRepository.findByName(placeName);
-        placeModel.setRecommend(placeModel.getRecommend() + 1);
-        placeRepository.save(placeModel);
-
-    }
-
-    public void putRecommend(String userName, long id) {
+    public void putRecommend(String userName, long id) throws Exception {
         RecommendModel recommendModel = recommendRepository.findByPlaceId(id);
         PlaceModel place = placeRepository.findById(id);
-        List<String> users = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
 
         if (recommendModel != null) {
-            users = recommendModel.getUserList();
-            if (users.contains(userName)) {
-                users.remove(userName);
-            } else users.add(userName);
-            recommendModel.setUserList(users);
+            JSONParser jsonParser = new JSONParser();
+            Object obj = jsonParser.parse(recommendModel.getUsers());
+            jsonArray = (JSONArray) obj;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                Object jsonObject = jsonArray.get(i);
+                if (jsonObject.equals(place.getName())) {
+                    jsonArray.remove(i);
+                    break;
+                } else if (i == jsonArray.size() - 1) {
+                    JSONObject object = new JSONObject();
+                    object.put("user", userName);
+                    jsonArray.add(object);
+                }
+
+            }
         } else {
             recommendModel = new RecommendModel();
-            recommendModel.setPlaceId(place.getId());
-            users.add(userName);
-            recommendModel.setUserList(users);
-
+            recommendModel.setPlaceId(id);
+            JSONObject object = new JSONObject();
+            object.put("user", userName);
+            jsonArray.add(object);
         }
+
+        recommendModel.setUsers(jsonArray.toJSONString());
         recommendRepository.save(recommendModel);
 
         // place에 추천수 집어넣기
-        PlaceModel placeModel = place;
-        placeModel.setRecommend(users.size());
-        placeRepository.save(placeModel);
+        place.setRecommend(jsonArray.size());
+        placeRepository.save(place);
     }
 
     public JSONArray getWished(String userName) throws Exception {
         WishedModel wishedModel = wishedRepository.findByUserName(userName);
-        JSONArray jsonArray = new JSONArray();
 
-        if (wishedModel.getPlaces() != null) {
-            String[] places = wishedModel.getPlaces().split(",");
-            ArrayList<PlaceModel> placeModels= new ArrayList<>();
-            for (String place : places) {
-                PlaceModel placeModel = placeRepository.findByName(place);
-                if (placeModel != null) {
-                    placeModels.add(placeModel);
-                }
+        JSONParser jsonParser = new JSONParser();
+        Object obj = jsonParser.parse(wishedModel.getPlaces());
+        JSONArray arr = (JSONArray) obj;
+
+        ArrayList<PlaceModel> placeModels = new ArrayList<>();
+        for (int i = 0; i < arr.size(); i++) {
+            JSONObject jsonObject = (JSONObject) arr.get(i);
+            String place = jsonObject.get("place").toString();
+            PlaceModel placeModel = placeRepository.findByName(place);
+            if (placeModel != null) {
+                placeModels.add(placeModel);
             }
-            jsonArray = CommonCode.convertToJSON(placeModels);
         }
+        JSONArray jsonArray = CommonCode.convertToJSON(placeModels);
+
 
         return jsonArray;
 
     }
 
-    public void putWished(String userName, long id) {
+    public void putWished(String userName, long id) throws Exception {
         PlaceModel place = placeRepository.findById(id);
         WishedModel wishedModel = wishedRepository.findByUserName(userName);
-        String places = wishedModel.getPlaces();
-        if (places != null) {
-            int startIndex = places.indexOf("," + place.getName());
-            int endIndex = startIndex + place.getName().length();
-            if (startIndex > 0) { // 지우는거 구현 안됨
-                places = places.substring(0, startIndex) + places.substring(endIndex);
-            } else places += "," + place.getName();
-            wishedModel.setPlaces(places);
+        JSONArray jsonArray = new JSONArray();
+
+        if (wishedModel != null) {
+            JSONParser jsonParser = new JSONParser();
+            Object obj = jsonParser.parse(wishedModel.getPlaces());
+            jsonArray = (JSONArray) obj;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                Object jsonObject = jsonArray.get(i);
+                if (jsonObject.equals(place.getName())) {
+                    jsonArray.remove(i);
+                    break;
+                } else if (i == jsonArray.size() - 1) {
+                    JSONObject object = new JSONObject();
+                    object.put("place", place.getName());
+                    jsonArray.add(object);
+                }
+
+            }
         } else {
             wishedModel = new WishedModel();
             wishedModel.setUserName(userName);
-            wishedModel.setPlaces("," + place.getName());
+            JSONObject object = new JSONObject();
+            object.put("place", place.getName());
+            jsonArray.add(object);
         }
+
+        wishedModel.setPlaces(jsonArray.toString());
         wishedRepository.save(wishedModel);
+
+
+    }
+
+    public JSONArray getRecommend(String userName) throws Exception {
+        ArrayList<PointDto> maps = new ArrayList<PointDto>();
+        List<DessertModel> desserts = dessertRepository.findAll();
+
+        desserts.forEach(dessert -> maps.add(new PointDto(dessert.getSubCategory(), 0)));
+
+
+        // 찜에 들어있는 카테고리 별로 점수 부여
+        WishedModel wishedModel = wishedRepository.findByUserName(userName);
+
+        JSONParser jsonParser = new JSONParser();
+        Object obj = jsonParser.parse(wishedModel.getPlaces());
+        JSONArray arr = (JSONArray) obj;
+
+        ArrayList<PlaceModel> placeModels = new ArrayList<>();
+        for (int i = 0; i < arr.size(); i++) {
+            JSONObject jsonObject = (JSONObject) arr.get(i);
+            String place = jsonObject.get("place").toString();
+            // 사용자가 찜한 place
+            PlaceModel placeModel = placeRepository.findByName(place);
+            placeModels.add(placeModel);
+
+            if (placeModel != null) {
+                String subCategory = placeModel.getSubCategory();
+                // 카테고리 명에 따라 점수 추가
+                maps.forEach(map -> {
+                    if(map.category.equals(subCategory)){
+                        map.point = map.point + 1;
+                    }
+                });
+
+            }
+        }
+
+        // 카테고리 점수가 높은 순대로 결과에 추가
+        List<PlaceModel> result = new ArrayList<PlaceModel>();
+        for(PointDto p : maps){
+            if(result.size() > 10) break;
+            if(p.point>0){
+                List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
+                result =  placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList());
+
+            }
+        }
+        JSONArray jsonArray = CommonCode.convertToJSON(result);
+        return jsonArray;
     }
 
 }

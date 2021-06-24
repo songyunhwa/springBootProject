@@ -1,9 +1,9 @@
 <template>
-  <div class="right">
+  <div class="youtube-list-right">
     <Youtube :select_place="select"></Youtube>
   </div>
-  <div class="left">
-    <ul class="type04">
+  <div class="youtube-list-left">
+    <ul style="list-style: none;">
       <li v-for="place in this.places"
           v-bind:key="place" @click="selectPlace(place)">
 
@@ -42,7 +42,7 @@ export default {
         videoId: '',
         channelTitle: '',
         title: '',
-        url : '',
+        url: '',
       }],
     }],
     select: {
@@ -63,9 +63,9 @@ export default {
   methods: {
     getYoutube() {
 
-      if(this.msg&&this.msg.length>0) {
+      if (this.msg && this.msg.length > 0) {
         this.url = 'http://localhost:9000/api/v1/place/' + this.msg;
-      }else {
+      } else {
         this.url = 'http://localhost:9000/api/v1/place';
       }
 
@@ -77,8 +77,8 @@ export default {
             this.places.forEach(place => {
               // 만약 정보가 없으면 - 로 바꾸기
 
-              place.area =  place.area&&place.area.length>0?   place.area : "-";
-              place.number = place.number&&place.number.length>0 ? place.number : "-";
+              place.area = place.area && place.area.length > 0 ? place.area : "-";
+              place.number = place.number && place.number.length > 0 ? place.number : "-";
 
               // 유투브 설정
               let titles = [];
@@ -89,7 +89,7 @@ export default {
                 if (!titles.includes(youtube.channelTitle)) {
                   titles.push(youtube.channelTitle);
 
-                  youtube.url = "https://www.youtube.com/watch?v="+youtube.videoId;
+                  youtube.url = "https://www.youtube.com/watch?v=" + youtube.videoId;
                   place.youtubers += "#" + youtube.channelTitle;
                   youtubes.push(youtube);
                 }
@@ -99,7 +99,7 @@ export default {
               })
 
               //처음 들어갈 때 - 리스트 맨 앞으로 설정
-              if(this.place == null) {
+              if (this.place == null) {
                 this.select = this.places[0];
               }
             })
@@ -117,18 +117,16 @@ export default {
 </script>
 <style>
 
-youtube {
-  list-style: none;
-  font-size: 10px;
-}
-
-ul.type04 {
+.youtube-list-left {
   list-style: none;
   border-collapse: separate;
   border-spacing: 1px;
   text-align: left;
   line-height: 1.5;
   margin-top: 0px;
+  background: #7C7877;
+  position: absolute;
+  width: 40%;
 }
 
 name {
@@ -136,22 +134,10 @@ name {
   color: #F0E5DE;
 }
 
-li {
-  padding: 5px 0px 5px 5px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #efefef;
-  font-size: 20px;
-  color: #ABD0CE;
-}
 
-.left {
-  background: #7C7877;
-  width: 50%;
-}
-
-.right {
-  right: -20px;
-  width: 50%;;
+.youtube-list-right {
+  right: 20%;
+  width: 40%;
   position: absolute;
   background: #D9D4CF; /*#ABD0CE #F0E5DE #D9D4CF; #7C7877;*/
   text-align: center;
@@ -160,4 +146,5 @@ li {
   font-size: 20px;
   color: #7C7877;
 }
+
 </style>

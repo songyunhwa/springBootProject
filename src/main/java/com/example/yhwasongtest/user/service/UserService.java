@@ -140,7 +140,9 @@ public class UserService implements UserDetailsService {
         return passwordHashed;
     }
 
-    public ResponseEntity login(String name, String password, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ResponseEntity login(String name, String password,
+                                HttpServletRequest request, HttpServletResponse response,
+                                HttpSession httpSession) throws Exception {
 
         String resultToken = getToken(name, password);
 

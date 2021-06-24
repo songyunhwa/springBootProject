@@ -6,9 +6,8 @@ import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
-import com.example.yhwasongtest.youtube.model.YoutubeModel;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

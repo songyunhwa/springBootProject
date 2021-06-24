@@ -53,27 +53,4 @@ export default {
   float: left;
 }
 
-button {
-  color: #444444;
-  background: #F3F3F3;
-  border: 1px #DADADA solid;
-  padding: 5px 10px;
-  font-weight: bold;
-  font-size: 9pt;
-  outline: none;
-  float: left;
-  margin: 10px 10px;
-}
-
-button:hover {
-  border: 1px #C6C6C6 solid;
-  box-shadow: 1px 1px 1px #EAEAEA;
-  color: #333333;
-  background: #F7F7F7;
-}
-
-button:active {
-  box-shadow: inset 1px 1px 1px #DFDFDF;
-}
-
 </style>

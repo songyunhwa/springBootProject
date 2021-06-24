@@ -1,5 +1,7 @@
 <!-- 배너 -->
 <template>
+  <recommend class="right-banner"></recommend>
+
   <div class="banner">
     <div v-if="this.email&&this.email.length>0">
       <router-link to="/logout">
@@ -30,10 +32,10 @@
 
 <script>
 import YoutubeList from "@/components/YoutubeList";
-
+import Recommend from "@/components/Recommend";
 export default {
   name: 'Home',
-  components: {YoutubeList},
+  components: {YoutubeList, Recommend},
   data: () => ({
     email: '',
     password: '',
@@ -90,6 +92,10 @@ button:active {
 
 .search{
   float: right;
+}
 
+.right-banner{
+  float:right;
+  width: 20%;
 }
 </style>

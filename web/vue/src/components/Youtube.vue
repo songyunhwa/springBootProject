@@ -46,6 +46,9 @@ export default {
     this.email = this.$cookies.get('email');
   },
   methods: {
+    setPlace(place){
+      this.$props.select_place = place;
+    },
     setRecommend() {
       return axios
           .post(this.url + 'recommend?userName=' + this.email + '&id=' + this.select_place.id)

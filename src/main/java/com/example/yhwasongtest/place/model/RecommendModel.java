@@ -18,8 +18,8 @@ public class RecommendModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+
     private long placeId;
 
-    @Transient
-    private List<String> userList = new ArrayList<String>();
+    private String users;
 }

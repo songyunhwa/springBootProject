@@ -1,10 +1,7 @@
 package com.example.yhwasongtest.place.controller;
 
-import com.example.yhwasongtest.common.CommonCode;
-import com.example.yhwasongtest.place.model.PlaceModel;
-import com.example.yhwasongtest.place.model.WishedModel;
 import com.example.yhwasongtest.place.service.RecommendService;
-import org.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
@@ -28,7 +24,7 @@ public class RecommendController {
     }
 
     /**
-     *
+     *  장소 추천하기
      * @param userName 추천자 이름
      * @param id       장소 아이디
      * @return
@@ -46,19 +42,29 @@ public class RecommendController {
         }
     }
 
+    /**
+     * 장소 찜하기
+     * @param userName
+     * @param id
+     * @return
+     */
     @PostMapping(value = "/wished")
     public ResponseEntity putWished(@RequestParam(name = "userName",required = true) String userName,
-                                       @RequestParam(name = "id",required = true) long id) {
+                                    @RequestParam(name = "id",required = true) long id) {
 
         try {
             recommendService.putWished(userName, id);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e) {
             logger.info("PlaceController.js : putReview exception cause :" , e.toString());
-            return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
     }
-
+    /**
+     * 장소 찜한 것 가져오기
+     * @param userName
+     * @return
+     */
     @GetMapping(value = "/wished")
     public ResponseEntity getWished(@RequestParam(name = "userName",required = true) String userName) {
 
@@ -68,6 +74,24 @@ public class RecommendController {
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {
             logger.info("PlaceController.js : putReview exception cause :" , e.toString());
+            return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 추천 배너
+     * @param userName
+     * @return
+     */
+    @GetMapping(value = "/recommend")
+    public ResponseEntity getRecommend(@RequestParam(name = "userName",required = true) String userName) {
+
+        try {
+            JSONArray jsonArray = recommendService.getRecommend(userName);
+
+            return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
+        } catch (Exception e) {
+            logger.info("RecommendController.js : getRecommend cause :" , e.toString());
             return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
         }
     }

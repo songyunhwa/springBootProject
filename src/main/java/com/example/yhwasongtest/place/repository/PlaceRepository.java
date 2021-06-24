@@ -18,7 +18,7 @@ public interface PlaceRepository extends JpaRepository<PlaceModel, Long> {
 
     List<PlaceModel> findByNameContaining(String name);
 
-    // vue 에서 list 불러올 때 쓰임.
+    // 기본 목록
     @Query(value = "SELECT * FROM test.place p WHERE p.sub_category != '디저트' And p.view > 1 Order By p.view Desc;", nativeQuery = true)
     List<PlaceModel> findByViewAndSubCategory();
 
@@ -26,6 +26,7 @@ public interface PlaceRepository extends JpaRepository<PlaceModel, Long> {
     @Query(value = "SELECT * FROM test.place p WHERE p.name REGEXP '^[A-Za-z]';", nativeQuery = true)
     List<PlaceModel> findByNameContaingEng();
 
+    // 검색 기능
     @Query(value = "SELECT * FROM test.place p " +
             "           WHERE p.name like concat('%', :msg, '%'); " , nativeQuery = true)
     List<PlaceModel> findByNameContaing(@Param("msg") String msg);
@@ -39,6 +40,10 @@ public interface PlaceRepository extends JpaRepository<PlaceModel, Long> {
             "           )as y " +
             "       ON y.place_id = p.id;", nativeQuery = true)
     List<PlaceModel> findByChannelTitle(@Param("msg") String msg);
+
+    // 추천 목록
+    @Query(value = "SELECT p.* , (p.view + p.recommend) as sum FROM test.place p WHERE p.sub_category = :category order by sum desc;", nativeQuery = true)
+    List<PlaceModel> findBySubCategoryOrderByRecommendDecsViewDesc(@Param("category") String category);
 
 
 }

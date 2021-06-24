@@ -1,9 +1,9 @@
 <template>
-  <div class="right">
+  <div class="youtube-list-right">
     <Youtube :select_place="select"></Youtube>
   </div>
-  <div class="left">
-    <ul class="type04">
+  <div class="youtube-list-left">
+    <ul>
       <li v-for="place in this.places"
           v-bind:key="place" @click="selectPlace(place)">
 
@@ -25,7 +25,7 @@ export default {
   data: () => ({
     email: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/wished',
+    url: 'http://localhost:9000/api/v1/wished', //
     places: [{
       name: '',
       area: '',
@@ -107,48 +107,12 @@ export default {
 }
 </script>
 <style>
-
-youtube {
-  list-style: none;
-  font-size: 10px;
-}
-
-ul.type04 {
-  list-style: none;
-  border-collapse: separate;
-  border-spacing: 1px;
-  text-align: left;
-  line-height: 1.5;
-  margin-top: 0px;
-}
-
-name {
-  width: 150px;
-  color: #F0E5DE;
-}
-
 li {
-  padding: 5px 0px 5px 5px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #efefef;
   font-size: 20px;
   color: #ABD0CE;
-}
-
-.left {
-  background: #7C7877;
-  width: 50%;
-}
-
-.right {
-  right: -20px;
-  width: 50%;;
-  position: absolute;
-  background: #D9D4CF; /*#ABD0CE #F0E5DE #D9D4CF; #7C7877;*/
-  text-align: center;
-  margin-right: 20px;
+  border-bottom: 1px solid #DFDFDF;
+  margin-top: 10px;
   margin-bottom: 10px;
-  font-size: 20px;
-  color: #7C7877;
 }
+
 </style>
