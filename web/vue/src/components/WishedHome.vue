@@ -27,7 +27,7 @@ import WishedList from "@/components/Wished";
 
 export default {
   name: 'WishedHome',
-  components: {WishedList, },
+  components: {WishedList},
   data: () => ({
     email: '',
     password: '',
@@ -44,13 +44,6 @@ export default {
 
 .banner {
   height: 50px;
-}
-
-.title {
-  font-size: 18px;
-  color: #7C7877;
-  padding: 10px 10px;
-  float: left;
 }
 
 </style>

@@ -64,7 +64,6 @@ export default {
           .then(({data}) => {
             this.places = data;
 
-
             this.places.forEach(place => {
               // 만약 정보가 없으면 - 로 바꾸기
 
@@ -88,12 +87,9 @@ export default {
                 // 한번 더 겹치는 거 없는지 filtering
                 place.youtube = youtubes;
               })
-
-              //처음 들어갈 때 - 리스트 맨 앞으로 설정
-              if(this.place == null) {
-                this.select = this.places[0];
-              }
             })
+
+
           })
           .catch(({error}) => {
             console.log("error");

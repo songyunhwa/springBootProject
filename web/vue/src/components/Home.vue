@@ -19,6 +19,7 @@
 
     <div class="title">
       당다라당당에 오신걸 환영합니다! {{ email }}
+      오늘 방문자수: {{this.views}}
     </div>
 
     <div class="search">
@@ -33,23 +34,35 @@
 <script>
 import YoutubeList from "@/components/YoutubeList";
 import Recommend from "@/components/Recommend";
+import axios from "axios";
 export default {
   name: 'Home',
   components: {YoutubeList, Recommend},
   data: () => ({
     email: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/place',
+    url: 'http://localhost:9000/api/v1/history',
     input: '', // 입력하는 값
     msg: '',   // 실질적으로 넘어가는 값
-    object: [],
+    views : '0', // 하루 접속량
   }),
   created() {
     this.email = this.$cookies.get('email');
+    this.getLoginHistory();
   },
   methods: {
     setMsg(){
       this.$refs.list.getYoutube();
+    },
+    getLoginHistory(){
+      return axios
+          .get(this.url)
+          .then(({data}) => {
+            this.views = data;
+          })
+          .catch(() => {
+
+          })
     }
   }
 }
@@ -61,7 +74,7 @@ export default {
 }
 
 .title {
-  font-size: 18px;
+  font-size: 14px;
   color: #7C7877;
   padding: 10px 10px;
   float: left;

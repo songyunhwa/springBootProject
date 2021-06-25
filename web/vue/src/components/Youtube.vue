@@ -22,13 +22,15 @@
     <div class="tail" @click="setRecommend">추천</div>
   </div>
 
-
+  <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
 </template>
 <script>
 import axios from "axios";
+import Modal from "@/views/Modal";
 
 export default {
   name: 'Youtube',
+  components: {Modal},
   props: {
     select_place: Object
   },
@@ -36,6 +38,12 @@ export default {
     email: '',
     password: '',
     url: 'http://localhost:9000/api/v1/',
+    showModal: false,
+    modal: {
+      header:'',
+      body:'',
+      footer:''
+    }
   }),
   computed: {
     placeName() {
@@ -46,17 +54,20 @@ export default {
     this.email = this.$cookies.get('email');
   },
   methods: {
-    setPlace(place){
+    setPlace(place) {
       this.$props.select_place = place;
     },
     setRecommend() {
       return axios
           .post(this.url + 'recommend?userName=' + this.email + '&id=' + this.select_place.id)
           .then(() => {
-
+            this.modal.body = '추천을 성공했습니다.'
+            this.onToggleModal();
           })
           .catch(({error}) => {
-            console.log("error");
+            this.modal.body = '추천을 실패했습니다.'
+            this.onToggleModal();
+
             console.log(error);
           })
     },
@@ -64,12 +75,22 @@ export default {
       return axios
           .post(this.url + 'wished?userName=' + this.email + '&id=' + this.select_place.id)
           .then(() => {
-
+            this.modal.body = '찜을 성공했습니다.'
+            this.onToggleModal();
           })
           .catch(({error}) => {
-            console.log("error");
+            this.modal.body = '찜을 실패했습니다.'
+            this.onToggleModal();
+
             console.log(error);
           })
+    },
+    onToggleModal() {
+      if (this.showModal) {
+        this.showModal = false;
+      } else {
+        this.showModal = true;
+      }
     },
   }
 }

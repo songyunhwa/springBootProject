@@ -1,12 +1,10 @@
 <template>
-  <ul style="list-style: none;">
+  <ul class="recommend">
     <div>추천 리스트</div>
     <li v-for="place in this.places"
         v-bind:key="place" @click="selectPlace(place)">
-      <div class="recommend">
         {{ place.name }}
         {{ place.subCategory }}
-      </div>
     </li>
   </ul>
 
@@ -51,6 +49,10 @@ export default {
   },
   methods: {
     getYoutube() {
+      if(this.email===undefined){
+        this.email = 'test1';
+      }
+
       return axios
           .get(this.url + "?userName=" + this.email)
           .then(({data}) => {
@@ -70,7 +72,7 @@ export default {
 </script>
 <style>
 .recommend {
-  background: beige;
+  list-style: none;
   font-size: 15px;
   align-content: center;
 }

@@ -4,8 +4,10 @@ import com.example.yhwasongtest.common.JwtUtil;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.Authority;
 import com.example.yhwasongtest.user.model.CustomUserDetails;
+import com.example.yhwasongtest.user.model.LoginHistory;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.repository.AuthorityRepository;
+import com.example.yhwasongtest.user.repository.LoginHistoryRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -27,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -35,10 +41,14 @@ public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
+    private final LoginHistoryRepository loginHistoryRepository;
 
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
+    public UserService(UserRepository userRepository,
+                       AuthorityRepository authorityRepository,
+                       LoginHistoryRepository loginHistoryRepository) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
+        this.loginHistoryRepository = loginHistoryRepository;
     }
 
     @Override
@@ -99,7 +109,6 @@ public class UserService implements UserDetailsService {
                 String resultToken = getToken(userModelDto.getEmail(), userModelDto.getPassword());
                 resultToken = getHashed(resultToken);
 
-                logger.info(" Hashed Password : ", resultToken);
                 UserModel userModel = new UserModel(userModelDto.getEmail(), resultToken, "ROLE_USER");
 
                 return userModel;
@@ -110,6 +119,10 @@ public class UserService implements UserDetailsService {
         }
         UserModel userModel = userRepository.findByUsername(userModelDto.getEmail());
         return userModel;
+    }
+
+    public UserModel getUser(String userName){
+        return userRepository.findByUsername(userName);
     }
 
     public String getToken(String id, String password) throws Exception {
@@ -140,35 +153,39 @@ public class UserService implements UserDetailsService {
         return passwordHashed;
     }
 
-    public ResponseEntity login(String name, String password,
-                                HttpServletRequest request, HttpServletResponse response,
-                                HttpSession httpSession) throws Exception {
+    public ResponseEntity login(String name, String password, HttpServletRequest request, HttpSession httpSession) throws Exception {
 
-        String resultToken = getToken(name, password);
 
         UserModel userModel = userRepository.findByUsername(name);
+        String ip = this.getRemoteAddr(request);
 
-        HttpSession session = request.getSession();
+        // session 기간이 아직 지나지 않았다면
+        if(userModel.getDate()!=null && userModel.getDate().compareTo(new Date()) > 0){
+            // 기간을 다시 설정
+            Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
+            this.keepLogin(userModel.getUsername(), userModel.getSessionId(), date);
+
+            this.putHistory(userModel.getUsername(), ip);
+
+            return new ResponseEntity(userModel, HttpStatus.OK);
+        }
+
+        HttpSession session = request.getSession(true);
 
         if (userModel != null) {
+            String resultToken = getToken(name, password);
             //if (userModel.getPassword().equals(resultToken)) {
             if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
-                // 쿠키 설정
-                Cookie cookie = new Cookie("loginCookie", userModel.getUsername());
-                cookie.setMaxAge(60 * 60 * 24 * 7);
-                response.addCookie(cookie);
 
                 // 세션 설정
                 session.setAttribute("login", userModel);
-                session.setAttribute("id",  userModel.getId());
-                session.setAttribute("email", userModel.getUsername());
-                session.setAttribute("auth", userModel.getRole());
                 session.setMaxInactiveInterval(1800); //30분
 
                 // 세션 유효시간 설정
                 Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
                 this.keepLogin(userModel.getUsername(), session.getId(), date);
 
+                this.putHistory(userModel.getUsername(), ip);
                 /*
                 // 토큰 생성
                 String accessToken = JwtUtil.createToken(userModel.getId(), userModel.getUsername());
@@ -178,19 +195,17 @@ public class UserService implements UserDetailsService {
                         .email(userModel.getUsername())
                         .token(accessToken)
                         .build()); */
-                return new ResponseEntity(userModel, HttpStatus.OK);
             }
-
+            return new ResponseEntity(userModel, HttpStatus.OK);
         }
 
         return new ResponseEntity(userModel, HttpStatus.BAD_REQUEST);
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-
-        request.getSession().invalidate();
-
-        Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
+    public void logout(HttpSession httpSession) {
+        httpSession.invalidate();
+        /*
+        Cookie loginCookie = WebUtils.getCookie(request, "loginUser");
         if (loginCookie != null) {
             loginCookie.setPath("/");
             loginCookie.setMaxAge(0);
@@ -200,7 +215,7 @@ public class UserService implements UserDetailsService {
             Date date = new Date(System.currentTimeMillis());
             this.keepLogin(loginCookie.getValue(), null, date);
         }
-
+        */
     }
 
     public void keepLogin(String username, String sessionId, Date date) {
@@ -213,12 +228,71 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public UserModel checkLogin(String sessionId) {
-        UserModel userModel = userRepository.findBySessionId(sessionId);
-        Date date = new Date();
-        if (userModel.getDate().before(date))
-            return userModel;
-        else return null;
+    public void putHistory(String userName, String ip) throws ParseException {
+        boolean exist = false;
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate =new Date();
+        String date = format.format(currentDate);
+
+        String start = date + " 00:00:00";
+        String end = date + " 23:59:59";
+
+        format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 유저가 오늘 접속했는지 // 같은 ip를 갖고 있는지 확인
+        List<LoginHistory> loginHistories= loginHistoryRepository.findByUserNameAndLoginDateBetween(userName, format.parse(start), format.parse(end));
+        for(LoginHistory history : loginHistories) {
+            if(history.getIp().equals(ip)){
+                exist = true;
+                break;
+            }
+        }
+        if(!exist){
+            LoginHistory loginHistory = new LoginHistory();
+            loginHistory.setIp(ip);
+            loginHistory.setUserName(userName);
+            loginHistory.setLoginDate(new Date());
+            loginHistoryRepository.save(loginHistory);
+        }
+
+    }
+
+    public String getRemoteAddr(HttpServletRequest request) {
+
+        String ip = null;
+
+        ip = request.getHeader("X-Forwarded-For");
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+
+    }
+    public int getLoginHistory() throws ParseException{
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate =new Date();
+        String date = format.format(currentDate);
+
+        String start = date + " 00:00:00";
+        String end = date + " 23:59:59";
+
+        format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        List<LoginHistory> loginHistories= loginHistoryRepository.findByLoginDateBetween(format.parse(start), format.parse(end));
+        return loginHistories.size();
     }
 
 }

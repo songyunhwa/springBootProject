@@ -1,7 +1,7 @@
-import Home from "@/views/Home";
+import Home from "@/components/Home";
 import Login from './components/Login'
 import Logout from "@/components/Logout";
-import WishedHome from "@/views/WishedHome";
+import WishedHome from "@/components/WishedHome";
 import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [

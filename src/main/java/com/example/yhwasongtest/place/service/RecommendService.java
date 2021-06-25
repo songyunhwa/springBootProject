@@ -37,6 +37,55 @@ public class RecommendService {
         this.dessertRepository = dessertRepository;
     }
 
+
+    public JSONArray getRecommend(String userName) throws Exception {
+        ArrayList<PointDto> maps = new ArrayList<PointDto>();
+        List<DessertModel> desserts = dessertRepository.findAll();
+
+        desserts.forEach(dessert -> maps.add(new PointDto(dessert.getSubCategory(), 0)));
+
+
+        // 찜에 들어있는 카테고리 별로 점수 부여
+        WishedModel wishedModel = wishedRepository.findByUserName(userName);
+
+        JSONParser jsonParser = new JSONParser();
+        Object obj = jsonParser.parse(wishedModel.getPlaces());
+        JSONArray arr = (JSONArray) obj;
+
+        ArrayList<PlaceModel> placeModels = new ArrayList<>();
+        for (int i = 0; i < arr.size(); i++) {
+            JSONObject jsonObject = (JSONObject) arr.get(i);
+            String place = jsonObject.get("place").toString();
+            // 사용자가 찜한 place
+            PlaceModel placeModel = placeRepository.findByName(place);
+            placeModels.add(placeModel);
+
+            if (placeModel != null) {
+                String subCategory = placeModel.getSubCategory();
+                // 카테고리 명에 따라 점수 추가
+                maps.forEach(map -> {
+                    if(map.category.equals(subCategory)){
+                        map.point = map.point + 1;
+                    }
+                });
+
+            }
+        }
+
+        // 카테고리 점수가 높은 순대로 결과에 추가
+        List<PlaceModel> result = new ArrayList<PlaceModel>();
+        for(PointDto p : maps){
+            if(result.size() > 10) break;
+            if(p.point>0){
+                List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
+                result =  placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList());
+
+            }
+        }
+        JSONArray jsonArray = CommonCode.convertToJSON(result);
+        return jsonArray;
+    }
+
     public void putRecommend(String userName, long id) throws Exception {
         RecommendModel recommendModel = recommendRepository.findByPlaceId(id);
         PlaceModel place = placeRepository.findById(id);
@@ -115,6 +164,7 @@ public class RecommendService {
                     JSONObject object = new JSONObject();
                     object.put("place", place.getName());
                     jsonArray.add(object);
+                    break;
                 }
 
             }
@@ -132,52 +182,5 @@ public class RecommendService {
 
     }
 
-    public JSONArray getRecommend(String userName) throws Exception {
-        ArrayList<PointDto> maps = new ArrayList<PointDto>();
-        List<DessertModel> desserts = dessertRepository.findAll();
-
-        desserts.forEach(dessert -> maps.add(new PointDto(dessert.getSubCategory(), 0)));
-
-
-        // 찜에 들어있는 카테고리 별로 점수 부여
-        WishedModel wishedModel = wishedRepository.findByUserName(userName);
-
-        JSONParser jsonParser = new JSONParser();
-        Object obj = jsonParser.parse(wishedModel.getPlaces());
-        JSONArray arr = (JSONArray) obj;
-
-        ArrayList<PlaceModel> placeModels = new ArrayList<>();
-        for (int i = 0; i < arr.size(); i++) {
-            JSONObject jsonObject = (JSONObject) arr.get(i);
-            String place = jsonObject.get("place").toString();
-            // 사용자가 찜한 place
-            PlaceModel placeModel = placeRepository.findByName(place);
-            placeModels.add(placeModel);
-
-            if (placeModel != null) {
-                String subCategory = placeModel.getSubCategory();
-                // 카테고리 명에 따라 점수 추가
-                maps.forEach(map -> {
-                    if(map.category.equals(subCategory)){
-                        map.point = map.point + 1;
-                    }
-                });
-
-            }
-        }
-
-        // 카테고리 점수가 높은 순대로 결과에 추가
-        List<PlaceModel> result = new ArrayList<PlaceModel>();
-        for(PointDto p : maps){
-            if(result.size() > 10) break;
-            if(p.point>0){
-                List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
-                result =  placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList());
-
-            }
-        }
-        JSONArray jsonArray = CommonCode.convertToJSON(result);
-        return jsonArray;
-    }
 
 }

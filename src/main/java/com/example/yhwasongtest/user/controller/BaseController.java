@@ -17,7 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -50,45 +54,49 @@ public class BaseController {
     }
 
     @GetMapping(value = "/logout")
-    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-
-        userService.logout(request, response);
-
-        return "redirect:/api/v1/login";
     }
 
     @GetMapping(value = "/login")
     public ResponseEntity login(@RequestParam(name = "email", required = true) String email,
                            @RequestParam(name = "password", required = true) String password,
-                           HttpServletRequest request,
-                           HttpServletResponse response,
-                                HttpSession httpSession) {
+                                HttpServletRequest request,
+                                HttpSession httpSession
+                            ) {
         try {
-            ResponseEntity responseEntity = userService.login(email, password, request, response, httpSession);
+
+            ResponseEntity responseEntity = userService.login(email, password, request, httpSession);
             return  responseEntity;
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping(value = "/login/check")
-    public ResponseEntity checkLogin(@RequestParam(name = "id", required = true) String sessionId) {
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ResponseEntity home(UserModel model, final HttpSession session)
+    {
+
         try {
-            UserModel userModel = userService.checkLogin(sessionId);
-            return  new ResponseEntity<>(userModel, HttpStatus.OK);
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpSession httpSession = request.getSession(false);
+            Object user = httpSession.getAttribute("login");
+            return  new ResponseEntity<>(user, HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
+    @GetMapping(value = "/history")
+    public ResponseEntity getLoginHistory()
+    {
 
-    @GetMapping("/")
-    public String userAccess(UserModel model, Authentication authentication) {
-        //Authentication 객체를 통해 유저 정보를 가져올 수 있다.
-        CustomUserDetails userDetail = (CustomUserDetails)authentication.getPrincipal();  //userDetail 객체를 가져옴
-        return "user_access";
+        try {
+            int cnt = userService.getLoginHistory();
+            return  new ResponseEntity<>(cnt, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
-
 
 }
