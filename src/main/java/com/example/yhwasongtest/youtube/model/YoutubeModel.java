@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "youtube")
+@Table(name = "youtube", uniqueConstraints=@UniqueConstraint(columnNames = {"videoId"}))
 public class YoutubeModel implements Serializable {
 
     @Id
@@ -23,6 +23,7 @@ public class YoutubeModel implements Serializable {
     public String channelTitle; // 유투버 이름
     public String title;       //동영상 제목
     public String description;  // 동영상 설명
+
     public String videoId; // 동영상 id
 
     @ManyToOne(

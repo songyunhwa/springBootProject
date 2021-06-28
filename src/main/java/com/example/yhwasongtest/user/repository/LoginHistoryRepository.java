@@ -8,6 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface LoginHistoryRepository extends JpaRepository<LoginHistory, Long> {
-    List<LoginHistory> findByUserNameAndLoginDateBetween(String userName, Date start, Date end);
-    List<LoginHistory> findByLoginDateBetween(Date start, Date end);
+    LoginHistory findByStatusAndUserNameAndLoginDateBetween(String status, String userName, Date start, Date end);
+    List<LoginHistory> findByStatusAndLoginDateBetween(String status, Date start, Date end);
 }

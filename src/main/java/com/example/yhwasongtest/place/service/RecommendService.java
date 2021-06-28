@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,16 +73,15 @@ public class RecommendService {
 
             }
         }
-
         // 카테고리 점수가 높은 순대로 결과에 추가
+        Collections.sort(maps);
+
         List<PlaceModel> result = new ArrayList<PlaceModel>();
         for(PointDto p : maps){
             if(result.size() > 10) break;
-            if(p.point>0){
-                List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
-                result =  placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList());
 
-            }
+            List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
+            result.addAll(placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList()));
         }
         JSONArray jsonArray = CommonCode.convertToJSON(result);
         return jsonArray;
@@ -91,27 +92,29 @@ public class RecommendService {
         PlaceModel place = placeRepository.findById(id);
         JSONArray jsonArray = new JSONArray();
 
+        JSONObject object = new JSONObject();
+        object.put("user", userName);
+
         if (recommendModel != null) {
             JSONParser jsonParser = new JSONParser();
             Object obj = jsonParser.parse(recommendModel.getUsers());
             jsonArray = (JSONArray) obj;
             for (int i = 0; i < jsonArray.size(); i++) {
                 Object jsonObject = jsonArray.get(i);
-                if (jsonObject.equals(place.getName())) {
+                if (jsonObject.equals(object)) {
                     jsonArray.remove(i);
                     break;
                 } else if (i == jsonArray.size() - 1) {
-                    JSONObject object = new JSONObject();
-                    object.put("user", userName);
                     jsonArray.add(object);
                 }
 
             }
+            if (jsonArray.size() == 0) {
+                jsonArray.add(object);
+            }
         } else {
             recommendModel = new RecommendModel();
             recommendModel.setPlaceId(id);
-            JSONObject object = new JSONObject();
-            object.put("user", userName);
             jsonArray.add(object);
         }
 
@@ -151,28 +154,30 @@ public class RecommendService {
         WishedModel wishedModel = wishedRepository.findByUserName(userName);
         JSONArray jsonArray = new JSONArray();
 
+        JSONObject object = new JSONObject();
+        object.put("place", place.getName());
+
         if (wishedModel != null) {
             JSONParser jsonParser = new JSONParser();
             Object obj = jsonParser.parse(wishedModel.getPlaces());
             jsonArray = (JSONArray) obj;
             for (int i = 0; i < jsonArray.size(); i++) {
                 Object jsonObject = jsonArray.get(i);
-                if (jsonObject.equals(place.getName())) {
+                if (jsonObject.equals(object)) {
                     jsonArray.remove(i);
                     break;
                 } else if (i == jsonArray.size() - 1) {
-                    JSONObject object = new JSONObject();
-                    object.put("place", place.getName());
                     jsonArray.add(object);
                     break;
                 }
 
             }
+            if (jsonArray.size() == 0) {
+                jsonArray.add(object);
+            }
         } else {
             wishedModel = new WishedModel();
             wishedModel.setUserName(userName);
-            JSONObject object = new JSONObject();
-            object.put("place", place.getName());
             jsonArray.add(object);
         }
 

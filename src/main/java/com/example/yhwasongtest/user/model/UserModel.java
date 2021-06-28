@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user")
+@Table(name = "user", uniqueConstraints=@UniqueConstraint(columnNames = {"username"}))
 public class UserModel {
         @Id
         @GeneratedValue

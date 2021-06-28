@@ -4,13 +4,15 @@
     <form @submit="onSubmit">
       <input placeholder="Enter your ID" v-model="email">
       <input placeholder="Enter your password" v-model="password">
-      <button type="button" @click="Click">{{this.title}}</button>
     </form>
     {{ result }}
-
-    <button @click="ChangeUrl">Sign Up</button>
-    <button @click="ChangeUrl">Login</button>
+    <button type="button" @click="Click">확인</button>
   </div>
+
+  <button v-if="this.title==='로그인'" @click="ChangeUrl">회원가입</button>
+  <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인</button>
+  <button @click="this.$router.push({path: '/'});">홈</button>
+
 </template>
 
 <script>
@@ -20,7 +22,7 @@ const resourceHost = "http://localhost:9000/api/v1"
 export default {
   name: 'Login',
   data: () => ({
-    title: 'Login',
+    title: '로그인',
     email: '',
     password: '',
     url: '',
@@ -43,7 +45,7 @@ export default {
   },
   methods: {
     Click(){
-      if(this.title == 'Login')
+      if(this.title == '로그인')
         this.Login();
       else
         this.SignUp();
@@ -77,15 +79,19 @@ export default {
     },
 
     ChangeUrl(){
-      if(this.title == 'Login') {
-        this.title = 'Sign Up';
+      if(this.title == '로그인') {
+        this.title = '회원가입';
         this.url = resourceHost + '/user';
       }else {
-        this.title = 'Login';
+        this.title = '로그인';
       }
     },
 
     SignUp(){
+      if (!this.email || !this.password) {
+        alert("Your email or password is empty.");
+      }
+
       this.userModel.email = this.email;
       this.userModel.password = this.password;
 

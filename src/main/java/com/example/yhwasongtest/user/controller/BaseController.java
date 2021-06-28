@@ -54,8 +54,17 @@ public class BaseController {
     }
 
     @GetMapping(value = "/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response,
+                                 HttpSession session) {
+        try {
+            //new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+            userService.logout(session);
+
+            return new ResponseEntity(HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(value = "/login")

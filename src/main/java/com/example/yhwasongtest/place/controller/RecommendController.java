@@ -37,8 +37,7 @@ public class RecommendController {
             recommendService.putRecommend(userName, id);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e) {
-            logger.info("PlaceController.js : putReview exception cause :" , e.toString());
-            return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("e.toString()",HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -56,7 +55,6 @@ public class RecommendController {
             recommendService.putWished(userName, id);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e) {
-            logger.info("PlaceController.js : putReview exception cause :" , e.toString());
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
     }
@@ -73,8 +71,7 @@ public class RecommendController {
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {
-            logger.info("PlaceController.js : putReview exception cause :" , e.toString());
-            return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -91,8 +88,7 @@ public class RecommendController {
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {
-            logger.info("RecommendController.js : getRecommend cause :" , e.toString());
-            return new ResponseEntity("리퀘스트 값이 없습니다.",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
     }
 }

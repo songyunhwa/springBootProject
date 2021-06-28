@@ -2,7 +2,8 @@
   <ul class="recommend">
     <div>추천 리스트</div>
     <li v-for="place in this.places"
-        v-bind:key="place" @click="selectPlace(place)">
+        v-bind:key="place" @click="selectPlace(place)"
+        style="font-size: 15px;   color: rosybrown;">
         {{ place.name }}
         {{ place.subCategory }}
     </li>
@@ -52,7 +53,6 @@ export default {
       if(this.email===undefined){
         this.email = 'test1';
       }
-
       return axios
           .get(this.url + "?userName=" + this.email)
           .then(({data}) => {

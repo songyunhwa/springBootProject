@@ -1,7 +1,8 @@
 <template>
   <div>
-    <h2>로그아웃하시겠습니까?</h2>
+    <h2>로그아웃</h2>
     <button type="button" @click="LOGOUT">확인</button>
+    <button @click="this.$router.push({path: '/'});">홈</button>
   </div>
 </template>
 

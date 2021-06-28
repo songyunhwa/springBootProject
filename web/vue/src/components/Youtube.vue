@@ -1,7 +1,6 @@
 <template>
   <div class="youtube">
 
-
     <h3>{{ select_place.name }}</h3>
     <div>지역 : {{ select_place.area }}</div>
     <div>번호 : {{ select_place.number }}</div>
@@ -18,10 +17,10 @@
         <a :href="youtube.url" target="_blank" style="color: rosybrown">바로가기</a>
       </li>
     </ul>
+
     <div class="tail" @click="setWished">찜</div>
     <div class="tail" @click="setRecommend">추천</div>
   </div>
-
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
 </template>
 <script>
@@ -30,7 +29,7 @@ import Modal from "@/views/Modal";
 
 export default {
   name: 'Youtube',
-  components: {Modal},
+  components: { Modal},
   props: {
     select_place: Object
   },
@@ -111,4 +110,6 @@ export default {
   float: right;
   margin-right: 40px;
 }
+
+
 </style>

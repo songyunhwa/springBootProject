@@ -22,8 +22,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.SessionScope;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -153,13 +155,14 @@ public class UserService implements UserDetailsService {
         return passwordHashed;
     }
 
-    public ResponseEntity login(String name, String password, HttpServletRequest request, HttpSession httpSession) throws Exception {
+    public ResponseEntity login(String name, String password, HttpServletRequest request, HttpSession session) throws Exception {
 
 
         UserModel userModel = userRepository.findByUsername(name);
         String ip = this.getRemoteAddr(request);
 
         // session 기간이 아직 지나지 않았다면
+
         if(userModel.getDate()!=null && userModel.getDate().compareTo(new Date()) > 0){
             // 기간을 다시 설정
             Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
@@ -169,8 +172,6 @@ public class UserService implements UserDetailsService {
 
             return new ResponseEntity(userModel, HttpStatus.OK);
         }
-
-        HttpSession session = request.getSession(true);
 
         if (userModel != null) {
             String resultToken = getToken(name, password);
@@ -202,8 +203,13 @@ public class UserService implements UserDetailsService {
         return new ResponseEntity(userModel, HttpStatus.BAD_REQUEST);
     }
 
-    public void logout(HttpSession httpSession) {
-        httpSession.invalidate();
+    public void logout(HttpSession session){
+
+        //HttpSession session = request.getSession(false);
+        if(session != null){
+            session.invalidate();
+        }
+
         /*
         Cookie loginCookie = WebUtils.getCookie(request, "loginUser");
         if (loginCookie != null) {
@@ -229,7 +235,6 @@ public class UserService implements UserDetailsService {
     }
 
     public void putHistory(String userName, String ip) throws ParseException {
-        boolean exist = false;
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date currentDate =new Date();
@@ -240,20 +245,19 @@ public class UserService implements UserDetailsService {
 
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 유저가 오늘 접속했는지 // 같은 ip를 갖고 있는지 확인
-        List<LoginHistory> loginHistories= loginHistoryRepository.findByUserNameAndLoginDateBetween(userName, format.parse(start), format.parse(end));
-        for(LoginHistory history : loginHistories) {
-            if(history.getIp().equals(ip)){
-                exist = true;
-                break;
-            }
+        LoginHistory loginHistory= loginHistoryRepository.findByStatusAndUserNameAndLoginDateBetween("LOGIN", userName, format.parse(start), format.parse(end));
+        if(loginHistory!=null){
+            loginHistory.setLoginDate(new Date());
         }
-        if(!exist){
-            LoginHistory loginHistory = new LoginHistory();
+        else{
+            loginHistory = new LoginHistory();
             loginHistory.setIp(ip);
             loginHistory.setUserName(userName);
+            loginHistory.setStatus("LOGIN");
             loginHistory.setLoginDate(new Date());
-            loginHistoryRepository.save(loginHistory);
         }
+
+        loginHistoryRepository.save(loginHistory);
 
     }
 
@@ -291,7 +295,7 @@ public class UserService implements UserDetailsService {
 
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        List<LoginHistory> loginHistories= loginHistoryRepository.findByLoginDateBetween(format.parse(start), format.parse(end));
+        List<LoginHistory> loginHistories= loginHistoryRepository.findByStatusAndLoginDateBetween("LOGIN", format.parse(start), format.parse(end));
         return loginHistories.size();
     }
 

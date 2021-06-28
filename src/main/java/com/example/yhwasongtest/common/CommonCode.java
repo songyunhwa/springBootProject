@@ -1,6 +1,7 @@
 package com.example.yhwasongtest.common;
 
 import com.example.yhwasongtest.place.model.PlaceModel;
+import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import lombok.AllArgsConstructor;
 import org.json.simple.JSONArray;
@@ -39,6 +40,21 @@ public class CommonCode {
             jsonObject.put("youtube", subArray);
 
 
+            jsonArray.add(jsonObject);
+        }
+        return jsonArray;
+    }
+
+    public static JSONArray reviewConvertToJSON(List<ReviewModel> reviewModels) throws Exception{
+        JSONArray jsonArray = new JSONArray();
+        for (ReviewModel reviewModel : reviewModels) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", reviewModel.getId());
+            jsonObject.put("userName" , reviewModel.getUserName());
+            jsonObject.put("userId" , reviewModel.getUserId());
+            jsonObject.put("contents" , reviewModel.getContents());
+            jsonObject.put("star" , reviewModel.getStar());
+            jsonObject.put("prevId" , reviewModel.getPrevId());
             jsonArray.add(jsonObject);
         }
         return jsonArray;

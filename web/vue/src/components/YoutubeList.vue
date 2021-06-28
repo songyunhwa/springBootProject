@@ -1,6 +1,7 @@
 <template>
   <div class="youtube-list-right">
     <Youtube :select_place="select"></Youtube>
+    <Review :select_place="select" ref="review"></Review>
   </div>
   <div class="youtube-list-left">
     <ul style="list-style: none;">
@@ -15,14 +16,16 @@
       </li>
     </ul>
   </div>
+
+
 </template>
 <script>
 import axios from "axios";
 import Youtube from "@/components/Youtube";
-
+import Review from "@/components/Review";
 export default {
   name: 'YoutubeList',
-  components: {Youtube},
+  components: {Youtube, Review},
   props: {
     msg: Object,
   },
@@ -101,6 +104,7 @@ export default {
               //처음 들어갈 때 - 리스트 맨 앞으로 설정
               if (this.place == null) {
                 this.select = this.places[0];
+                this.$refs.review.getReview(this.select.id);
               }
             })
           })
@@ -111,6 +115,7 @@ export default {
     },
     selectPlace(place) {
       this.select = place;
+      this.$refs.review.getReview(place.id);
     }
   }
 }
@@ -146,5 +151,6 @@ name {
   font-size: 20px;
   color: #7C7877;
 }
+
 
 </style>

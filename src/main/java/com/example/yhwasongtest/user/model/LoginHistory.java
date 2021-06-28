@@ -14,12 +14,14 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "history")
+@Table(name = "login_history")
 public class LoginHistory {
     @Id
     @GeneratedValue
     private Long id;
     private String userName;    // 이메일
     private String ip;          // 로그인한 ip
-    private Date loginDate; // 로그인 시간
+    private String status;      // LOGIN or LOGOUT
+    private Date loginDate;     // 로그인 시간
+    private Date logoutDate;    // 로그아웃 시간
 }
