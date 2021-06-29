@@ -32,13 +32,10 @@ public class PlaceController {
     private static final Logger logger = LoggerFactory.getLogger(PlaceController.class);
 
     private final PlaceService placeService;
-    private PictureRepository pictureRepository;
 
     @Autowired
-    public PlaceController(PlaceService placeService,
-                           PictureRepository pictureRepository) {
+    public PlaceController(PlaceService placeService) {
         this.placeService = placeService;
-        this.pictureRepository = pictureRepository;
     }
 
     @GetMapping(value = "/place")
@@ -69,15 +66,11 @@ public class PlaceController {
     }
 
     @PostMapping(value = "/place")
-    public ResponseEntity putPlace(@RequestParam("file") MultipartFile file, @RequestBody PlaceDto model) {
+    public ResponseEntity putPlace(@RequestBody PlaceDto model) {
 
         String result = "";
         PlaceModel placeModel = new PlaceModel();
         try {
-            if(!file.isEmpty()){
-                model.setFileId(placeService.saveFile(file));
-            }
-
             placeModel.setName(model.getName()); // 장소 이름
             placeModel.setArea(model.getArea()); // 지역
             placeModel.setNumber(model.getNumber());
@@ -127,27 +120,6 @@ public class PlaceController {
         placeService.deletePlaceContaingEng();
         placeService.getFoodCategory();
         placeService.getDessertCategory();
-    }
-
-    public ResponseEntity getFile(String placeName) {
-        try{
-        PlaceModel placeModel = placeService.getPlaceByName(placeName);
-        if (placeModel.getFileId() == null)
-            return null;
-
-        PictureModel pictureModel = pictureRepository.findById(placeModel.getFileId()).orElseThrow(IllegalArgumentException::new);;
-        String filename = pictureModel.getFileName();
-        String encodeFileName = URLEncoder.encode(filename, "UTF-8");
-        Resource file = placeService.loadFile(filename);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodeFileName + "\"")
-                .body(file);
-
-        }catch (Exception e){
-            logger.info("PlaceController.js error =>" , e.toString());
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 }

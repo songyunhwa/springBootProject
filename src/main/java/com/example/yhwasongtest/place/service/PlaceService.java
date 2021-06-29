@@ -184,50 +184,6 @@ public class PlaceService {
         }
     }
 
-    public long saveFile(MultipartFile file) throws Exception {
-        String orgname = file.getOriginalFilename();
-        String filename = new FileSecurity().md5(orgname);
-
-        Path rootpath = Paths.get("upload-dir");
-        Path path = rootpath.resolve(filename); // 고정된 루트 경로에 부분경로 추가
-        String savePath = path.toString();
-
-        if (!new File(savePath).exists()) {
-            try {
-                new File(savePath).mkdir();
-            } catch (Exception e) {
-                e.getStackTrace();
-            }
-        }
-        String filePath = savePath + "\\" + filename;
-        file.transferTo(new File(filePath));
-
-        PictureModel pictureModel = new PictureModel();
-        pictureModel.setOriginFileName(orgname);
-        pictureModel.setFileName(filename);
-        pictureModel.setFilePath(filePath);
-        pictureRepository.save(pictureModel);
-
-        pictureModel = pictureRepository.findByOriginFileName(orgname);
-        return pictureModel.getId();
-    }
-
-    public Resource loadFile(String filename) {
-        try {
-            Path rootpath = Paths.get("upload-dir");
-            Path path = rootpath.resolve(filename); // 고정된 루트 경로에 부분경로 추가
-            Resource resource = new UrlResource(path.toUri());
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                return null;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
 
     // 영어 이름 제거
     public void deletePlaceContaingEng() {

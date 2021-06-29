@@ -8,7 +8,8 @@
       </thead>
       <tbody>
       <td><textarea type="text" rows="5" style="width:500px; resize: none;" v-model="this.input"/></td>
-      <button @click="putReview">등록</button>
+      <input type="file" name="image" id="image"/>
+      <button @click="uploadFile">등록</button>
       </tbody>
     </table>
 
@@ -16,6 +17,7 @@
       <li v-for="review in reviews" v-bind:key="review" class="review">
         <table>
           <tbody>
+          <td><img v-bind:src="image_path + review.fileName"/></td>
           <td>{{ review.userName }}</td>
           <td>{{ review.contents }}</td>
 
@@ -46,7 +48,6 @@
 <script>
 import axios from "axios";
 import Modal from "@/views/Modal";
-
 export default {
   name: 'Review',
   components: {
@@ -58,6 +59,8 @@ export default {
   data: () => ({
         input: '',
         url: 'http://localhost:9000/api/v1/',
+        image_path : 'C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\src\\main\\resources\\file\\',
+        fileId: '',
         reviews: [{
           id: '',
           placeName: '',
@@ -67,6 +70,9 @@ export default {
           contents: '',
           star: '',
           prevId: '',
+          fileId: '',
+          fileName: '',
+
           // 아래부터는 사용자 입력
           modify: false,
           input: '',
@@ -84,6 +90,11 @@ export default {
   ,
   methods: {
     putReview() {
+      var image = document.getElementById("image");
+      if (image.files[0]&&image.files[0].length>0) {
+        this.uploadFile();
+      }
+
       var params = {
         id: '',
         placeName: this.select_place.name,
@@ -92,7 +103,8 @@ export default {
         userId: '',
         contents: this.input,
         star: '',
-        prevId: ''
+        prevId: '',
+        fileId: this.fileId
       };
       return axios
           .post(
@@ -113,9 +125,6 @@ export default {
           .get(this.url + 'review?id=' + id)
           .then((data) => {
             this.reviews = data.data;
-            this.reviews.forEach(place => {
-              console.log(place);
-            })
           })
           .catch(({error}) => {
             console.log(error);
@@ -126,7 +135,6 @@ export default {
     modifyReview(id, review) {
       review.contents = review.input;
       review.star = '0';
-      console.log(this.url + 'review/' + id);
       return axios
           .post(
               this.url + 'review/' + id,
@@ -154,8 +162,35 @@ export default {
           .catch(({error}) => {
             console.log(error);
           })
-    }
-    ,
+    },
+    uploadFile() {
+      const formData = new FormData();
+      var image = document.getElementById("image");
+      formData.append("image", image.files[0]);
+
+      axios.post(this.url + 'review/image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((data) => {
+        this.fileId = data;
+
+      }).catch((error) => {
+        console.log(error);
+      })
+    },
+    getFile(fileId) {
+      return axios.post(this.url + 'review/image?id=' + fileId, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((data) => {
+        // 파일 아이디가 들어옴 -> review fileId 에 넣어야함.
+        console.log(data);
+      }).catch((error) => {
+        console.log(error);
+      })
+    },
     onToggle(review) {
       if (review.userName !== this.$cookies.get('email')) {
         this.modal.body = '수정 불가능합니다.'

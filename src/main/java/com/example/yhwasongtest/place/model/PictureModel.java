@@ -21,6 +21,7 @@ public class PictureModel implements Serializable {
     private long placeId; // 연결된 place 아이디
 
     private String originFileName;
+
     private String fileName;
 
     private String filePath;
