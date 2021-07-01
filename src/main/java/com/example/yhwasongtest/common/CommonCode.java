@@ -55,6 +55,8 @@ public class CommonCode {
             jsonObject.put("contents" , reviewModel.getContents());
             jsonObject.put("star" , reviewModel.getStar());
             jsonObject.put("prevId" , reviewModel.getPrevId());
+            jsonObject.put("fileId", reviewModel.getFileId());
+            jsonObject.put("fileName", reviewModel.getFileName());
             jsonArray.add(jsonObject);
         }
         return jsonArray;

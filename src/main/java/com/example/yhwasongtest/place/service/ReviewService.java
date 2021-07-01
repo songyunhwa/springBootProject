@@ -87,9 +87,9 @@ public class ReviewService {
 
         PictureModel pictureModel = pictureRepository.findByFileName(filename);
         if(pictureModel == null) {
-            String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\src\\main\\resources\\file\\";
+            String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\web\\vue\\src\\assets\\images\\";
 
-            String savePath = root_path + filename;
+            String savePath = root_path + filename + ".png";
 
             if (!new File(savePath).exists()) {
                 try {

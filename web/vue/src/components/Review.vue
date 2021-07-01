@@ -13,14 +13,21 @@
       </tbody>
     </table>
 
-    <ul>
+    <ul style="float: right">
       <li v-for="review in reviews" v-bind:key="review" class="review">
         <table>
           <tbody>
-          <td><img v-bind:src="image_path + review.fileName"/></td>
-          <td>{{ review.userName }}</td>
-          <td>{{ review.contents }}</td>
-
+          <div v-if="review.fileName.length>0">
+            <img
+                :src="require(`C:/Users/pc/Documents/공부/springBootProject_back/web/vue/src/assets/images/${review.fileName}.png`)"
+                class="review-img"/>
+          </div>
+          <td>
+            <div>{{ review.userName }}</div>
+            <div>
+              {{ review.contents }}
+            </div>
+          </td>
           <div v-show="!review.modify">
             <button @click="onToggle(review)">수정</button>
             <button @click="deleteReview(review.id, review)">삭제</button>
@@ -48,6 +55,7 @@
 <script>
 import axios from "axios";
 import Modal from "@/views/Modal";
+
 export default {
   name: 'Review',
   components: {
@@ -59,7 +67,7 @@ export default {
   data: () => ({
         input: '',
         url: 'http://localhost:9000/api/v1/',
-        image_path : 'C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\src\\main\\resources\\file\\',
+        image_path: '', //'@/assets/e1e35ffd2e6fa5d6b0d5bf9f53a6182b.png',
         fileId: '',
         reviews: [{
           id: '',
@@ -91,7 +99,7 @@ export default {
   methods: {
     putReview() {
       var image = document.getElementById("image");
-      if (image.files[0]&&image.files[0].length>0) {
+      if (image.files[0] && image.files[0].length > 0) {
         this.uploadFile();
       }
 
@@ -179,17 +187,8 @@ export default {
         console.log(error);
       })
     },
-    getFile(fileId) {
-      return axios.post(this.url + 'review/image?id=' + fileId, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then((data) => {
-        // 파일 아이디가 들어옴 -> review fileId 에 넣어야함.
-        console.log(data);
-      }).catch((error) => {
-        console.log(error);
-      })
+    getImageUrl(fileName) {
+      return '../assets/' + fileName + '.png';
     },
     onToggle(review) {
       if (review.userName !== this.$cookies.get('email')) {
@@ -222,5 +221,11 @@ export default {
 .review {
   list-style: none;
   color: #7C7877;
+}
+
+.review-img {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
 }
 </style>
