@@ -29,7 +29,7 @@ public class ReviewModel implements Serializable {
 
     public long prevId; // 대댓글이라면 리뷰 아이디
 
-    private Long fileId;
+    private long fileId;
     private String fileName;
 
 }

@@ -9,4 +9,5 @@ public interface ReviewRepository  extends JpaRepository<ReviewModel, Long> {
     ReviewModel findByUserIdAndPlaceIdAndPrevId(long userId, long placeId, long prevId);
     ReviewModel findByUserNameAndPlaceName(String userName, String placeName);
     List<ReviewModel> findByPlaceId(long placeId);
+    ReviewModel findById(long id);
 }

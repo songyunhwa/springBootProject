@@ -61,14 +61,17 @@ public class ReviewService {
         reviewModel.setPrevId(review.getPrevId());
         reviewModel.setStar(0);
         reviewModel.setFileId(review.getFileId());
-        reviewModel.setFileName(review.getFileName());
+
+        if(review.getFileId() > 0){
+            PictureModel pictureModel = pictureRepository.findById(review.getFileId());
+            reviewModel.setFileName(pictureModel.getFileName());
+        }
 
         return reviewRepository.save(reviewModel);
     }
 
     public void modifyReview(ReviewModel review){
-        Optional<ReviewModel> reviewModelOptional = reviewRepository.findById(review.getId());
-        ReviewModel reviewModel = reviewModelOptional.get();
+        ReviewModel reviewModel = reviewRepository.findById(review.getId());
         reviewModel.setContents(review.getContents());
         reviewModel.setStar(review.getStar());
         reviewModel.setFileId(review.getFileId());
@@ -77,8 +80,12 @@ public class ReviewService {
     }
 
     public void deleteReview(long id) {
-        Optional<ReviewModel> reviewModel = reviewRepository.findById(id);
-        reviewRepository.delete(reviewModel.get());
+        ReviewModel reviewModel = reviewRepository.findById(id);
+        if (reviewModel.getFileId() > 0 && reviewModel.getFileName() != null) {
+            deleteFile(reviewModel.getFileId());
+        }
+
+        reviewRepository.delete(reviewModel);
     }
 
     public PictureModel saveFile(MultipartFile file) throws Exception {
@@ -112,21 +119,21 @@ public class ReviewService {
         return pictureModel;
     }
 
-    public Resource loadFile(String filename) {
-        try {
-            Path rootpath = Paths.get("upload-dir");
-            Path path = rootpath.resolve(filename); // 고정된 루트 경로에 부분경로 추가
-            Resource resource = new UrlResource(path.toUri());
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                return null;
+    public void deleteFile(long id){
+
+        PictureModel pictureModel = pictureRepository.findById(id);
+        if(pictureModel != null) {
+            String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\web\\vue\\src\\assets\\images\\";
+            String savePath = root_path + pictureModel.getFileName() + ".png";
+            File deleteFile = new File(savePath);
+            if (deleteFile.exists()) {
+                try {
+                    deleteFile.delete();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            pictureRepository.delete(pictureModel);
         }
-
-        return null;
     }
-
 }

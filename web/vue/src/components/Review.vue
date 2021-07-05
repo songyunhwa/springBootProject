@@ -17,7 +17,7 @@
       <li v-for="review in reviews" v-bind:key="review" class="review">
         <table>
           <tbody>
-          <div v-if="review.fileName.length>0">
+          <div v-if="review.fileName">
             <img
                 :src="require(`C:/Users/pc/Documents/공부/springBootProject_back/web/vue/src/assets/images/${review.fileName}.png`)"
                 class="review-img"/>
@@ -98,10 +98,6 @@ export default {
   ,
   methods: {
     putReview() {
-      var image = document.getElementById("image");
-      if (image.files[0] && image.files[0].length > 0) {
-        this.uploadFile();
-      }
 
       var params = {
         id: '',
@@ -112,7 +108,7 @@ export default {
         contents: this.input,
         star: '',
         prevId: '',
-        fileId: this.fileId
+        fileId: this.fileId,
       };
       return axios
           .post(
@@ -124,20 +120,7 @@ export default {
           })
           .catch(({error}) => {
             console.log(error);
-          })
-
-    }
-    ,
-    getReview(id) {
-      return axios
-          .get(this.url + 'review?id=' + id)
-          .then((data) => {
-            this.reviews = data.data;
-          })
-          .catch(({error}) => {
-            console.log(error);
-          })
-
+          });
     }
     ,
     modifyReview(id, review) {
@@ -170,26 +153,34 @@ export default {
           .catch(({error}) => {
             console.log(error);
           })
-    },
+    }
+    ,
     uploadFile() {
       const formData = new FormData();
       var image = document.getElementById("image");
-      formData.append("image", image.files[0]);
+      if (image.files[0].fileId != "") {
+        formData.append("image", image.files[0]);
+        axios.post(this.url + 'review/image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((data) => {
+          this.fileId = data;
+          console.log(this.fileId);
+          this.putReview();
+        }).catch((error) => {
+          console.log(error);
+        })
+      }else {
+        this.putReview();
+      }
 
-      axios.post(this.url + 'review/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then((data) => {
-        this.fileId = data;
-
-      }).catch((error) => {
-        console.log(error);
-      })
-    },
+    }
+    ,
     getImageUrl(fileName) {
       return '../assets/' + fileName + '.png';
-    },
+    }
+    ,
     onToggle(review) {
       if (review.userName !== this.$cookies.get('email')) {
         this.modal.body = '수정 불가능합니다.'
@@ -205,14 +196,16 @@ export default {
       } else {
         review.modify = true
       }
-    },
+    }
+    ,
     onToggleModal() {
       if (this.showModal) {
         this.showModal = false;
       } else {
         this.showModal = true;
       }
-    },
+    }
+    ,
   }
 }
 </script>
