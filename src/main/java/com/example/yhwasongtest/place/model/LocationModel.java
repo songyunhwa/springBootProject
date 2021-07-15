@@ -1,9 +1,14 @@
 package com.example.yhwasongtest.place.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 
+@Getter
+@Setter
 @Entity
 @Table(name = "location")
 public class LocationModel implements Serializable {
@@ -16,35 +21,4 @@ public class LocationModel implements Serializable {
     public String district; // 구
     public String neighborhood; // 동
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-    public String getNeighborhood() {
-        return neighborhood;
-    }
-
-    public void setNeighborhood(String neighborhood) {
-        this.neighborhood = neighborhood;
-    }
 }

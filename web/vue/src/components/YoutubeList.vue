@@ -4,6 +4,9 @@
     <Review :select_place="select" ref="review"></Review>
   </div>
   <div class="youtube-list-left">
+
+    <search v-on:click="selectDessert"></search>
+
     <ul style="list-style: none;">
       <li v-for="place in this.places"
           v-bind:key="place" @click="selectPlace(place)">
@@ -16,16 +19,15 @@
       </li>
     </ul>
   </div>
-
-
 </template>
 <script>
 import axios from "axios";
 import Youtube from "@/components/Youtube";
 import Review from "@/components/Review";
+import Search from "@/components/Search";
 export default {
   name: 'YoutubeList',
-  components: {Youtube, Review},
+  components: {Search, Youtube, Review},
   props: {
     msg: Object,
   },
@@ -64,13 +66,16 @@ export default {
     this.getYoutube();
   },
   methods: {
-    getYoutube() {
+    getYoutube(params) {
 
       if (this.msg && this.msg.length > 0) {
         this.url = 'http://localhost:9000/api/v1/place/' + this.msg;
+      } else if(params && params.length > 0 ) {
+        this.url = 'http://localhost:9000/api/v1/dessert?subCategory=' + subCategory
       } else {
         this.url = 'http://localhost:9000/api/v1/place';
       }
+
 
       return axios
           .get(this.url)
@@ -116,6 +121,9 @@ export default {
     selectPlace(place) {
       this.select = place;
       this.$refs.review.getReview(place.id);
+    },
+    selectDessert(params){
+      this.getYoutube(params);
     }
   }
 }

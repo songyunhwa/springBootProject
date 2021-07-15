@@ -2,26 +2,19 @@ package com.example.yhwasongtest.place.controller;
 
 import com.example.yhwasongtest.common.CommonCode;
 import com.example.yhwasongtest.place.dto.PlaceDto;
-import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
-import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
 
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")

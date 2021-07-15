@@ -175,10 +175,8 @@ export default {
         this.putReview();
       }
 
-    }
-    ,
-    getImageUrl(fileName) {
-      return '../assets/' + fileName + '.png';
+    },
+    deleteFile() {
     }
     ,
     onToggle(review) {
