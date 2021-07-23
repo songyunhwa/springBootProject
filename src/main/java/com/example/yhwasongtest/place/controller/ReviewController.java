@@ -44,7 +44,10 @@ public class ReviewController {
 
         try {
             List<ReviewModel> reviewModels = reviewService.getReview(id);
-            JSONArray jsonArray = CommonCode.reviewConvertToJSON(reviewModels);
+            JSONArray jsonArray = new JSONArray();
+            if(reviewModels.size() > 0) {
+                jsonArray = CommonCode.reviewConvertToJSON(reviewModels);
+            }
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);

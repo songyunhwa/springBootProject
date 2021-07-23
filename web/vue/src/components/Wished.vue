@@ -1,3 +1,4 @@
+<!-- 찜한 창 -->
 <template>
   <div class="youtube-list-right">
     <Youtube :select_place="select"></Youtube>

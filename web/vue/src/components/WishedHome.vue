@@ -1,4 +1,4 @@
-<!-- 배너 -->
+<!-- 찜한 창 홈 -->
 <template>
   <recommend class="right-banner"></recommend>
 

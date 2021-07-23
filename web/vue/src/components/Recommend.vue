@@ -1,3 +1,4 @@
+<!-- 추천 리스트 창 -->
 <template>
   <ul class="recommend">
     <div>추천 리스트</div>
@@ -12,7 +13,6 @@
 </template>
 <script>
 import axios from "axios";
-
 export default {
   name: 'Recommend',
   components: {},
@@ -67,6 +67,9 @@ export default {
       console.log("들어옴");
       this.select = place;
     },
+    selectDessert(params){
+      this.getYoutube(params);
+    }
   }
 }
 </script>

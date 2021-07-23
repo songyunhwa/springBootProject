@@ -23,7 +23,7 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @GetMapping(value = "/dessert")
+    @GetMapping(value = "/dessert/list")
     public ResponseEntity getDessert() {
 
         try {

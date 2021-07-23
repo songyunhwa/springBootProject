@@ -1,12 +1,11 @@
+<!-- 왼쪽에 있는 유투브 리스트 -->
 <template>
   <div class="youtube-list-right">
-    <Youtube :select_place="select"></Youtube>
-    <Review :select_place="select" ref="review"></Review>
+    <Youtube :select_place="select" ref="youtube"></Youtube>
   </div>
+
+
   <div class="youtube-list-left">
-
-    <search v-on:click="selectDessert"></search>
-
     <ul style="list-style: none;">
       <li v-for="place in this.places"
           v-bind:key="place" @click="selectPlace(place)">
@@ -23,11 +22,9 @@
 <script>
 import axios from "axios";
 import Youtube from "@/components/Youtube";
-import Review from "@/components/Review";
-import Search from "@/components/Search";
 export default {
   name: 'YoutubeList',
-  components: {Search, Youtube, Review},
+  components: { Youtube },
   props: {
     msg: Object,
   },
@@ -71,7 +68,7 @@ export default {
       if (this.msg && this.msg.length > 0) {
         this.url = 'http://localhost:9000/api/v1/place/' + this.msg;
       } else if(params && params.length > 0 ) {
-        this.url = 'http://localhost:9000/api/v1/dessert?subCategory=' + subCategory
+        this.url = 'http://localhost:9000/api/v1/dessert?subCategory=' + params;
       } else {
         this.url = 'http://localhost:9000/api/v1/place';
       }
@@ -109,7 +106,8 @@ export default {
               //처음 들어갈 때 - 리스트 맨 앞으로 설정
               if (this.place == null) {
                 this.select = this.places[0];
-                this.$refs.review.getReview(this.select.id);
+                this.$refs.youtube.getReview(this.select.id);
+
               }
             })
           })
@@ -120,11 +118,9 @@ export default {
     },
     selectPlace(place) {
       this.select = place;
-      this.$refs.review.getReview(place.id);
+      this.$refs.youtube.getReview(place.id);
     },
-    selectDessert(params){
-      this.getYoutube(params);
-    }
+
   }
 }
 </script>
@@ -136,10 +132,9 @@ export default {
   border-spacing: 1px;
   text-align: left;
   line-height: 1.5;
-  margin-top: 0px;
   background: #7C7877;
   position: absolute;
-  width: 40%;
+  width: 30%;
 }
 
 name {
@@ -149,13 +144,12 @@ name {
 
 
 .youtube-list-right {
-  right: 20%;
+  left : 30%;
   width: 40%;
   position: absolute;
   background: #D9D4CF; /*#ABD0CE #F0E5DE #D9D4CF; #7C7877;*/
   text-align: center;
   margin-right: 20px;
-  margin-bottom: 10px;
   font-size: 20px;
   color: #7C7877;
 }

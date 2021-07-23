@@ -1,3 +1,4 @@
+<!-- 검색에 쓰이는 디저트 종류 리스트 화면 -->
 <template>
   <ul style="list-style: none; float:left;">
     <li v-for="dessert in this.desserts"
@@ -11,9 +12,6 @@ import axios from "axios";
 
 export default {
   name: 'Search',
-  components: {
-    Modal
-  },
   props: {
     select_place: Object
   },
@@ -31,7 +29,7 @@ export default {
     getDessert() {
       return axios
           .get(
-              this.url + 'dessert'
+              this.url + 'dessert/list'
           )
           .then((data) => {
             this.desserts = data;

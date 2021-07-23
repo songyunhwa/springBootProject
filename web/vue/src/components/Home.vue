@@ -103,10 +103,6 @@ button:active {
   box-shadow: inset 1px 1px 1px #DFDFDF;
 }
 
-.search{
-  float: right;
-}
-
 .right-banner{
   float:right;
   width: 20%;

@@ -1,3 +1,4 @@
+<!-- 유투브 리스트에 있는 유투브 -->
 <template>
   <div class="youtube">
 
@@ -21,15 +22,17 @@
     <div class="tail" @click="setWished">찜</div>
     <div class="tail" @click="setRecommend">추천</div>
   </div>
+
+  <Review :select_place="select_place" ref="review"></Review>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
 </template>
 <script>
 import axios from "axios";
 import Modal from "@/views/Modal";
-
+import Review from "@/components/Review";
 export default {
   name: 'Youtube',
-  components: { Modal},
+  components: { Modal , Review},
   props: {
     select_place: Object
   },
@@ -42,7 +45,8 @@ export default {
       header:'',
       body:'',
       footer:''
-    }
+    },
+    select: '',
   }),
   computed: {
     placeName() {
@@ -53,10 +57,13 @@ export default {
     this.email = this.$cookies.get('email');
   },
   methods: {
-    setPlace(place) {
-      this.$props.select_place = place;
-    },
     setRecommend() {
+      if(this.$cookies.get('email')==null){
+        this.modal.body = '로그인을 해야합니다.';
+        this.onToggleModal();
+        return;
+      }
+
       return axios
           .post(this.url + 'recommend?userName=' + this.email + '&id=' + this.select_place.id)
           .then(() => {
@@ -71,6 +78,12 @@ export default {
           })
     },
     setWished() {
+      if(this.$cookies.get('email')==null){
+        this.modal.body = '로그인을 해야합니다.';
+        this.onToggleModal();
+        return;
+      }
+
       return axios
           .post(this.url + 'wished?userName=' + this.email + '&id=' + this.select_place.id)
           .then(() => {
@@ -90,6 +103,12 @@ export default {
       } else {
         this.showModal = true;
       }
+    },
+    selectPlace() {
+      this.select = this.select_place;
+    },
+    getReview(id) {
+      this.$refs.review.getReview(id);
     },
   }
 }

@@ -1,19 +1,20 @@
+<!-- 댓글창 -->
 <template>
-  <div style="float: right">
-    <table>
+  <div>
+    <table style="margin-left: 50px;">
       <thead>
       <tr>
         <th>댓글</th>
       </tr>
       </thead>
       <tbody>
-      <td><textarea type="text" rows="5" style="width:500px; resize: none;" v-model="this.input"/></td>
-      <input type="file" name="image" id="image"/>
-      <button @click="uploadFile">등록</button>
+      <div><td><textarea type="text" rows="5" style="width:400px; resize: none;" v-model="this.input"/></td></div>
+        <button class="review-register" @click="uploadFile">등록</button>
+        <input name="image" id="image"  type="file"/>
       </tbody>
     </table>
 
-    <ul style="float: right">
+    <ul>
       <li v-for="review in reviews" v-bind:key="review" class="review">
         <table>
           <tbody>
@@ -24,9 +25,7 @@
           </div>
           <td>
             <div>{{ review.userName }}</div>
-            <div>
-              {{ review.contents }}
-            </div>
+            <div>{{ review.contents }}</div>
           </td>
           <div v-show="!review.modify">
             <button @click="onToggle(review)">수정</button>
@@ -97,8 +96,17 @@ export default {
   computed: {}
   ,
   methods: {
+    getReview(id) {
+      return axios
+          .get(this.url + 'review?id=' + id)
+          .then((reviews) => {
+            this.reviews = reviews.data;
+          })
+          .catch(({error}) => {
+            console.log(error);
+          });
+    },
     putReview() {
-
       var params = {
         id: '',
         placeName: this.select_place.name,
@@ -156,6 +164,12 @@ export default {
     }
     ,
     uploadFile() {
+      if(this.$cookies.get('email')==null){
+        this.modal.body = '로그인을 해야합니다.'
+        this.onToggleModal();
+        return;
+      }
+
       const formData = new FormData();
       var image = document.getElementById("image");
       if (image.files[0].fileId != "") {
@@ -218,5 +232,10 @@ export default {
   width: 200px;
   height: 150px;
   object-fit: cover;
+}
+
+.review-register {
+  float: right;
+  margin-top:0px;
 }
 </style>
