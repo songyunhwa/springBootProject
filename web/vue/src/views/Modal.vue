@@ -7,7 +7,7 @@
 
             <div class="modal-header">
               <slot name="header">
-                알림
+                <h3>알림</h3>
               </slot>
             </div>
 
@@ -15,14 +15,11 @@
               <slot name="body">
                 {{ select_modal.body }}
               </slot>
-            </div>
-
-            <div class="modal-footer">
-              <slot name="footer">
+              <div class="modal-default-button">
                 <button class="modal-default-button" @click="$emit('close')">
-                  OK
+                  확인
                 </button>
-              </slot>
+              </div>
             </div>
           </div>
         </div>

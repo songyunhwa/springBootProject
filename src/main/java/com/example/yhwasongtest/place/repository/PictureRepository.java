@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PictureRepository extends JpaRepository<PictureModel, Long> {
     PictureModel findByFileName(String fileName);
     PictureModel findById(long id);
+    PictureModel findByOriginFileName(String originFileName);
 }

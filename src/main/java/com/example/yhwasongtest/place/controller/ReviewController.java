@@ -8,6 +8,7 @@ import com.example.yhwasongtest.place.repository.ReviewRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.place.service.ReviewService;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,8 +90,12 @@ public class ReviewController {
     @PostMapping(value = "/review/image")
     public ResponseEntity putFile(@RequestPart(value = "image", required = true) MultipartFile file) {
         try {
-            PictureModel pictureModel = reviewService.saveFile(file);
-            return new ResponseEntity(pictureModel, HttpStatus.OK);
+            long id = reviewService.saveFile(file);
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("fileId", id);
+
+            return new ResponseEntity(jsonObject.toString(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }

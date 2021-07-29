@@ -8,9 +8,11 @@
       </tr>
       </thead>
       <tbody>
-      <div><td><textarea type="text" rows="5" style="width:400px; resize: none;" v-model="this.input"/></td></div>
-        <button class="review-register" @click="uploadFile">등록</button>
-        <input name="image" id="image"  type="file"/>
+      <div>
+        <td><textarea type="text" rows="5" style="width:400px; resize: none;" v-model="this.input"/></td>
+      </div>
+      <button class="review-register" @click="uploadFile">등록</button>
+      <input name="image" id="image" type="file"/>
       </tbody>
     </table>
 
@@ -18,14 +20,15 @@
       <li v-for="review in reviews" v-bind:key="review" class="review">
         <table>
           <tbody>
-          <div v-if="review.fileName">
-            <img
-                :src="require(`C:/Users/pc/Documents/공부/springBootProject_back/web/vue/src/assets/images/${review.fileName}.png`)"
-                class="review-img"/>
-          </div>
           <td>
-            <div>{{ review.userName }}</div>
-            <div>{{ review.contents }}</div>
+            <div>
+              {{ review.userName }} {{ review.contents }}
+            </div>
+            <div v-if="review.fileName">
+              <img
+                  :src="require(`C:/Users/pc/Documents/공부/springBootProject_back/web/vue/src/assets/images/${review.fileName}.png`)"
+                  class="review-img"/>
+            </div>
           </td>
           <div v-show="!review.modify">
             <button @click="onToggle(review)">수정</button>
@@ -93,8 +96,9 @@ export default {
         }
       }
   ),
-  computed: {}
-  ,
+  created() {
+    this.onReviewTimeout();
+  },
   methods: {
     getReview(id) {
       return axios
@@ -124,6 +128,7 @@ export default {
               params
           )
           .then(() => {
+            this.input = null;
             this.getReview(this.select_place.id);
           })
           .catch(({error}) => {
@@ -157,6 +162,7 @@ export default {
       return axios
           .delete(this.url + 'review/' + id)
           .then(() => {
+            this.getReview(this.select_place.id);
           })
           .catch(({error}) => {
             console.log(error);
@@ -164,7 +170,7 @@ export default {
     }
     ,
     uploadFile() {
-      if(this.$cookies.get('email')==null){
+      if (this.$cookies.get('email') == null) {
         this.modal.body = '로그인을 해야합니다.'
         this.onToggleModal();
         return;
@@ -172,25 +178,24 @@ export default {
 
       const formData = new FormData();
       var image = document.getElementById("image");
-      if (image.files[0].fileId != "") {
+
+      if (image != null && image.files[0] != null) {
         formData.append("image", image.files[0]);
         axios.post(this.url + 'review/image', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).then((data) => {
-          this.fileId = data;
+          this.fileId = data.data.fileId;
           console.log(this.fileId);
           this.putReview();
         }).catch((error) => {
           console.log(error);
         })
-      }else {
+      } else {
         this.putReview();
       }
 
-    },
-    deleteFile() {
     }
     ,
     onToggle(review) {
@@ -218,6 +223,9 @@ export default {
       }
     }
     ,
+    onReviewTimeout() {
+      setTimeout('getReview(this.placeId)', 10000);
+    }
   }
 }
 </script>
@@ -236,6 +244,6 @@ export default {
 
 .review-register {
   float: right;
-  margin-top:0px;
+  margin-top: 0px;
 }
 </style>

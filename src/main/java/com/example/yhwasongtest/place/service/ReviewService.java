@@ -81,14 +81,18 @@ public class ReviewService {
 
     public void deleteReview(long id) {
         ReviewModel reviewModel = reviewRepository.findById(id);
-        if (reviewModel.getFileId() > 0 && reviewModel.getFileName() != null) {
-            deleteFile(reviewModel.getFileId());
+        if(reviewModel!=null) {
+            if (reviewModel.getFileId() > 0 && reviewModel.getFileName() != null) {
+                deleteFile(reviewModel.getFileId());
+            }
         }
 
         reviewRepository.delete(reviewModel);
     }
 
-    public PictureModel saveFile(MultipartFile file) throws Exception {
+    public Long saveFile(MultipartFile file) throws Exception {
+        long result = 0;
+
         String orgname = file.getOriginalFilename();
         String filename = new FileSecurity().md5(orgname);
 
@@ -114,9 +118,11 @@ public class ReviewService {
             pictureRepository.save(pictureModel);
 
             pictureModel = pictureRepository.findByFileName(filename);
-        }
 
-        return pictureModel;
+        }
+        pictureModel = pictureRepository.findByOriginFileName(orgname);
+        result = pictureModel.getId();
+        return result;
     }
 
     public void deleteFile(long id){
