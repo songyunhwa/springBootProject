@@ -78,7 +78,7 @@ public class RecommendService {
 
         List<PlaceModel> result = new ArrayList<PlaceModel>();
         for(PointDto p : maps){
-            if(result.size() > 10) break;
+            if(result.size() > 20) break;
 
             List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
             result.addAll(placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList()));

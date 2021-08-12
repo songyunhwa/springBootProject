@@ -1,6 +1,6 @@
 <!-- 댓글창 -->
 <template>
-  <div>
+  <div style="margin-left: 50px;">
     <table style="margin-left: 50px;">
       <thead>
       <tr>
@@ -9,7 +9,7 @@
       </thead>
       <tbody>
       <div>
-        <td><textarea type="text" rows="5" style="width:400px; resize: none;" v-model="this.input"/></td>
+        <td><textarea type="text" rows="5" style="width:500px;" v-model="this.input"/></td>
       </div>
       <button class="review-register" @click="uploadFile">등록</button>
       <input name="image" id="image" type="file"/>
@@ -40,7 +40,7 @@
 
         <div v-if="review.modify">
           <div>
-            <textarea type="text" rows="5" style="width:500px; resize: none;" v-model="review.input"/>
+            <textarea type="text" rows="5" v-model="review.input"/>
           </div>
           <div style="margin-left: 0px;">
             <button @click="modifyReview(review.id, review);onToggle(review);">수정</button>

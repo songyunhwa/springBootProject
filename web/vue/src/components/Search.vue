@@ -2,7 +2,7 @@
 <template>
   <ul style="list-style: none; float:left;">
     <li v-for="dessert in this.desserts"
-        v-bind:key="dessert" @click="getDessert()">
+        v-bind:key="dessert" @click="getDessert">
       <div v-on:click="selectDessert(dessert.subCategory)">{{ dessert.included }}</div>
     </li>
   </ul>
@@ -40,7 +40,8 @@ export default {
     },
     selectDessert(subCategory) {
       this.$emit('click', subCategory);
-    }
+    },
+
   }
 }
 </script>

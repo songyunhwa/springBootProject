@@ -23,12 +23,17 @@
     </div>
 
     <div class="search">
-      <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;">
-      <button @click="setMsg">검색</button>
+      <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube">
+      <button @click="getYoutube">검색</button>
     </div>
-
   </div>
+  <!-- 유투브 -->
   <youtube-list :msg="input" ref="list"></youtube-list>
+
+  <!-- 하단 스크롤 바 -->
+  <div class="scoll-menu">
+    <img src="../assets/images/scroll_up.png" v-on:click="scrollUp"/>
+  </div>
 </template>
 
 <script>
@@ -44,14 +49,14 @@ export default {
     url: 'http://localhost:9000/api/v1/history',
     input: '', // 입력하는 값
     msg: '',   // 실질적으로 넘어가는 값
-    views : '0', // 하루 접속량
+    views : '0', // 하루 접속량,
   }),
   created() {
     this.email = this.$cookies.get('email');
     this.getLoginHistory();
   },
   methods: {
-    setMsg(){
+    getYoutube(){
       this.$refs.list.getYoutube();
     },
     getLoginHistory(){
@@ -63,6 +68,9 @@ export default {
           .catch(() => {
 
           })
+    },
+    scrollUp(){
+      window.scrollTo(0,0);
     }
   }
 }
@@ -106,5 +114,15 @@ button:active {
 .right-banner{
   float:right;
   width: 20%;
+}
+
+.scoll-menu{
+  position: fixed;
+  right:10px;
+  bottom:10px;
+  height:100px;
+  width:100px;
+  text-decoration: none;
+
 }
 </style>

@@ -144,9 +144,9 @@ name {
 
 
 .youtube-list-right {
-  left : 30%;
-  width: 40%;
   position: absolute;
+  left : 30%;
+  width: 49%;
   background: #D9D4CF; /*#ABD0CE #F0E5DE #D9D4CF; #7C7877;*/
   text-align: center;
   margin-right: 20px;
