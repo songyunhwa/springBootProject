@@ -1,26 +1,51 @@
 <template>
-  <div>
-    <h2>{{this.title}}</h2>
-    <form @submit="onSubmit">
-      <input placeholder="Enter your ID" v-model="email">
-      <input placeholder="Enter your password" v-model="password">
-    </form>
-    {{ result }}
-    <button type="button" @click="Click">확인</button>
-  </div>
+  <div><h2>{{ this.title }}</h2></div>
+  <Form @submit="Click" v-slot="{ errors }">
+    <table>
+      <tr>
+        <td>이메일</td>
+        <Field name="email" rules="required" v-model="this.email"/>
+        <span v-if="errors.email"><div style="color:red;">이메일을 적어주세요.</div> </span>
+      </tr>
+      <tr>
+        <td>비밀번호</td>
+        <Field name="password" rules="required|alpha_dash" v-model="this.password"/>
+        <span v-if="errors.password"><div style="color:red;">비밀번호를 적어주세요. ** 알파벳, 숫자 밑 대시만이 가능합니다.</div> </span>
+      </tr>
+      <tr></tr>
+      <tr>
+        <input type="submit" value="확인" v-if="!errors.email&&!errors.password">
+      </tr>
+      <tr>
+        <div style="color:red;">{{ result }}</div>
+      </tr>
+    </table>
+  </Form>
 
-  <button v-if="this.title==='로그인'" @click="ChangeUrl">회원가입</button>
-  <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인</button>
-  <button @click="this.$router.push({path: '/'});">홈</button>
+  <div>
+    <button v-if="this.title==='로그인'" @click="ChangeUrl">회원가입으로 가기</button>
+    <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인</button>
+    <button @click="this.$router.push({path: '/'});">홈</button>
+  </div>
 
 </template>
 
 <script>
 import axios from 'axios'
+import {Form, Field, defineRule} from 'vee-validate';
+import {required, email, alpha_dash} from '@vee-validate/rules';
+
+defineRule('required', required);
+defineRule('email', email);
+defineRule('alpha_dash', alpha_dash);
 
 const resourceHost = "http://localhost:9000/api/v1"
 export default {
   name: 'Login',
+  components: {
+    Form,
+    Field,
+  },
   data: () => ({
     title: '로그인',
     email: '',
@@ -31,7 +56,8 @@ export default {
       email: '',
       password: '',
       authority: 'ROLE_USER',
-    }
+    },
+    errors: [],
   }),
   state: {
     accessToken: null,
@@ -44,8 +70,8 @@ export default {
     },
   },
   methods: {
-    Click(){
-      if(this.title == '로그인')
+    Click() {
+      if (this.title == '로그인')
         this.Login();
       else
         this.SignUp();
@@ -78,19 +104,17 @@ export default {
           })
     },
 
-    ChangeUrl(){
-      if(this.title == '로그인') {
+    ChangeUrl() {
+      if (this.title == '로그인') {
         this.title = '회원가입';
         this.url = resourceHost + '/user';
-      }else {
+      } else {
         this.title = '로그인';
       }
     },
 
-    SignUp(){
-      if (!this.email || !this.password) {
-        alert("Your email or password is empty.");
-      }
+    SignUp() {
+
 
       this.userModel.email = this.email;
       this.userModel.password = this.password;
@@ -106,7 +130,6 @@ export default {
 
           })
     },
-  },
-
+  }
 }
 </script>
