@@ -1,32 +1,8 @@
-<!-- 배너 -->
 <template>
+  <!-- 배너 -->
   <recommend class="right-banner"></recommend>
+  <Banner></Banner>
 
-  <div class="banner">
-    <div v-if="this.email&&this.email.length>0">
-      <router-link to="/logout">
-        <button>로그아웃</button>
-      </router-link>
-    </div>
-    <div v-else>
-      <router-link to="/login">
-        <button>로그인</button>
-      </router-link>
-    </div>
-    <router-link to="/wished">
-      <button>찜한 장소</button>
-    </router-link>
-
-    <div class="title">
-      당다라당당에 오신걸 환영합니다! {{ email }}
-      오늘 방문자수: {{this.views}}
-    </div>
-
-    <div class="search">
-      <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube">
-      <button @click="getYoutube">검색</button>
-    </div>
-  </div>
   <!-- 유투브 -->
   <youtube-list :msg="input" ref="list"></youtube-list>
 
@@ -39,10 +15,10 @@
 <script>
 import YoutubeList from "@/components/YoutubeList";
 import Recommend from "@/components/Recommend";
-import axios from "axios";
+import Banner from "@/components/Banner";
 export default {
   name: 'Home',
-  components: {YoutubeList, Recommend},
+  components: {YoutubeList, Recommend, Banner},
   data: () => ({
     email: '',
     password: '',
@@ -53,22 +29,8 @@ export default {
   }),
   created() {
     this.email = this.$cookies.get('email');
-    this.getLoginHistory();
   },
   methods: {
-    getYoutube(){
-      this.$refs.list.getYoutube();
-    },
-    getLoginHistory(){
-      return axios
-          .get(this.url)
-          .then(({data}) => {
-            this.views = data;
-          })
-          .catch(() => {
-
-          })
-    },
     scrollUp(){
       window.scrollTo(0,0);
     }
@@ -76,17 +38,6 @@ export default {
 }
 </script>
 <style>
-
-.banner {
-  height: 50px;
-}
-
-.title {
-  font-size: 14px;
-  color: #7C7877;
-  padding: 10px 10px;
-  float: left;
-}
 
 button {
   color: #444444;
