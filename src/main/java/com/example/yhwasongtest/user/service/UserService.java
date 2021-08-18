@@ -1,6 +1,6 @@
 package com.example.yhwasongtest.user.service;
 
-import com.example.yhwasongtest.common.JwtUtil;
+import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.Authority;
 import com.example.yhwasongtest.user.model.CustomUserDetails;
@@ -86,20 +86,19 @@ public class UserService implements UserDetailsService {
     /**
      * 회원정보 저장
      *
-     * @param infoDto 회원정보가 들어있는 DTO
+     * @param userModelDto 회원정보가 들어있는 DTO
      * @return 저장되는 회원의 PK
      */
-    public Long save(UserModelDto infoDto) throws Exception {
-        //BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        //infoDto.setPassword(encoder.encode(infoDto.getPassword()));
-        try {
-            UserModel userModel = insertUser(infoDto);
+    public UserModel signUp(UserModelDto userModelDto) throws Exception {
+        UserModel userModel = userRepository.findByUsername(userModelDto.getEmail());
 
-            userRepository.save(userModel);
-            return userModel.getId();
-        } catch (Exception e) {
-            throw new Exception();
+        if (userModel != null) {
+            throw new Exception(ErrorMessage.EMAIL_DUPLICATION.getMessage());
         }
+
+        userModel = insertUser(userModelDto);
+        userRepository.save(userModel);
+        return userModel;
     }
 
     public UserModel insertUser(UserModelDto userModelDto) throws Exception {
@@ -123,7 +122,7 @@ public class UserService implements UserDetailsService {
         return userModel;
     }
 
-    public UserModel getUser(String userName){
+    public UserModel getUser(String userName) {
         return userRepository.findByUsername(userName);
     }
 
@@ -157,71 +156,56 @@ public class UserService implements UserDetailsService {
 
     public ResponseEntity login(String name, String password, HttpServletRequest request, HttpSession session) throws Exception {
 
-
         UserModel userModel = userRepository.findByUsername(name);
         String ip = this.getRemoteAddr(request);
-
-        // session 기간이 아직 지나지 않았다면
-
-        if(userModel.getDate()!=null && userModel.getDate().compareTo(new Date()) > 0){
-            // 기간을 다시 설정
-            Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
-            this.keepLogin(userModel.getUsername(), userModel.getSessionId(), date);
-
-            this.putHistory(userModel.getUsername(), ip);
-
-            return new ResponseEntity(userModel, HttpStatus.OK);
-        }
 
         if (userModel != null) {
             String resultToken = getToken(name, password);
             //if (userModel.getPassword().equals(resultToken)) {
+            String check = getHashed(resultToken);
             if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
+                // session 기간이 아직 지나지 않았다면 다시 설정
+                if (userModel.getDate() != null && userModel.getDate().compareTo(new Date()) > 0) {
 
-                // 세션 설정
-                session.setAttribute("login", userModel);
-                session.setMaxInactiveInterval(1800); //30분
+                    Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
+                    this.keepLogin(userModel.getUsername(), userModel.getSessionId(), date);
 
-                // 세션 유효시간 설정
-                Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
-                this.keepLogin(userModel.getUsername(), session.getId(), date);
+                    this.putHistory(userModel.getUsername(), ip);
 
-                this.putHistory(userModel.getUsername(), ip);
-                /*
-                // 토큰 생성
-                String accessToken = JwtUtil.createToken(userModel.getId(), userModel.getUsername());
-                String url ="/session";
-                return ResponseEntity.created(new URI(url)).body(SessionResponseDto
-                        .builder()
-                        .email(userModel.getUsername())
-                        .token(accessToken)
-                        .build()); */
+                    return new ResponseEntity(userModel, HttpStatus.OK);
+                } else {
+                    // 세션 설정
+                    session.setAttribute("login", userModel);
+                    session.setMaxInactiveInterval(1800); //30분
+
+                    // 세션 유효시간 설정
+                    Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
+                    this.keepLogin(userModel.getUsername(), session.getId(), date);
+
+                    this.putHistory(userModel.getUsername(), ip);
+                    /*
+                    // 토큰 생성
+                    String accessToken = JwtUtil.createToken(userModel.getId(), userModel.getUsername());
+                    String url ="/session";
+                    return ResponseEntity.created(new URI(url)).body(SessionResponseDto
+                            .builder()
+                            .email(userModel.getUsername())
+                            .token(accessToken)
+                            .build()); */
+                }
+                return new ResponseEntity(userModel, HttpStatus.OK);
             }
-            return new ResponseEntity(userModel, HttpStatus.OK);
+            throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
         }
-
-        return new ResponseEntity(userModel, HttpStatus.BAD_REQUEST);
+        throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
     }
 
-    public void logout(HttpSession session){
+    public void logout(HttpSession session) {
 
         //HttpSession session = request.getSession(false);
-        if(session != null){
+        if (session != null) {
             session.invalidate();
         }
-
-        /*
-        Cookie loginCookie = WebUtils.getCookie(request, "loginUser");
-        if (loginCookie != null) {
-            loginCookie.setPath("/");
-            loginCookie.setMaxAge(0);
-            response.addCookie(loginCookie);
-
-            // 사용자 테이블에서도 유효기간을 현재시간으로 다시 세팅해줘야함.
-            Date date = new Date(System.currentTimeMillis());
-            this.keepLogin(loginCookie.getValue(), null, date);
-        }
-        */
     }
 
     public void keepLogin(String username, String sessionId, Date date) {
@@ -237,7 +221,7 @@ public class UserService implements UserDetailsService {
     public void putHistory(String userName, String ip) throws ParseException {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date currentDate =new Date();
+        Date currentDate = new Date();
         String date = format.format(currentDate);
 
         String start = date + " 00:00:00";
@@ -245,11 +229,10 @@ public class UserService implements UserDetailsService {
 
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 유저가 오늘 접속했는지 // 같은 ip를 갖고 있는지 확인
-        LoginHistory loginHistory= loginHistoryRepository.findByStatusAndUserNameAndLoginDateBetween("LOGIN", userName, format.parse(start), format.parse(end));
-        if(loginHistory!=null){
+        LoginHistory loginHistory = loginHistoryRepository.findByStatusAndUserNameAndLoginDateBetween("LOGIN", userName, format.parse(start), format.parse(end));
+        if (loginHistory != null) {
             loginHistory.setLoginDate(new Date());
-        }
-        else{
+        } else {
             loginHistory = new LoginHistory();
             loginHistory.setIp(ip);
             loginHistory.setUserName(userName);
@@ -285,9 +268,10 @@ public class UserService implements UserDetailsService {
         return ip;
 
     }
-    public int getLoginHistory() throws ParseException{
+
+    public int getLoginHistory() throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date currentDate =new Date();
+        Date currentDate = new Date();
         String date = format.format(currentDate);
 
         String start = date + " 00:00:00";
@@ -295,7 +279,7 @@ public class UserService implements UserDetailsService {
 
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        List<LoginHistory> loginHistories= loginHistoryRepository.findByStatusAndLoginDateBetween("LOGIN", format.parse(start), format.parse(end));
+        List<LoginHistory> loginHistories = loginHistoryRepository.findByStatusAndLoginDateBetween("LOGIN", format.parse(start), format.parse(end));
         return loginHistories.size();
     }
 

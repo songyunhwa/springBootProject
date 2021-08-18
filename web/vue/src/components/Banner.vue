@@ -19,10 +19,6 @@
       오늘 방문자수: {{ this.views }}
     </div>
 
-    <button @click="onToggle" >
-      나만 아는 맛집
-    </button>
-
     <div class="search">
       <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube">
       <button @click="getYoutube">검색</button>

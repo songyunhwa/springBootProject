@@ -1,7 +1,7 @@
 <template>
   <div><h2>{{ this.title }}</h2></div>
   <Form @submit="Click" v-slot="{ errors }">
-    <table>
+    <table style="width: 300px; text-align: center;">
       <tr>
         <td>이메일</td>
         <Field name="email" rules="required" v-model="this.email"/>
@@ -13,16 +13,12 @@
         <span v-if="errors.password"><div style="color:red;">비밀번호를 적어주세요. ** 알파벳, 숫자 밑 대시만이 가능합니다.</div> </span>
       </tr>
       <tr></tr>
-      <tr>
-        <input type="submit" value="확인" v-if="!errors.email&&!errors.password">
-      </tr>
-      <tr>
-        <div style="color:red;">{{ result }}</div>
-      </tr>
+      <tr><input type="submit" value="확인" v-if="!errors.email&&!errors.password"></tr>
     </table>
+    <div style="color:red; margin-top: 10px;">{{ result }}</div>
   </Form>
 
-  <div>
+  <div style="margin-top: 10px;">
     <button v-if="this.title==='로그인'" @click="ChangeUrl">회원가입으로 가기</button>
     <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인</button>
     <button @click="this.$router.push({path: '/'});">홈</button>
@@ -97,14 +93,15 @@ export default {
             this.$router.push({path: '/'});
 
           })
-          .catch(() => {
-            this.result = "로그인에 실패했습니다. 다시 시도해주세요"
+          .catch((error) => {
+            this.result = error.response.data.split("java.lang.Exception:")[1];
             if (this.$cookies.get('sessionId') != null)
               this.$cookies.remove('sessionId');
           })
     },
 
     ChangeUrl() {
+      this.result = "";
       if (this.title == '로그인') {
         this.title = '회원가입';
         this.url = resourceHost + '/user';
@@ -114,8 +111,6 @@ export default {
     },
 
     SignUp() {
-
-
       this.userModel.email = this.email;
       this.userModel.password = this.password;
 
@@ -123,11 +118,10 @@ export default {
           .post(this.url, this.userModel)
           .then(({data}) => {
             console.log(data);
-
-
+            this.title = '로그인';
           })
-          .catch(() => {
-
+          .catch((error) => {
+            this.result = error.response.data.split("java.lang.Exception:")[1];
           })
     },
   }

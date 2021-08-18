@@ -1,5 +1,6 @@
 package com.example.yhwasongtest.user.controller;
 
+import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.BaseQuestion;
 import com.example.yhwasongtest.user.model.CustomUserDetails;
@@ -44,12 +45,12 @@ public class BaseController {
 
     }
     @RequestMapping(method = RequestMethod.POST, value = "/user")
-    public ResponseEntity signup(@RequestBody  UserModelDto infoDto){ // 회원 추가
+    public ResponseEntity signup(@RequestBody  UserModelDto userModelDto){ // 회원 추가
         try {
-            userService.save(infoDto);
-            return new ResponseEntity<>(infoDto.getEmail(), HttpStatus.OK);
+            UserModel userModel = userService.signUp(userModelDto);
+            return new ResponseEntity(userModel.getUsername(), HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -74,11 +75,10 @@ public class BaseController {
                                 HttpSession httpSession
                             ) {
         try {
-
             ResponseEntity responseEntity = userService.login(email, password, request, httpSession);
             return  responseEntity;
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 

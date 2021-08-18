@@ -5,24 +5,19 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
-@AllArgsConstructor
 @Getter
 public enum ErrorMessage {
-    // Common
-    INVALID_INPUT_VALUE(400, "C001", " Invalid Input Value"),
-    METHOD_NOT_ALLOWED(405, "C002", " Invalid Input Value"),
-    HANDLE_ACCESS_DENIED(403, "C006", "Access is Denied"),
-    // Member
-    EMAIL_DUPLICATION(400, "M001", "Email is Duplication"),
-    LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid");
+    // 로그인 화면
+    EMAIL_DUPLICATION(400, "등록된 이메일이 있습니다."),
+    SIGNUP_PWD_INVALID(400,  "비밀번호가 틀렸습니다."),
+    SIGNUP_EMAIL_INVALID(400,  "등록된 이메일이 없습니다.");
 
-    String code;
+    int code;
     String message;
-    int status;
 
-    ErrorMessage(int i, String c001, String s) {
+
+    ErrorMessage(int code,  String message) {
         this.code = code;
-        this.status = status;
         this.message = message;
     }
 
