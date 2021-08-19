@@ -5,6 +5,9 @@ import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.PlaceService;
 
+import com.example.yhwasongtest.youtube.dto.YoutubeDto;
+import com.example.yhwasongtest.youtube.model.YoutubeModel;
+import com.example.yhwasongtest.youtube.service.YoutubeService;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +29,12 @@ public class PlaceController {
     private static final Logger logger = LoggerFactory.getLogger(PlaceController.class);
 
     private final PlaceService placeService;
+    private final YoutubeService youtubeService;
 
     @Autowired
-    public PlaceController(PlaceService placeService) {
+    public PlaceController(PlaceService placeService, YoutubeService youtubeService) {
         this.placeService = placeService;
+        this.youtubeService = youtubeService;
     }
 
     @GetMapping(value = "/places")
@@ -76,24 +81,16 @@ public class PlaceController {
     }
 
     @PostMapping(value = "/place")
-    public ResponseEntity putPlace(@RequestBody PlaceDto model) {
+    public ResponseEntity putPlace(@RequestBody PlaceDto placeDto) {
 
-        String result = "";
-        PlaceModel placeModel = new PlaceModel();
         try {
-            placeModel.setName(model.getName()); // 장소 이름
-            placeModel.setArea(model.getArea()); // 지역
-            placeModel.setNumber(model.getNumber());
-            placeModel.setUrl(model.getUrl());
-            placeModel.setSubCategory(model.getSubCategory());
-
-            placeModel = placeService.putPlace(placeModel);
+            // 지역에 대한 정보 저장
+            PlaceModel placeModel = placeService.putPlace(placeDto);
 
             return new ResponseEntity<>(placeModel, HttpStatus.OK);
-
         } catch (Exception error) {
             System.err.println("putPlace Error ==> " + error);
-            return new ResponseEntity<>(placeModel, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(error.toString(), HttpStatus.BAD_REQUEST);
 
         }
     }

@@ -1,9 +1,12 @@
 package com.example.yhwasongtest.place.service;
 
 import com.example.yhwasongtest.common.FileSecurity;
+import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.*;
 import com.example.yhwasongtest.place.repository.*;
+import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
+import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +35,21 @@ public class PlaceService {
     private FoodRepository foodRepository;
     private DessertRepository dessertRepository;
     private PictureRepository pictureRepository;
+    private YoutubeRepository youtubeRepository;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository,
                         LocationRepository locationRepository,
                         FoodRepository foodRepository,
                         DessertRepository dessertRepository,
-                        PictureRepository pictureRepository) {
+                        PictureRepository pictureRepository,
+                        YoutubeRepository youtubeRepository) {
         this.placeRepository = placeRepository;
         this.locationRepository = locationRepository;
         this.foodRepository = foodRepository;
         this.dessertRepository = dessertRepository;
         this.pictureRepository = pictureRepository;
+        this.youtubeRepository = youtubeRepository;
     }
 
     public List<PlaceModel> getPlaces() {
@@ -70,7 +76,7 @@ public class PlaceService {
         return placeModelList;
     }
 
-    public PlaceModel putPlace(PlaceModel placeModel) throws Exception {
+    public PlaceModel putPlace(PlaceDto placeModel) throws Exception {
         if (placeModel.getSubCategory() == null) {
             throw new Exception("sub_category 가 없습니다.");
         }
@@ -84,30 +90,48 @@ public class PlaceService {
         if (isMatch) return null;
 
         PlaceModel existPlace = placeRepository.findByName(placeModel.getName());
-        if (existPlace == null) {
+        if(existPlace!=null){
+            // 있는 장소라면 view +1
+            existPlace.setView(existPlace.getView() + 1);
+        }else{
             existPlace = new PlaceModel();
-
             existPlace.setName(placeModel.getName());
-            existPlace.setSubCategory("etc");
+            existPlace.setSubCategory(placeModel.getSubCategory());
             existPlace.setView(1);
-            existPlace.setYoutubes(placeModel.getYoutubes());
+            existPlace.setRecommend(0);
+            List<YoutubeModel> youtubes= new ArrayList<YoutubeModel>();
+            existPlace.setYoutubes(youtubes);
 
-            if (placeModel.getRecommend() > 0) placeModel.setRecommend(0);
-            else existPlace.setRecommend(placeModel.getRecommend());
             if (placeModel.getArea() == null) existPlace.setArea("");
             else existPlace.setArea(placeModel.getArea());
             if (placeModel.getNumber() == null) existPlace.setNumber("");
             else existPlace.setNumber(placeModel.getNumber());
             if (placeModel.getUrl() == null) existPlace.setUrl("");
             else existPlace.setUrl(placeModel.getUrl());
-        } else {
-            // 있는 장소라면 view +1
-            existPlace.setYoutubes(placeModel.getYoutubes());
-            existPlace.setView(existPlace.getView() + 1);
+        }
+
+        // 유투브에 대한 정보 저장
+
+        if(placeModel.getYoutubes()!=null) {
+            for (YoutubeDto youtube : placeModel.getYoutubes()) {
+                YoutubeModel youtubeModel = youtubeRepository.findByVideoId(youtube.getVideoId());
+                if(youtubeModel==null) {
+                    youtubeModel = new YoutubeModel();
+                    youtubeModel.setPublishedAt("");
+                    youtubeModel.setChannelId("");
+                    youtubeModel.setTitle(youtube.getTitle());
+                    youtubeModel.setDescription("");
+                    youtubeModel.setChannelTitle(youtube.getChannelTitle());
+                    youtubeModel.setVideoId(youtube.getVideoId());
+                    youtubeModel.setPlace(existPlace);
+
+                    youtubeModel = youtubeRepository.save(youtubeModel);
+                }
+                existPlace.getYoutubes().add(youtubeModel);
+            }
         }
 
         placeRepository.save(existPlace);
-
         return existPlace;
     }
 

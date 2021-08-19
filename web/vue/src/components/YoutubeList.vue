@@ -1,14 +1,14 @@
 <!-- 왼쪽에 있는 유투브 리스트 -->
 <template>
   <div class="youtube-list-right">
-    <Youtube :select_place="select" ref="youtube" v-on:click="getPlace"></Youtube>
+    <Youtube :select_place="select" ref="youtube" v-on:click="selectPlace"></Youtube>
   </div>
 
 
   <div class="youtube-list-left">
     <ul style="list-style: none;">
       <li v-for="place in this.places"
-          v-bind:key="place" @click="selectPlace(place)">
+          v-bind:key="place" @click="selectPlace(place.id)">
 
         <name>{{ place.name }}</name>
         {{ place.subCategory }}
@@ -116,17 +116,34 @@ export default {
             console.log(error);
           })
     },
-    selectPlace(place) {
-      this.select = place;
-      this.$refs.youtube.getReview(place.id);
-    },
-    getPlace(id){
+    selectPlace(id){
+      this.$refs.youtube.getReview(id);
+
       this.url = 'http://localhost:9000/api/v1/place?id=' + id;
       return axios
           .get(this.url)
           .then(({data}) => {
-            console.log(data);
-            this.select = data.data;
+            this.select = data[0];
+            this.select.area = this.select.area && this.select.area.length > 0 ? this.select.area : "-";
+            this.select.number = this.select.number && this.select.number.length > 0 ? this.select.number : "-";
+
+            // 유투브 설정
+            let titles = [];
+            let youtubes = [];
+
+            this.select.youtubers = '';
+            data[0].youtube.forEach(youtube => {
+              if (!titles.includes(youtube.channelTitle)) {
+                titles.push(youtube.channelTitle);
+
+                youtube.url = "https://www.youtube.com/watch?v=" + youtube.videoId;
+                this.select.youtubers += "#" + youtube.channelTitle;
+                youtubes.push(youtube);
+                }
+            })
+
+            // 한번 더 겹치는 거 없는지 filtering
+            this.select.youtube = youtubes;
           })
       }
   }

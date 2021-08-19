@@ -14,6 +14,11 @@
       <button>찜한 장소</button>
     </router-link>
 
+    <button @click="onToggleModal">
+      나만 아는 맛집
+    </button>
+
+
     <div class="title">
       당다라당당에 오신걸 환영합니다! {{ email }}
       오늘 방문자수: {{ this.views }}
@@ -31,7 +36,7 @@
 <script>
 import axios from "axios";
 import PlaceModal from "@/views/PlaceModal";
-const resourceHost = "http://localhost:9000/api/v1"
+
 export default {
   name: 'Banner',
   components: {PlaceModal},
@@ -67,27 +72,12 @@ export default {
 
           })
     },
-    setPlace(place) {
-      return axios
-          .post(`${resourceHost}` + "/place" , place)
-          .then(({data}) => {
-            console.log(data);
-          })
-          .catch(({error}) => {
-            console.log("error");
-            console.log(error);
-          })
-    },
     scrollUp() {
       window.scrollTo(0, 0);
     },
-    onToggle(){
-      this.onToggleModal();
-    },
-    onToggleModal(place) {
+    onToggleModal() {
       if (this.showModal) {
         this.showModal = false;
-        this.setPlace(place);
       } else {
         this.showModal = true;
       }

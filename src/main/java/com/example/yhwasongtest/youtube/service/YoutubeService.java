@@ -1,12 +1,15 @@
 package com.example.yhwasongtest.youtube.service;
 
+import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.PlaceService;
+import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,4 +74,5 @@ public class YoutubeService {
         }
         return result;
     }
+
 }

@@ -1,59 +1,21 @@
 package com.example.yhwasongtest.place.dto;
 
+import com.example.yhwasongtest.youtube.dto.YoutubeDto;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
 public class PlaceDto {
 
     public String name; // 장소 이름
     public String area; // 지역
-    public String url;  // 주문 페이지 (있다면)
+    public String url;  // 유투브 페이지
     public String number; // 폰 번호
-    private String subCategory; // CategoryModel 과 연결
-    private Long fileId; // 파일 아이디
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getArea() {
-        return area;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(String subCategory) {
-        this.subCategory = subCategory;
-    }
-
-    public Long getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(Long fileId) {
-        this.fileId = fileId;
-    }
+    public String subCategory; // CategoryModel 과 연결
+    public Long fileId; // 파일 아이디
+    public List<YoutubeDto> youtubes;
 }
+
