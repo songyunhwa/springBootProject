@@ -46,9 +46,14 @@ public class PlaceService {
         this.pictureRepository = pictureRepository;
     }
 
-    public List<PlaceModel> getPlace() {
+    public List<PlaceModel> getPlaces() {
         List<PlaceModel> placeModelList = this.placeRepository.findByViewAndSubCategory();
         return placeModelList;
+    }
+
+    public PlaceModel getPlace(long id) {
+        PlaceModel placeModel = this.placeRepository.findById(id);
+        return placeModel;
     }
 
     public PlaceModel getPlaceByName(String name) {

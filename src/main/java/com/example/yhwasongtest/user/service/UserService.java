@@ -154,7 +154,7 @@ public class UserService implements UserDetailsService {
         return passwordHashed;
     }
 
-    public ResponseEntity login(String name, String password, HttpServletRequest request, HttpSession session) throws Exception {
+    public ResponseEntity login(String name, String password, HttpServletRequest request) throws Exception {
 
         UserModel userModel = userRepository.findByUsername(name);
         String ip = this.getRemoteAddr(request);
@@ -162,19 +162,10 @@ public class UserService implements UserDetailsService {
         if (userModel != null) {
             String resultToken = getToken(name, password);
             //if (userModel.getPassword().equals(resultToken)) {
-            String check = getHashed(resultToken);
             if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
-                // session 기간이 아직 지나지 않았다면 다시 설정
-                if (userModel.getDate() != null && userModel.getDate().compareTo(new Date()) > 0) {
 
-                    Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
-                    this.keepLogin(userModel.getUsername(), userModel.getSessionId(), date);
-
-                    this.putHistory(userModel.getUsername(), ip);
-
-                    return new ResponseEntity(userModel, HttpStatus.OK);
-                } else {
                     // 세션 설정
+                    HttpSession session = request.getSession();
                     session.setAttribute("login", userModel);
                     session.setMaxInactiveInterval(1800); //30분
 
@@ -192,7 +183,7 @@ public class UserService implements UserDetailsService {
                             .email(userModel.getUsername())
                             .token(accessToken)
                             .build()); */
-                }
+
                 return new ResponseEntity(userModel, HttpStatus.OK);
             }
             throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
@@ -200,9 +191,9 @@ public class UserService implements UserDetailsService {
         throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
     }
 
-    public void logout(HttpSession session) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
 
-        //HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }

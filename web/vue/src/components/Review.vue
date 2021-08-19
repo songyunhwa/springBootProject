@@ -137,6 +137,12 @@ export default {
     }
     ,
     modifyReview(id, review) {
+      if (review.userName !== this.$cookies.get('email')) {
+        this.modal.body = '수정 불가능합니다.'
+        this.onToggleModal();
+        return;
+      }
+
       review.contents = review.input;
       review.star = '0';
       return axios

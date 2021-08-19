@@ -69,12 +69,14 @@ export default {
           .then(() => {
             this.modal.body = '추천을 성공했습니다.'
             this.onToggleModal();
+            this.$emit('click', this.select_place.id);
           })
           .catch(({error}) => {
             this.modal.body = '추천을 실패했습니다.'
             this.onToggleModal();
-
             console.log(error);
+            this.$emit('click', this.select_place.id);
+
           })
     },
     setWished() {
@@ -89,12 +91,13 @@ export default {
           .then(() => {
             this.modal.body = '찜을 성공했습니다.'
             this.onToggleModal();
+            this.$emit('click', this.select_place.id);
           })
           .catch(({error}) => {
             this.modal.body = '찜을 실패했습니다.'
             this.onToggleModal();
-
             console.log(error);
+            this.$emit('click', this.select_place.id)
           })
     },
     onToggleModal() {

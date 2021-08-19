@@ -82,12 +82,13 @@ export default {
         }
         this.url = `${resourceHost}/login?email=${this.email}&password=${this.password}`
       }
+      axios.defaults.withCredentials = true;
       return axios
           .get(this.url)
           .then(({data}) => {
             console.log(data);
-            if (this.$cookies.get('sessionId') == null) {
-              this.$cookies.set('sessionId', data.sessionId);
+
+            if (this.$cookies.get('email') == null) {
               this.$cookies.set('email', data.username);
             }
             this.$router.push({path: '/'});

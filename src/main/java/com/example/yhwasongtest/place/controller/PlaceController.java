@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
@@ -31,11 +32,11 @@ public class PlaceController {
         this.placeService = placeService;
     }
 
-    @GetMapping(value = "/place")
-    public ResponseEntity getPlace(){
+    @GetMapping(value = "/places")
+    public ResponseEntity getPlaces(){
 
         try {
-            List<PlaceModel> placeModels = placeService.getPlace();
+            List<PlaceModel> placeModels = placeService.getPlaces();
 
             JSONArray jsonArray = CommonCode.convertToJSON(placeModels);
 
@@ -45,6 +46,22 @@ public class PlaceController {
         }
 
     }
+
+    @GetMapping(value = "/place")
+    public ResponseEntity getPlace(@RequestParam(name = "id") long id){
+        try {
+            PlaceModel placeModel = placeService.getPlace(id);
+            List<PlaceModel> placeModels = new ArrayList<>();
+            placeModels.add(placeModel);
+            JSONArray jsonArray = CommonCode.convertToJSON(placeModels);
+
+            return  new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 
     @GetMapping(value = "/place/{msg}")
     public ResponseEntity getPlaceByCategory(@PathVariable String msg){

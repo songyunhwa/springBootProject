@@ -26,6 +26,7 @@ public class RecommendService {
     private WishedRepository wishedRepository;
     private CategoryRepository categoryRepository;
     private DessertRepository dessertRepository;
+
     @Autowired
     public void RecommendService(PlaceRepository placeRepository,
                                  RecommendRepository recommendRepository,
@@ -66,7 +67,7 @@ public class RecommendService {
                 String subCategory = placeModel.getSubCategory();
                 // 카테고리 명에 따라 점수 추가
                 maps.forEach(map -> {
-                    if(map.category.equals(subCategory)){
+                    if (map.category.equals(subCategory)) {
                         map.point = map.point + 1;
                     }
                 });
@@ -77,8 +78,8 @@ public class RecommendService {
         Collections.sort(maps);
 
         List<PlaceModel> result = new ArrayList<PlaceModel>();
-        for(PointDto p : maps){
-            if(result.size() > 20) break;
+        for (PointDto p : maps) {
+            if (result.size() > 20) break;
 
             List<PlaceModel> placeModel = placeRepository.findBySubCategoryOrderByRecommendDecsViewDesc(p.category);
             result.addAll(placeModel.stream().filter(place -> !placeModels.contains(place)).collect(Collectors.toList()));
@@ -99,19 +100,16 @@ public class RecommendService {
             JSONParser jsonParser = new JSONParser();
             Object obj = jsonParser.parse(recommendModel.getUsers());
             jsonArray = (JSONArray) obj;
-            for (int i = 0; i < jsonArray.size(); i++) {
-                Object jsonObject = jsonArray.get(i);
-                if (jsonObject.equals(object)) {
-                    jsonArray.remove(i);
-                    break;
-                } else if (i == jsonArray.size() - 1) {
-                    jsonArray.add(object);
-                }
-
-            }
             if (jsonArray.size() == 0) {
                 jsonArray.add(object);
+            } else {
+                if(jsonArray.contains(object)){
+                        jsonArray.remove(object);
+                }else {
+                        jsonArray.add(object);
+                }
             }
+
         } else {
             recommendModel = new RecommendModel();
             recommendModel.setPlaceId(id);

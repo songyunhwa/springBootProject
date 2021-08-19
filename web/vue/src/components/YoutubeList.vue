@@ -1,7 +1,7 @@
 <!-- 왼쪽에 있는 유투브 리스트 -->
 <template>
   <div class="youtube-list-right">
-    <Youtube :select_place="select" ref="youtube"></Youtube>
+    <Youtube :select_place="select" ref="youtube" v-on:click="getPlace"></Youtube>
   </div>
 
 
@@ -31,7 +31,7 @@ export default {
   data: () => ({
     email: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/place',
+    url: 'http://localhost:9000/api/v1/places',
     places: [{
       name: '',
       area: '',
@@ -66,11 +66,11 @@ export default {
     getYoutube(params) {
 
       if (this.msg && this.msg.length > 0) {
-        this.url = 'http://localhost:9000/api/v1/place/' + this.msg;
+        this.url = 'http://localhost:9000/api/v1/places/' + this.msg;
       } else if(params && params.length > 0 ) {
         this.url = 'http://localhost:9000/api/v1/dessert?subCategory=' + params;
       } else {
-        this.url = 'http://localhost:9000/api/v1/place';
+        this.url = 'http://localhost:9000/api/v1/places';
       }
 
 
@@ -120,7 +120,15 @@ export default {
       this.select = place;
       this.$refs.youtube.getReview(place.id);
     },
-
+    getPlace(id){
+      this.url = 'http://localhost:9000/api/v1/place?id=' + id;
+      return axios
+          .get(this.url)
+          .then(({data}) => {
+            console.log(data);
+            this.select = data.data;
+          })
+      }
   }
 }
 </script>

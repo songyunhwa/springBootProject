@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+//@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping(value = "/api/v1")
 public class BaseController {
 
@@ -55,12 +55,11 @@ public class BaseController {
     }
 
     @GetMapping(value = "/logout")
-    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response,
-                                 HttpSession session) {
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) {
         try {
             //new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
-            userService.logout(session);
+            userService.logout(request, response);
 
             return new ResponseEntity(HttpStatus.OK);
         }catch (Exception e){
@@ -71,11 +70,17 @@ public class BaseController {
     @GetMapping(value = "/login")
     public ResponseEntity login(@RequestParam(name = "email", required = true) String email,
                            @RequestParam(name = "password", required = true) String password,
-                                HttpServletRequest request,
-                                HttpSession httpSession
+                                HttpServletRequest request,    HttpServletResponse response
                             ) {
         try {
-            ResponseEntity responseEntity = userService.login(email, password, request, httpSession);
+            HttpSession session = request.getSession();
+            Object userModel =session.getAttribute("login");
+            if(userModel!=null){
+                response.sendRedirect(request.getContextPath());
+                return new ResponseEntity(userModel, HttpStatus.OK);
+            }
+
+            ResponseEntity responseEntity = userService.login(email, password, request);
             return  responseEntity;
         }catch (Exception e){
             return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
