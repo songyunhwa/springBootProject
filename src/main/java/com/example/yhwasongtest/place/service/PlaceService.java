@@ -34,7 +34,6 @@ public class PlaceService {
     private LocationRepository locationRepository;
     private FoodRepository foodRepository;
     private DessertRepository dessertRepository;
-    private PictureRepository pictureRepository;
     private YoutubeRepository youtubeRepository;
 
     @Autowired
@@ -42,13 +41,11 @@ public class PlaceService {
                         LocationRepository locationRepository,
                         FoodRepository foodRepository,
                         DessertRepository dessertRepository,
-                        PictureRepository pictureRepository,
                         YoutubeRepository youtubeRepository) {
         this.placeRepository = placeRepository;
         this.locationRepository = locationRepository;
         this.foodRepository = foodRepository;
         this.dessertRepository = dessertRepository;
-        this.pictureRepository = pictureRepository;
         this.youtubeRepository = youtubeRepository;
     }
 
@@ -123,15 +120,19 @@ public class PlaceService {
                     youtubeModel.setDescription("");
                     youtubeModel.setChannelTitle(youtube.getChannelTitle());
                     youtubeModel.setVideoId(youtube.getVideoId());
-                    youtubeModel.setPlace(existPlace);
 
-                    youtubeModel = youtubeRepository.save(youtubeModel);
                 }
                 existPlace.getYoutubes().add(youtubeModel);
             }
         }
 
-        placeRepository.save(existPlace);
+        existPlace = placeRepository.save(existPlace);
+
+        for(YoutubeModel youtubeModel : existPlace.getYoutubes()) {
+            youtubeModel.setPlace(existPlace);
+            youtubeRepository.save(youtubeModel);
+        }
+
         return existPlace;
     }
 
@@ -262,4 +263,7 @@ public class PlaceService {
         return places;
     }
 
+    public List<DessertModel> getCategory(){
+        return dessertRepository.findAll();
+    }
 }

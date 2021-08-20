@@ -2,6 +2,7 @@ package com.example.yhwasongtest.place.controller;
 
 import com.example.yhwasongtest.common.CommonCode;
 import com.example.yhwasongtest.place.dto.PlaceDto;
+import com.example.yhwasongtest.place.model.DessertModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.PlaceService;
 
@@ -127,6 +128,18 @@ public class PlaceController {
         placeService.deletePlaceContaingEng();
         placeService.getFoodCategory();
         placeService.getDessertCategory();
+    }
+
+    @GetMapping(value = "/category")
+    public ResponseEntity getCategory(){
+        try {
+            List<DessertModel> dessertModels = placeService.getCategory();
+
+            JSONArray jsonArray = CommonCode.categoryConvertToJSON(dessertModels);
+            return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

@@ -29,7 +29,7 @@
       <button @click="getYoutube">검색</button>
     </div>
 
-    <PlaceModal v-show="showModal" :select_modal="modal" @close="onToggleModal"></PlaceModal>
+    <PlaceModal v-show="showModal" :select_modal="modal" @close="onToggleModal" ref="placeModal"></PlaceModal>
   </div>
 </template>
 
@@ -80,6 +80,7 @@ export default {
         this.showModal = false;
       } else {
         this.showModal = true;
+        this.$refs.placeModal.initialization();
       }
     }
   }
