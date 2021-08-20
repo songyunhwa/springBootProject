@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,33 +56,11 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserModel user = userRepository.findByUsername(username);
-
-        if (user == null) {
-            throw new UsernameNotFoundException(username + "is not found.");
-        }
-
-        CustomUserDetails quickGuideUser = new CustomUserDetails();
-        quickGuideUser.setUsername(user.getUsername());
-        quickGuideUser.setPassword(user.getPassword());
-        quickGuideUser.setAuthorities(getAuthorities(username));
-        quickGuideUser.setEnabled(true);
-        quickGuideUser.setAccountNonExpired(true);
-        quickGuideUser.setAccountNonLocked(true);
-        quickGuideUser.setCredentialsNonExpired(true);
-
-        return quickGuideUser;
+        UserModel userModel = userRepository.findByUsername(username);
+        List<GrantedAuthority> authorityList = new ArrayList<>();
+        authorityList.add(new SimpleGrantedAuthority(userModel.getRole()));
+        return new User(userModel.getUsername() , userModel.getPassword() , authorityList);
     }
-
-    public Collection<GrantedAuthority> getAuthorities(String username) {
-        List<Authority> authList = authorityRepository.findByUsername(username);
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (Authority authority : authList) {
-            authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
-        }
-        return authorities;
-    }
-
 
     /**
      * 회원정보 저장
@@ -154,7 +133,7 @@ public class UserService implements UserDetailsService {
         return passwordHashed;
     }
 
-    public ResponseEntity login(String name, String password, HttpServletRequest request) throws Exception {
+    public UserModel login(String name, String password, HttpServletRequest request) throws Exception {
 
         UserModel userModel = userRepository.findByUsername(name);
         String ip = this.getRemoteAddr(request);
@@ -184,11 +163,13 @@ public class UserService implements UserDetailsService {
                             .token(accessToken)
                             .build()); */
 
-                return new ResponseEntity(userModel, HttpStatus.OK);
+
             }
-            throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
+            else throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
         }
-        throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
+        else throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
+
+        return userModel;
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {

@@ -121,9 +121,6 @@ export default {
     url: '',
     result: '',
   }),
-  created() {
-    this.place.youtubes.pop();
-  },
   methods: {
     initialization() {
       while (this.place.youtubes.length !== 0) {
@@ -168,17 +165,15 @@ export default {
         return;
       }
 
-      this.url = 'http://localhost:9000/api/v1/place';
-      console.log(this.place);
       return axios
-          .post(this.url, this.place)
+          .post('http://localhost:9000/api/v1/admin/place', this.place)
           .then(({data}) => {
             console.log(data);
             this.$emit('close');
           })
           .catch(({error}) => {
             console.log("error");
-            this.result = error.response.data;
+            this.result = error;
           })
 
 
@@ -188,7 +183,6 @@ export default {
       return axios
           .get(this.url)
           .then(({data}) => {
-            console.log(data);
             this.categorys = data;
           })
           .catch((error) => {

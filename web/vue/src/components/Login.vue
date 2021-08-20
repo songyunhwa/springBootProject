@@ -25,7 +25,6 @@
   </div>
 
 </template>
-
 <script>
 import axios from 'axios'
 import {Form, Field, defineRule} from 'vee-validate';
@@ -90,12 +89,12 @@ export default {
 
             if (this.$cookies.get('email') == null) {
               this.$cookies.set('email', data.username);
+              this.$cookies.set('role', data.role);
             }
             this.$router.push({path: '/'});
-
           })
           .catch((error) => {
-            this.result = error.response.data.split("java.lang.Exception:")[1];
+            this.result = error;
             if (this.$cookies.get('sessionId') != null)
               this.$cookies.remove('sessionId');
           })
@@ -110,21 +109,21 @@ export default {
         this.title = '로그인';
       }
     },
-
     SignUp() {
       this.userModel.email = this.email;
       this.userModel.password = this.password;
 
       return axios
           .post(this.url, this.userModel)
-          .then(({data}) => {
-            console.log(data);
+          .then(() => {
             this.title = '로그인';
+            this.result = '회원가입 되었습니다.';
           })
           .catch((error) => {
             this.result = error.response.data.split("java.lang.Exception:")[1];
           })
     },
+
   }
 }
 </script>

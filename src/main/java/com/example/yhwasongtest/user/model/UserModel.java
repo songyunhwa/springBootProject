@@ -34,5 +34,9 @@ public class UserModel {
                 this.password = password;
                 this.role = role;
         }
+        public UserModel(String email, String role) {
+                this.username = email;
+                this.role = role;
+        }
 
 }

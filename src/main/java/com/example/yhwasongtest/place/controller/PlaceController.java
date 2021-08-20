@@ -81,7 +81,7 @@ public class PlaceController {
         }
     }
 
-    @PostMapping(value = "/place")
+    @PostMapping(value = "/admin/place")
     public ResponseEntity putPlace(@RequestBody PlaceDto placeDto) {
 
         try {

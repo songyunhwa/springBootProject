@@ -25,8 +25,8 @@ export default {
       return axios
           .get(this.url)
           .then(() => {
-            this.$cookies.remove('sessionId');
             this.$cookies.remove('email');
+            this.$cookies.remove('role');
 
             this.$router.push({ path: '/' });
           })

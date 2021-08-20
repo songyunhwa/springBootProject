@@ -8,6 +8,8 @@ import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.service.BaseService;
 import com.example.yhwasongtest.user.service.UserService;
 import org.apache.catalina.User;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,8 +82,14 @@ public class BaseController {
                 return new ResponseEntity(userModel, HttpStatus.OK);
             }
 
-            ResponseEntity responseEntity = userService.login(email, password, request);
-            return  responseEntity;
+            UserModel user = userService.login(email, password, request);
+
+            JSONArray jsonArray = new JSONArray();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("email", user.getUsername());
+            jsonObject.put("role", user.getRole());
+            jsonArray.add(jsonObject);
+            return  new ResponseEntity(jsonArray.toString(), HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }

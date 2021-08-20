@@ -101,7 +101,6 @@ export default {
   },
   methods: {
     getReview(id) {
-      console.log("getReview" + id);
       return axios
           .get(this.url + 'review?id=' + id)
           .then((reviews) => {

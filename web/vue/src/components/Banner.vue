@@ -42,7 +42,7 @@ export default {
   components: {PlaceModal},
   data: () => ({
     email: '',
-    password: '',
+    role: '',
     url: 'http://localhost:9000/api/v1/history',
     input: '', // 입력하는 값
     msg: '',   // 실질적으로 넘어가는 값
@@ -56,6 +56,7 @@ export default {
   }),
   created() {
     this.email = this.$cookies.get('email');
+    this.role = this.$cookies.get('role');
     this.getLoginHistory();
   },
   methods: {

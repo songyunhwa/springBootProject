@@ -12,7 +12,7 @@
 
         <name>{{ place.name }}</name>
         {{ place.subCategory }}
-        <hr style="border: none; margin-top:0px;">
+       <!-- <hr style="border: none; margin-top:0px;">-->
         {{ place.youtubers }}
 
       </li>
