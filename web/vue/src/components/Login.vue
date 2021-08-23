@@ -24,9 +24,7 @@
     <button @click="this.$router.push({path: '/'});">홈</button>
   </div>
 
-  <div>
-    <button @click="handleClickGetAuth" :disabled="!isLoaded">get auth code</button>
-  </div>
+  <a href="http://localhost:9000/oauth2/authorization/google">구글 아이디로 로그인</a>
 </template>
 <script>
 import axios from 'axios'
@@ -127,23 +125,10 @@ export default {
             this.result = error.response.data.split("java.lang.Exception:")[1];
           })
     },
-    handleClickGetAuth() {
-      this.$gAuth.getAuthCode()
-          .then(authCode => {
-            //on success
-            return this.$http.post('http://localhost:9000/auth/google', {
-              code: authCode,
-              redirect_uri: 'postmessage'
-            })
-          })
-          .then(response => {
-            //and then
-            console.log(response);
-          })
-          .catch(error => {
-            //on fail do something
-            console.log(error);
-          })
+    loginGoogle() {
+      //http://localhost:9000/oauth2/authorization/google
+      //const url = 'https://accounts.google.com/o/oauth2/auth?client_id=942313148186-02jviab6j8v2po06op58129tttdmci28.apps.googleusercontent.com&redirect_uri=http://localhost:8080/auth/google/callback&response_type=code';
+
     }
   }
 }
