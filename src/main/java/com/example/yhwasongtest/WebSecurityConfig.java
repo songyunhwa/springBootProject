@@ -30,22 +30,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // 2
 
             http.csrf().disable();		//로그인 창
 
-            http.authorizeRequests()
-                    .antMatchers("/api/v1/**").permitAll()
-                    .antMatchers("/admin/**").hasRole("ADMIN") // '/admin/*' 요청은 ADMIN 권한을 가진 사용자만 접근 가능
-                    .anyRequest().authenticated()
-                    .and()
-                    .formLogin()
-                    .loginPage("/login")
-                    .usernameParameter("email")
-                    .passwordParameter("password")
-                    .permitAll()
-                    .and()
-                    .logout()
-                    .permitAll()
-              .and().sessionManagement()
-                      .maximumSessions(1)
-                      .expiredUrl("/login");
     }
 
     /**

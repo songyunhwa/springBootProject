@@ -120,6 +120,7 @@ public class PlaceService {
                     youtubeModel.setDescription("");
                     youtubeModel.setChannelTitle(youtube.getChannelTitle());
                     youtubeModel.setVideoId(youtube.getVideoId());
+                    youtubeModel.setPlace(existPlace);
 
                 }
                 existPlace.getYoutubes().add(youtubeModel);
@@ -128,11 +129,12 @@ public class PlaceService {
 
         existPlace = placeRepository.save(existPlace);
 
+        /*
         for(YoutubeModel youtubeModel : existPlace.getYoutubes()) {
             youtubeModel.setPlace(existPlace);
             youtubeRepository.save(youtubeModel);
         }
-
+*/
         return existPlace;
     }
 

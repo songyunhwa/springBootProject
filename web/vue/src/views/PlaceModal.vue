@@ -26,7 +26,7 @@
               <div>
                 <div>카테고리</div>
                 <div>
-                  <select name="category" v-model="place.subCategory">
+                  <select name="category" v-model="place.subCategory" class="select-category">
                     <option v-for="(category, index) in categorys" v-bind:key="index"> {{ category.included }}</option>
                   </select>
                 </div>
@@ -58,15 +58,13 @@
                 <div>비디오 아이디</div>
                 <div><input v-model="youtube.videoId" style="margin: 5px 10px;padding: 5px 10px;"></div>
               </div>
-              <div>
-                <button class="modal-default-button" @click="putYoutube">
-                  추가
-                </button>
-              </div>
             </div>
 
             <div style="color:red; margin-top: 10px;">{{ result }}</div>
             <div class="modal-default-button">
+              <button class="modal-default-button" @click="putYoutube" v-if="addYoutube">
+                유투브 추가
+              </button>
               <button @click="this.putPlace">
                 확인
               </button>
@@ -78,14 +76,18 @@
         </div>
       </div>
     </transition>
+    <Modal v-show="showResultModal" :select_modal="modal" @close="onToggleResultModal"></Modal>
+
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Modal from "@/views/Modal";
 
 export default {
   name: 'PlaceModal',
+  components: {Modal},
   props: {
     select_modal: Object,
   },
@@ -118,6 +120,12 @@ export default {
     }],
     addYoutube: false,
     showModal: false,
+    showResultModal: false,
+    modal: {
+      header: '',
+      body: '',
+      footer: ''
+    },
     url: '',
     result: '',
   }),
@@ -160,6 +168,10 @@ export default {
         this.result = '장소의 이름을 적어주세요.';
         return;
       }
+      if (this.place.subCategory.length === 0) {
+        this.result = '카테고리를 적어주세요.';
+        return;
+      }
       if (this.place.youtubes.length === 0) {
         this.result = '관련한 유투브를 추가해주세요.';
         return;
@@ -170,10 +182,13 @@ export default {
           .then(({data}) => {
             console.log(data);
             this.$emit('close');
+            this.modal.body = "맛집이 저장되었습니다.";
+            this.onToggleResultModal();
           })
           .catch(({error}) => {
-            console.log("error");
-            this.result = error;
+            console.log(error);
+            this.modal.body = "관리자로 로그인해주세요.";
+            this.onToggleResultModal();
           })
 
 
@@ -188,9 +203,19 @@ export default {
           .catch((error) => {
             console.log(error);
           })
-    }
+    },
+    onToggleResultModal() {
+      if (this.showResultModal) {
+        this.showResultModal = false;
+      } else {
+        this.showResultModal = true;
+      }
+    },
   }
 }
 </script>
 <style>
+.select-category{
+  width: 180px; height: 30px; padding-left: 5px; margin-left: 10px;
+}
 </style>

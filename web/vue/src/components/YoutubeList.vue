@@ -78,7 +78,6 @@ export default {
           .get(this.url)
           .then(({data}) => {
             this.places = data;
-
             this.places.forEach(place => {
               // 만약 정보가 없으면 - 로 바꾸기
 

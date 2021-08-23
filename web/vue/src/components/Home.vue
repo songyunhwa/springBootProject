@@ -1,10 +1,10 @@
 <template>
   <!-- 배너 -->
   <recommend class="right-banner"></recommend>
-  <Banner></Banner>
+  <Banner @search="getYoutube"></Banner>
 
   <!-- 유투브 -->
-  <youtube-list :msg="input" ref="list"></youtube-list>
+  <youtube-list :msg="input" ref="youtube_list"></youtube-list>
 
   <!-- 하단 스크롤 바 -->
   <div class="scoll-menu">
@@ -33,6 +33,9 @@ export default {
   methods: {
     scrollUp(){
       window.scrollTo(0,0);
+    },
+    getYoutube(param) {
+      this.$refs.youtube_list.getYoutube(param);
     }
   }
 }

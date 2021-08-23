@@ -24,6 +24,9 @@
     <button @click="this.$router.push({path: '/'});">홈</button>
   </div>
 
+  <div>
+    <button @click="handleClickGetAuth" :disabled="!isLoaded">get auth code</button>
+  </div>
 </template>
 <script>
 import axios from 'axios'
@@ -53,6 +56,7 @@ export default {
       authority: 'ROLE_USER',
     },
     errors: [],
+    isLoaded: false,
   }),
   state: {
     accessToken: null,
@@ -123,7 +127,24 @@ export default {
             this.result = error.response.data.split("java.lang.Exception:")[1];
           })
     },
-
+    handleClickGetAuth() {
+      this.$gAuth.getAuthCode()
+          .then(authCode => {
+            //on success
+            return this.$http.post('http://localhost:9000/auth/google', {
+              code: authCode,
+              redirect_uri: 'postmessage'
+            })
+          })
+          .then(response => {
+            //and then
+            console.log(response);
+          })
+          .catch(error => {
+            //on fail do something
+            console.log(error);
+          })
+    }
   }
 }
 </script>

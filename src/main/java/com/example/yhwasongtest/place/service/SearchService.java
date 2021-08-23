@@ -33,6 +33,16 @@ public class SearchService {
     }
 
     public List<PlaceModel> selectDessert(String subCategory) {
-        return placeRepository.findBySubCategory(subCategory);
+        List<PlaceModel> results = new ArrayList<>();
+        results= placeRepository.findByNameContaining(subCategory);
+
+        List<PlaceModel> results_sub =  new ArrayList<>();
+        results_sub = placeRepository.findBySubCategory(subCategory);
+        for(PlaceModel placeModel : results_sub){
+            if(!results.contains(placeModel)){
+                results.add(placeModel);
+            }
+        }
+        return results;
     }
 }

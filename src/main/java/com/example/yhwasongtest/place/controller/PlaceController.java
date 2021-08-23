@@ -1,11 +1,13 @@
 package com.example.yhwasongtest.place.controller;
 
 import com.example.yhwasongtest.common.CommonCode;
+import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.DessertModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.PlaceService;
 
+import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.service.YoutubeService;
@@ -16,9 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +91,16 @@ public class PlaceController {
     public ResponseEntity putPlace(@RequestBody PlaceDto placeDto) {
 
         try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpSession httpSession = request.getSession(false);
+            UserModel user = (UserModel)httpSession.getAttribute("login");
+            if(user==null){
+                throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
+            }
+            if(!user.getRole().equals("ROLE_ADMIN")){
+                throw new Exception(ErrorMessage.PUT_PLACE_INVALID.getMessage());
+            }
+
             // 지역에 대한 정보 저장
             PlaceModel placeModel = placeService.putPlace(placeDto);
 

@@ -25,8 +25,8 @@
     </div>
 
     <div class="search">
-      <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube">
-      <button @click="getYoutube">검색</button>
+      <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="this.$emit('search', input)">
+      <button @click="this.$emit('search', input)">검색</button>
     </div>
 
     <PlaceModal v-show="showModal" :select_modal="modal" @close="onToggleModal" ref="placeModal"></PlaceModal>
@@ -60,9 +60,6 @@ export default {
     this.getLoginHistory();
   },
   methods: {
-    getYoutube() {
-      this.$refs.list.getYoutube();
-    },
     getLoginHistory() {
       return axios
           .get(this.url)
