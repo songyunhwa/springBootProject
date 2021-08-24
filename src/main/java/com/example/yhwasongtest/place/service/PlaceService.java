@@ -86,33 +86,32 @@ public class PlaceService {
         boolean isMatch = Pattern.matches(pattern, placeModel.getName());
         if (isMatch) return null;
 
-        PlaceModel existPlace = placeRepository.findByName(placeModel.getName());
-        if(existPlace!=null){
+        PlaceModel existPlace = placeRepository.findByNameAndSubCategory(placeModel.getName(), placeModel.getSubCategory());
+        if (existPlace != null) {
             // 있는 장소라면 view +1
             existPlace.setView(existPlace.getView() + 1);
-        }else{
+        } else {
             existPlace = new PlaceModel();
             existPlace.setName(placeModel.getName());
-            existPlace.setSubCategory(placeModel.getSubCategory());
             existPlace.setView(1);
             existPlace.setRecommend(0);
-            List<YoutubeModel> youtubes= new ArrayList<YoutubeModel>();
+            existPlace.setSubCategory(placeModel.getSubCategory());
+            List<YoutubeModel> youtubes = new ArrayList<YoutubeModel>();
             existPlace.setYoutubes(youtubes);
-
-            if (placeModel.getArea() == null) existPlace.setArea("");
-            else existPlace.setArea(placeModel.getArea());
-            if (placeModel.getNumber() == null) existPlace.setNumber("");
-            else existPlace.setNumber(placeModel.getNumber());
-            if (placeModel.getUrl() == null) existPlace.setUrl("");
-            else existPlace.setUrl(placeModel.getUrl());
         }
 
-        // 유투브에 대한 정보 저장
+        existPlace.setArea(placeModel.getArea());
+        existPlace.setNumber(placeModel.getNumber());
+        existPlace.setUrl(placeModel.getUrl());
 
-        if(placeModel.getYoutubes()!=null) {
+
+        List<YoutubeModel> youtubeModels = new ArrayList<>();
+        // 유투브에 대한 정보 저장
+        if (placeModel.getYoutubes() != null) {
             for (YoutubeDto youtube : placeModel.getYoutubes()) {
                 YoutubeModel youtubeModel = youtubeRepository.findByVideoId(youtube.getVideoId());
-                if(youtubeModel==null) {
+                // 포함하고 있는 유투브라면 넘어가기
+                if (youtubeModel == null) {
                     youtubeModel = new YoutubeModel();
                     youtubeModel.setPublishedAt("");
                     youtubeModel.setChannelId("");
@@ -123,18 +122,28 @@ public class PlaceService {
                     youtubeModel.setPlace(existPlace);
 
                 }
-                existPlace.getYoutubes().add(youtubeModel);
+                youtubeModels.add(youtubeModel);
             }
         }
 
+        for (YoutubeModel youtubeModel : existPlace.getYoutubes()) {
+            if(!youtubeModels.contains(youtubeModel)){
+                youtubeRepository.delete(youtubeModel);
+            }
+        }
+        existPlace.getYoutubes().clear();
+        existPlace.setYoutubes(youtubeModels);
         existPlace = placeRepository.save(existPlace);
 
-        /*
-        for(YoutubeModel youtubeModel : existPlace.getYoutubes()) {
-            youtubeModel.setPlace(existPlace);
-            youtubeRepository.save(youtubeModel);
+        for (YoutubeModel youtubeModel : existPlace.getYoutubes()) {
+            YoutubeModel youtube = youtubeRepository.findByVideoId(youtubeModel.getVideoId());
+            if (youtube == null) {
+                youtubeModel.setPlace(existPlace);
+                youtubeRepository.save(youtubeModel);
+            }
         }
-*/
+
+
         return existPlace;
     }
 
@@ -265,7 +274,7 @@ public class PlaceService {
         return places;
     }
 
-    public List<DessertModel> getCategory(){
+    public List<DessertModel> getCategory() {
         return dessertRepository.findAll();
     }
 }

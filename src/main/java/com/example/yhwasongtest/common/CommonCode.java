@@ -30,17 +30,17 @@ public class CommonCode {
             jsonObject.put("fileId", placeModel.getFileId());
 
             JSONArray subArray = new JSONArray();
-            JSONObject subObject = new JSONObject();
+
             List<YoutubeModel> youtubes = new ArrayList<>();
             youtubes = placeModel.getYoutubes();
             for(YoutubeModel youtube : youtubes){
+                JSONObject subObject = new JSONObject();
                 subObject.put("videoId", youtube.getVideoId());
                 subObject.put("channelTitle", youtube.getChannelTitle());
                 subObject.put("title", youtube.getTitle());
                 subArray.add(subObject);
             }
             jsonObject.put("youtube", subArray);
-
 
             jsonArray.add(jsonObject);
         }

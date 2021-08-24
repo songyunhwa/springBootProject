@@ -230,7 +230,7 @@ export default {
     }
     ,
     onReviewTimeout() {
-      setTimeout('getReview(this.placeId)', 10000);
+      //setTimeout('getReview(this.placeId)', 10000);
     }
   }
 }

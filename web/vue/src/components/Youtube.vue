@@ -21,20 +21,22 @@
 
     <div class="tail" @click="setWished">찜</div>
     <div class="tail" @click="setRecommend">추천</div>
-    <div class="tail" @click="">수정</div>
+    <div class="tail" @click="onTogglePlaceModal">수정</div>
   </div>
 
   <Review :select_place="select_place" ref="review"></Review>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
-  <PlaceModal v-show="showPlaceModal" :select_modal="modal" @close="onToggleModal" ref="placeModal"></PlaceModal>
+  <PlaceModal v-show="showPlaceModal" :select_modal="modal" @close="onTogglePlaceModal" ref="placeModal"></PlaceModal>
 </template>
 <script>
 import axios from "axios";
 import Modal from "@/views/Modal";
+import PlaceModal from "@/views/PlaceModal";
 import Review from "@/components/Review";
+
 export default {
   name: 'Youtube',
-  components: { Modal , Review},
+  components: { Modal , Review, PlaceModal},
   props: {
     select_place: Object
   },
@@ -105,6 +107,14 @@ export default {
         this.$emit('click', this.select_place.id);
       } else {
         this.showModal = true;
+      }
+    },
+    onTogglePlaceModal() {
+      if (this.showPlaceModal) {
+        this.showPlaceModal = false;
+      } else {
+        this.showPlaceModal = true;
+        this.$refs.placeModal.modifyYoutube(this.select_place);
       }
     },
     selectPlace() {

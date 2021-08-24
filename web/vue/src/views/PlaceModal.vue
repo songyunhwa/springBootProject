@@ -13,7 +13,7 @@
             <div class="modal-body">
               <div>
                 <div>장소이름</div>
-                <div><input v-model="place.name" style="margin: 5px 10px;padding: 5px 10px;"></div>
+                <div><input v-model="place.name" style="margin: 5px 10px;padding: 5px 10px;" :disabled="isModify"></div>
               </div>
               <div>
                 <div>지역</div>
@@ -26,7 +26,7 @@
               <div>
                 <div>카테고리</div>
                 <div>
-                  <select name="category" v-model="place.subCategory" class="select-category">
+                  <select name="category" v-model="place.subCategory" class="select-category" :disabled="isModify">
                     <option v-for="(category, index) in categorys" v-bind:key="index"> {{ category.included }}</option>
                   </select>
                 </div>
@@ -35,7 +35,6 @@
                 <ul>
                   <li v-for="(youtube) in place.youtubes" v-bind:key="youtube">
                     {{ youtube.title }}
-                    <!--<button @click="place.youtubes.splice(index, 1);">삭제</button>-->
                   </li>
                 </ul>
               </div>
@@ -64,6 +63,9 @@
             <div class="modal-default-button">
               <button class="modal-default-button" @click="putYoutube" v-if="addYoutube">
                 유투브 추가
+              </button>
+              <button class="modal-default-button" @click="popPlaceYoutubes">
+                전체 유투브 삭제
               </button>
               <button @click="this.putPlace">
                 확인
@@ -121,6 +123,7 @@ export default {
     addYoutube: false,
     showModal: false,
     showResultModal: false,
+    isModify: false,
     modal: {
       header: '',
       body: '',
@@ -134,12 +137,40 @@ export default {
       while (this.place.youtubes.length !== 0) {
         this.place.youtubes.pop();
       }
+      this.isModify = false;
       this.place.name = '';
       this.place.area = '';
       this.place.number = '';
       this.place.subCategory = '';
       this.addYoutube = false;
       this.result = '';
+
+      this.getCategory();
+    },
+    modifyYoutube(place) {
+      while (this.place.youtubes.length !== 0) {
+        this.place.youtubes.pop();
+      }
+
+      this.isModify = true;
+      this.place.name = place.name;
+      this.place.area = place.area;
+      this.place.number = place.number;
+      this.place.subCategory = place.subCategory;
+      this.addYoutube = false;
+
+      // 유투브 집어넣기
+      if(place.youtube!=null) {
+        for(let youtube of place.youtube) {
+          this.youtube.url = youtube.url;
+          this.youtube.title = youtube.title;
+          this.youtube.channelTitle = youtube.channelTitle;
+          this.youtube.videoId = youtube.videoId;
+          this.putYoutube();
+        }
+      }
+      console.log(place);
+      console.log(this.place);
 
       this.getCategory();
     },
@@ -173,21 +204,19 @@ export default {
         return;
       }
       if (this.place.youtubes.length === 0) {
-        this.result = '관련한 유투브를 추가해주세요.';
+        this.result = '유투브가 하나 이상이어야 합니다.';
         return;
       }
 
       return axios
           .post('http://localhost:9000/api/v1/admin/place', this.place)
-          .then(({data}) => {
-            console.log(data);
+          .then(() => {
+            this.$emit('putPlace');
             this.$emit('close');
-            this.modal.body = "맛집이 저장되었습니다.";
-            this.onToggleResultModal();
           })
           .catch(({error}) => {
             console.log(error);
-            this.modal.body = "관리자로 로그인해주세요.";
+            this.modal.body = "관리자로 다시 로그인해주십시오.";
             this.onToggleResultModal();
           })
 
@@ -211,6 +240,11 @@ export default {
         this.showResultModal = true;
       }
     },
+    popPlaceYoutubes(){
+      while (this.place.youtubes.length !== 0) {
+        this.place.youtubes.pop();
+      }
+    }
   }
 }
 </script>

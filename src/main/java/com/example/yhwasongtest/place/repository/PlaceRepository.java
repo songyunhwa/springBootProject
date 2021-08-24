@@ -11,11 +11,9 @@ import java.util.List;
 public interface PlaceRepository extends JpaRepository<PlaceModel, Long> {
     PlaceModel findById(long id);
     PlaceModel findByName(String name);
-
+    PlaceModel findByNameAndSubCategory(String name, String subCategory);
     List<PlaceModel> findBySubCategory(String subCategory);
-
     List<PlaceModel> findBySubCategoryOrderByViewDesc(String subCategory);
-
     List<PlaceModel> findByNameContaining(String name);
 
     // 기본 목록

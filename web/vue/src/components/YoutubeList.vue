@@ -55,7 +55,12 @@ export default {
       subCategory: '',
       recommend: '',
       view: '',
-      youtube: Object,
+      youtube: [{
+        videoId: '',
+        channelTitle: '',
+        title: '',
+        url: '',
+      }],
     },
     object: [],
   }),
@@ -122,16 +127,17 @@ export default {
       return axios
           .get(this.url)
           .then(({data}) => {
+            console.log(data[0].youtube);
             this.select = data[0];
             this.select.area = this.select.area && this.select.area.length > 0 ? this.select.area : "-";
             this.select.number = this.select.number && this.select.number.length > 0 ? this.select.number : "-";
-
             // 유투브 설정
+
             let titles = [];
             let youtubes = [];
 
             this.select.youtubers = '';
-            data[0].youtube.forEach(youtube => {
+            this.select.youtube.forEach(youtube => {
               if (!titles.includes(youtube.channelTitle)) {
                 titles.push(youtube.channelTitle);
 
@@ -143,7 +149,10 @@ export default {
 
             // 한번 더 겹치는 거 없는지 filtering
             this.select.youtube = youtubes;
-          })
+
+          }).catch(error=>{
+            console.log("selectPlace error", error);
+          });
       }
   }
 }

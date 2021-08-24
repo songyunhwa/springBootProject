@@ -104,7 +104,7 @@ public class PlaceController {
             // 지역에 대한 정보 저장
             PlaceModel placeModel = placeService.putPlace(placeDto);
 
-            return new ResponseEntity<>(placeModel, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception error) {
             System.err.println("putPlace Error ==> " + error);
             return new ResponseEntity<>(error.toString(), HttpStatus.BAD_REQUEST);
