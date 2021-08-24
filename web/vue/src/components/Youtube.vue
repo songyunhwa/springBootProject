@@ -21,10 +21,12 @@
 
     <div class="tail" @click="setWished">찜</div>
     <div class="tail" @click="setRecommend">추천</div>
+    <div class="tail" @click="">수정</div>
   </div>
 
   <Review :select_place="select_place" ref="review"></Review>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
+  <PlaceModal v-show="showPlaceModal" :select_modal="modal" @close="onToggleModal" ref="placeModal"></PlaceModal>
 </template>
 <script>
 import axios from "axios";
@@ -41,6 +43,7 @@ export default {
     password: '',
     url: 'http://localhost:9000/api/v1/',
     showModal: false,
+    showPlaceModal: false,
     modal: {
       header:'',
       body:'',

@@ -5,19 +5,22 @@
 * 로그인
     * json web token 을 이용해서 회원 정보 저장 / 확인  
     * 세션과 쿠키에 저장
-    
-    ![Base  width="10%"](./web/vue/src/assets/images/validation.png)
     * vee-validate 사용
+    ![Base  width="10%"](./web/vue/src/assets/images/validation.png)
+   
 
 * 로그아웃
     * 세션과 쿠키 삭게
 
-![Base  width="10%"](./web/vue/src/assets/images/modal_image.png) 
+
+* 구글 로그인 연동 완성
 
 * 댓글 (파일 추가)
     * 파일을 추가할 수 있음.  
     * 자신이 쓴 댓글만 수정/삭제 가능
     * 10초마다 리뷰 리프레시
+
+![Base  width="10%"](./web/vue/src/assets/images/modal_image.png) 
 
 *  추천기능
     * 추천수를 바탕으로 자신이 찜한 가게들과 비슷한 카테고리를 모아 추천
@@ -33,8 +36,11 @@
 
 * 장소 추가하기
     * 관리자만 가능
-    
+
+
 <h3>앞으로 해야할 기능들</h3>
 
 * 프론트단 수정중... 
-* 도커로 무중단 배포
+* 배포
+* 유투브 창/코멘트 화면 추가
+* 유투브 수정 버튼 추가

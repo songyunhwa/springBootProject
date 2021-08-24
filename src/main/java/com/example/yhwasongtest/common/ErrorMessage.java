@@ -12,7 +12,8 @@ public enum ErrorMessage {
     EMAIL_DUPLICATION(400, "등록된 이메일이 있습니다."),
     SIGNUP_PWD_INVALID(400,  "비밀번호가 틀렸습니다."),
     SIGNUP_EMAIL_INVALID(400,  "등록된 이메일이 없습니다."),
-    PUT_PLACE_INVALID(400,  "관리자로 로그인해주세요.");
+    PUT_PLACE_INVALID(400,  "관리자로 로그인해주세요."),
+    SIGNUP_GOOGLE_INVALID(400,  "등록된 사용자가 있습니다.");
 
     int code;
     String message;

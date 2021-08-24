@@ -23,8 +23,13 @@
     <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인</button>
     <button @click="this.$router.push({path: '/'});">홈</button>
   </div>
+  <div>
 
-  <a href="http://localhost:9000/oauth2/authorization/google">구글 아이디로 로그인</a>
+    <a href="http://localhost:9000/oauth2/authorization/google">
+      <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+      Sign in with google</a>
+  </div>
+
 </template>
 <script>
 import axios from 'axios'
@@ -59,7 +64,32 @@ export default {
   state: {
     accessToken: null,
   },
-  getters: {},
+  created() {
+    let url = 'http://localhost:9000/auth/google/callback';
+
+    if (this.$route.query.code) {
+      axios
+          .get(url + '?code=' + this.$route.query.code)
+          .then(({data}) => {
+            this.$route.query = '';
+            console.log(data);
+            if (this.$cookies.get('email') == null) {
+              this.$cookies.set('email', data[0].username);
+              this.$cookies.set('role', data[0].role);
+            }
+            this.$router.push({path: '/'});
+
+          })
+          .catch((error) => {
+            this.$route.query = '';
+
+            this.result = error;
+            if (this.$cookies.get('sessionId') != null)
+              this.$cookies.remove('sessionId');
+          })
+
+    }
+  },
   mutations: {
     login(state, {accessToken}) {
       state.accessToken = accessToken
@@ -125,11 +155,9 @@ export default {
             this.result = error.response.data.split("java.lang.Exception:")[1];
           })
     },
-    loginGoogle() {
-      //http://localhost:9000/oauth2/authorization/google
-      //const url = 'https://accounts.google.com/o/oauth2/auth?client_id=942313148186-02jviab6j8v2po06op58129tttdmci28.apps.googleusercontent.com&redirect_uri=http://localhost:8080/auth/google/callback&response_type=code';
-
-    }
   }
 }
 </script>
+<style>
+
+</style>

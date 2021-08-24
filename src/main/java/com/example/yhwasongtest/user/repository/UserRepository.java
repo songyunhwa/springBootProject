@@ -2,6 +2,7 @@ package com.example.yhwasongtest.user.repository;
 
 
 import com.example.yhwasongtest.user.model.UserModel;
+import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
     Optional<UserModel> findAllByUsername(String username);
     UserModel findByUsername(String username);
     UserModel findBySessionId(String sessionId);
+    UserModel findByUsernameAndEmail(String username, String email);
 }

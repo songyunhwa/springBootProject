@@ -22,7 +22,8 @@ public class UserModel {
         @Id
         @GeneratedValue
         private Long id;
-        private String username;    // 이메일
+        private String username;
+        private String email;
         private String password;    // 패스워드
 
         private String role;        // 권한

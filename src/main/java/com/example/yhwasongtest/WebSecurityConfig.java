@@ -43,18 +43,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-            //http.csrf().disable();
+            http.csrf().disable();
             http
                     .oauth2Login()
                     .userInfoEndpoint()
-                    .userService(customOAuth2UserService)
-                    .and().successHandler(new AuthenticationSuccessHandler() {
-                @Override
-                public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                    CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
-                    return;
-                }
-            });
+                    .userService(customOAuth2UserService);
 
     }
 
