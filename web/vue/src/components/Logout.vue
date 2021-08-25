@@ -12,7 +12,7 @@ const resourceHost = "http://localhost:9000/api/v1"
 export default {
   name: 'Logout',
   data: () => ({
-    email: '',
+    username: '',
     password: '',
     url: ''
   }),
@@ -25,7 +25,7 @@ export default {
       return axios
           .get(this.url)
           .then(() => {
-            this.$cookies.remove('email');
+            this.$cookies.remove('username');
             this.$cookies.remove('role');
 
             this.$router.push({ path: '/' });

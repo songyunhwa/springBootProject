@@ -29,7 +29,7 @@ export default {
     msg: Object,
   },
   data: () => ({
-    email: '',
+    username: '',
     password: '',
     url: 'http://localhost:9000/api/v1/places',
     places: [{
@@ -111,7 +111,6 @@ export default {
               if (this.place == null) {
                 this.select = this.places[0];
                 this.$refs.youtube.getReview(this.select.id);
-
               }
             })
           })
@@ -127,7 +126,6 @@ export default {
       return axios
           .get(this.url)
           .then(({data}) => {
-            console.log(data[0].youtube);
             this.select = data[0];
             this.select.area = this.select.area && this.select.area.length > 0 ? this.select.area : "-";
             this.select.number = this.select.number && this.select.number.length > 0 ? this.select.number : "-";

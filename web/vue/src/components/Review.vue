@@ -115,7 +115,7 @@ export default {
         id: '',
         placeName: this.select_place.name,
         placeId: this.select_place.id,
-        userName: this.$cookies.get('email'),
+        userName: this.$cookies.get('username'),
         userId: '',
         contents: this.input,
         star: '',
@@ -137,7 +137,7 @@ export default {
     }
     ,
     modifyReview(id, review) {
-      if (review.userName !== this.$cookies.get('email')) {
+      if (review.userName !== this.$cookies.get('username')) {
         this.modal.body = '수정 불가능합니다.'
         this.onToggleModal();
         return;
@@ -159,7 +159,7 @@ export default {
     }
     ,
     deleteReview(id, review) {
-      if (review.userName !== this.$cookies.get('email')) {
+      if (review.userName !== this.$cookies.get('username')) {
         this.modal.body = '삭제 불가능합니다.'
         this.onToggleModal();
         return;
@@ -176,7 +176,7 @@ export default {
     }
     ,
     uploadFile() {
-      if (this.$cookies.get('email') == null) {
+      if (this.$cookies.get('username') == null) {
         this.modal.body = '로그인을 해야합니다.'
         this.onToggleModal();
         return;
@@ -205,7 +205,7 @@ export default {
     }
     ,
     onToggle(review) {
-      if (review.userName !== this.$cookies.get('email')) {
+      if (review.userName !== this.$cookies.get('username')) {
         this.modal.body = '수정 불가능합니다.'
         this.onToggleModal();
         return;

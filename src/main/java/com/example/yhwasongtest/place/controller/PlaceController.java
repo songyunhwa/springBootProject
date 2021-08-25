@@ -97,9 +97,10 @@ public class PlaceController {
             if(user==null){
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
+            /*
             if(!user.getRole().equals("ROLE_ADMIN")){
                 throw new Exception(ErrorMessage.PUT_PLACE_INVALID.getMessage());
-            }
+            }*/
 
             // 지역에 대한 정보 저장
             PlaceModel placeModel = placeService.putPlace(placeDto);

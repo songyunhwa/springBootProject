@@ -20,7 +20,7 @@ export default {
   name: 'Home',
   components: {YoutubeList, Recommend, Banner},
   data: () => ({
-    email: '',
+    username: '',
     password: '',
     url: 'http://localhost:9000/api/v1/history',
     input: '', // 입력하는 값
@@ -28,7 +28,7 @@ export default {
     views : '0', // 하루 접속량,
   }),
   created() {
-    this.email = this.$cookies.get('email');
+    this.username = this.$cookies.get('username');
   },
   methods: {
     scrollUp(){

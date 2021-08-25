@@ -64,7 +64,7 @@
               <button class="modal-default-button" @click="putYoutube" v-if="addYoutube">
                 유투브 추가
               </button>
-              <button class="modal-default-button" @click="popPlaceYoutubes">
+              <button class="modal-default-button" @click="popPlaceYoutubes" :disabled="this.$cookies.get('role')!=='ROLE_ADMIN'">
                 전체 유투브 삭제
               </button>
               <button @click="this.putPlace">
@@ -169,9 +169,6 @@ export default {
           this.putYoutube();
         }
       }
-      console.log(place);
-      console.log(this.place);
-
       this.getCategory();
     },
     putYoutube() {
@@ -251,5 +248,9 @@ export default {
 <style>
 .select-category{
   width: 180px; height: 30px; padding-left: 5px; margin-left: 10px;
+}
+
+button:disabled {
+  background: #ccc;
 }
 </style>

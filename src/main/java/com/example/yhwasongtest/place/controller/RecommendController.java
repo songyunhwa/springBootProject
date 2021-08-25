@@ -39,8 +39,8 @@ public class RecommendController {
                                        @RequestParam(name = "id",required = true) long id){
 
         try {
-            recommendService.putRecommend(userName, id);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            String result = recommendService.putRecommend(userName, id);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
@@ -56,8 +56,8 @@ public class RecommendController {
     public ResponseEntity putWished(@RequestParam(name = "userName",required = true) String userName,
                                     @RequestParam(name = "id",required = true) long id){
         try {
-            recommendService.putWished(userName, id);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            String result = recommendService.putWished(userName, id);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }

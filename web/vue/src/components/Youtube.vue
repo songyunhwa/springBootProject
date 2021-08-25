@@ -41,7 +41,7 @@ export default {
     select_place: Object
   },
   data: () => ({
-    email: '',
+    username: '',
     password: '',
     url: 'http://localhost:9000/api/v1/',
     showModal: false,
@@ -59,20 +59,20 @@ export default {
     }
   },
   created() {
-    this.email = this.$cookies.get('email');
+    this.username = this.$cookies.get('username');
   },
   methods: {
     setRecommend() {
-      if(this.$cookies.get('email')==null){
+      if(this.$cookies.get('username')==null){
         this.modal.body = '로그인을 해야합니다.';
         this.onToggleModal();
         return;
       }
 
       return axios
-          .post(this.url + 'recommend?userName=' + this.email + '&id=' + this.select_place.id)
-          .then(() => {
-            this.modal.body = '추천을 성공했습니다.'
+          .post(this.url + 'recommend?userName=' + this.username + '&id=' + this.select_place.id)
+          .then((data) => {
+            this.modal.body = data.data;
             this.onToggleModal();
           })
           .catch(({error}) => {
@@ -83,20 +83,21 @@ export default {
           })
     },
     setWished() {
-      if(this.$cookies.get('email')==null){
+      if(this.$cookies.get('username')==null){
         this.modal.body = '로그인을 해야합니다.';
         this.onToggleModal();
         return;
       }
 
       return axios
-          .post(this.url + 'wished?userName=' + this.email + '&id=' + this.select_place.id)
-          .then(() => {
-            this.modal.body = '찜을 성공했습니다.'
+          .post(this.url + 'wished?userName=' + this.username + '&id=' + this.select_place.id)
+          .then((data) => {
+            this.modal.body = data.data;
             this.onToggleModal();
+            this.$emit('putWished', this.select_place);
           })
           .catch(({error}) => {
-            this.modal.body = '찜을 실패했습니다.'
+            this.modal.body = '찜을 실패했습니다.';
             this.onToggleModal();
             console.log(error);
           })

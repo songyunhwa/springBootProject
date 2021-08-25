@@ -70,7 +70,7 @@ public class BaseController {
     }
 
     @GetMapping(value = "/login")
-    public ResponseEntity login(@RequestParam(name = "email", required = true) String email,
+    public ResponseEntity login(@RequestParam(name = "username", required = true) String username,
                            @RequestParam(name = "password", required = true) String password,
                                 HttpServletRequest request,    HttpServletResponse response
                             ) {
@@ -82,11 +82,11 @@ public class BaseController {
                 return new ResponseEntity(userModel, HttpStatus.OK);
             }
 
-            UserModel user = userService.login(email, password, request);
+            UserModel user = userService.login(username, password, request);
 
             JSONArray jsonArray = new JSONArray();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("email", user.getUsername());
+            jsonObject.put("username", user.getUsername());
             jsonObject.put("role", user.getRole());
             jsonArray.add(jsonObject);
             return  new ResponseEntity(jsonArray.toString(), HttpStatus.OK);

@@ -6,7 +6,7 @@
     <button @click="this.$router.push({path: '/'});">홈</button>
 
     <div class="title">
-      당다라당당에 오신걸 환영합니다! {{ email }}
+      당다라당당에 오신걸 환영합니다! {{ username }}
       오늘 방문자수: {{this.views}}
     </div>
 
@@ -23,13 +23,13 @@ export default {
   name: 'Home',
   components: {WishedList, Recommend},
   data: () => ({
-    email: '',
+    username: '',
     password: '',
     url: 'http://localhost:9000/api/v1/history',
     views : '0', // 하루 접속량
   }),
   created() {
-    this.email = this.$cookies.get('email');
+    this.username = this.$cookies.get('username');
     this.getLoginHistory();
   },
   methods: {
@@ -80,10 +80,6 @@ button:hover {
 
 button:active {
   box-shadow: inset 1px 1px 1px #DFDFDF;
-}
-
-.search{
-  float: right;
 }
 
 .right-banner{

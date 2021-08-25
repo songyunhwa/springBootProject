@@ -4,7 +4,7 @@
     <table style="width: 300px; text-align: center;">
       <tr>
         <td>이메일</td>
-        <Field name="email" rules="required" v-model="this.email"/>
+        <Field name="username" rules="required" v-model="this.username"/>
         <span v-if="errors.email"><div style="color:red;">이메일을 적어주세요.</div> </span>
       </tr>
       <tr>
@@ -49,12 +49,12 @@ export default {
   },
   data: () => ({
     title: '로그인',
-    email: '',
+    username: '',
     password: '',
     url: '',
     result: '',
     userModel: {
-      email: '',
+      username: '',
       password: '',
       authority: 'ROLE_USER',
     },
@@ -73,8 +73,8 @@ export default {
           .then(({data}) => {
             this.$route.query = '';
             console.log(data);
-            if (this.$cookies.get('email') == null) {
-              this.$cookies.set('email', data[0].username);
+            if (this.$cookies.get('username') == null) {
+              this.$cookies.set('username', data[0].username);
               this.$cookies.set('role', data[0].role);
             }
             this.$router.push({path: '/'});
@@ -108,20 +108,19 @@ export default {
       if (this.$cookies.get('sessionId') != null) {
         this.url = `${resourceHost}/login/check?id=${this.$cookies.get('sessionId')}`
       } else {
-        if (!this.email || !this.password) {
+        if (!this.username || !this.password) {
           alert("Your email or password is empty.");
         }
-        this.url = `${resourceHost}/login?email=${this.email}&password=${this.password}`
+        this.url = `${resourceHost}/login?username=${this.username}&password=${this.password}`
       }
       axios.defaults.withCredentials = true;
       return axios
           .get(this.url)
           .then(({data}) => {
             console.log(data);
-
-            if (this.$cookies.get('email') == null) {
-              this.$cookies.set('email', data.username);
-              this.$cookies.set('role', data.role);
+            if (this.$cookies.get('username') == null) {
+              this.$cookies.set('username', data[0].username);
+              this.$cookies.set('role', data[0].role);
             }
             this.$router.push({path: '/'});
           })
@@ -142,7 +141,7 @@ export default {
       }
     },
     SignUp() {
-      this.userModel.email = this.email;
+      this.userModel.username = this.username;
       this.userModel.password = this.password;
 
       return axios

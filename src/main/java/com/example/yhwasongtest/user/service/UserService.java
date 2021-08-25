@@ -136,6 +136,15 @@ public class UserService implements UserDetailsService {
     public UserModel login(String name, String password, HttpServletRequest request) throws Exception {
 
         UserModel userModel = userRepository.findByUsername(name);
+
+        // 구글 로그인을 사용한 경우
+        if(userModel == null){
+            userModel = userRepository.findByEmail(name);
+        }
+        if(userModel.getPassword().length()==0 || userModel.getPassword() == null) {
+            throw new Exception(ErrorMessage.SIGNUP_GOOGLE_PREV_INVALID.getMessage());
+        }
+
         String ip = this.getRemoteAddr(request);
 
         if (userModel != null) {

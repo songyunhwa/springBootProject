@@ -1,6 +1,6 @@
 <template>
   <div class="banner">
-    <div v-if="this.email&&this.email.length>0">
+    <div v-if="this.username&&this.username.length>0">
       <router-link to="/logout">
         <button>로그아웃</button>
       </router-link>
@@ -20,7 +20,7 @@
 
 
     <div class="title">
-      당다라당당에 오신걸 환영합니다! {{ email }}
+      당다라당당에 오신걸 환영합니다! {{ username }}
       오늘 방문자수: {{ this.views }}
     </div>
 
@@ -43,7 +43,7 @@ export default {
   name: 'Banner',
   components: {PlaceModal},
   data: () => ({
-    email: '',
+    usename: '',
     role: '',
     url: 'http://localhost:9000/api/v1/history',
     input: '', // 입력하는 값
@@ -58,7 +58,7 @@ export default {
     }
   }),
   created() {
-    this.email = this.$cookies.get('email');
+    this.username = this.$cookies.get('username');
     this.role = this.$cookies.get('role');
     this.getLoginHistory();
   },

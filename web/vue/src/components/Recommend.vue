@@ -50,11 +50,11 @@ export default {
   },
   methods: {
     getYoutube() {
-      if(this.email===undefined){
-        this.email = 'test1';
+      if(this.username===undefined){
+        this.username = 'test1';
       }
       return axios
-          .get(this.url + "?userName=" + this.email)
+          .get(this.url + "?userName=" + this.username)
           .then(({data}) => {
             this.places = data;
           })

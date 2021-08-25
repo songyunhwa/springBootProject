@@ -1,7 +1,7 @@
 <!-- 찜한 창 -->
 <template>
   <div class="youtube-list-right">
-    <Youtube :select_place="select"></Youtube>
+    <Youtube :select_place="select" @putWished="deletePlace"></Youtube>
   </div>
   <div class="youtube-list-left">
     <ul>
@@ -24,7 +24,7 @@ export default {
   name: 'WishedList',
   components: {Youtube},
   data: () => ({
-    email: '',
+    username: '',
     password: '',
     url: 'http://localhost:9000/api/v1/wished', //
     places: [{
@@ -55,13 +55,13 @@ export default {
     object: [],
   }),
   created() {
-    this.email = this.$cookies.get('email');
+    this.username = this.$cookies.get('username');
     this.getYoutube();
   },
   methods: {
     getYoutube() {
       return axios
-          .get(this.url+"?userName="+this.email)
+          .get(this.url+"?userName="+this.username)
           .then(({data}) => {
             this.places = data;
 
@@ -87,6 +87,12 @@ export default {
 
                 // 한번 더 겹치는 거 없는지 filtering
                 place.youtube = youtubes;
+
+                /*처음 들어갈 때 - 리스트 맨 앞으로 설정
+                if (this.place == null) {
+                  this.select = this.places[0];
+                  this.$refs.youtube.getReview(this.select.id);
+                }*/
               })
             })
 
@@ -99,6 +105,15 @@ export default {
     },
     selectPlace(place) {
       this.select = place;
+    },
+    deletePlace(place){
+      console.log("deletePlace", place);
+      for(let i=0; i< this.places.length ; i++) {
+        if(this.places[i].name === place.name && this.places[i].subCategory === place.subCategory) {
+          this.places.splice(i, 1);
+          return;
+        }
+      }
     }
   }
 }

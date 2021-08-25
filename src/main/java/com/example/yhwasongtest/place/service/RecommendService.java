@@ -88,13 +88,14 @@ public class RecommendService {
         return jsonArray;
     }
 
-    public void putRecommend(String userName, long id) throws Exception {
+    public String putRecommend(String userName, long id) throws Exception {
         RecommendModel recommendModel = recommendRepository.findByPlaceId(id);
         PlaceModel place = placeRepository.findById(id);
         JSONArray jsonArray = new JSONArray();
 
         JSONObject object = new JSONObject();
         object.put("user", userName);
+        boolean isRemove = false;
 
         if (recommendModel != null) {
             JSONParser jsonParser = new JSONParser();
@@ -105,6 +106,7 @@ public class RecommendService {
             } else {
                 if(jsonArray.contains(object)){
                         jsonArray.remove(object);
+                        isRemove = true;
                 }else {
                         jsonArray.add(object);
                 }
@@ -122,6 +124,12 @@ public class RecommendService {
         // place에 추천수 집어넣기
         place.setRecommend(jsonArray.size());
         placeRepository.save(place);
+
+        if(isRemove) {
+            return "추천을 삭제했습니다.";
+        }else {
+            return "추천을 성공했습니다.";
+        }
     }
 
     public JSONArray getWished(String userName) throws Exception {
@@ -147,30 +155,22 @@ public class RecommendService {
 
     }
 
-    public void putWished(String userName, long id) throws Exception {
+    public String putWished(String userName, long id) throws Exception {
         PlaceModel place = placeRepository.findById(id);
         WishedModel wishedModel = wishedRepository.findByUserName(userName);
         JSONArray jsonArray = new JSONArray();
 
         JSONObject object = new JSONObject();
         object.put("place", place.getName());
-
+        boolean isRemove = false;
         if (wishedModel != null) {
             JSONParser jsonParser = new JSONParser();
             Object obj = jsonParser.parse(wishedModel.getPlaces());
             jsonArray = (JSONArray) obj;
-            for (int i = 0; i < jsonArray.size(); i++) {
-                Object jsonObject = jsonArray.get(i);
-                if (jsonObject.equals(object)) {
-                    jsonArray.remove(i);
-                    break;
-                } else if (i == jsonArray.size() - 1) {
-                    jsonArray.add(object);
-                    break;
-                }
-
-            }
-            if (jsonArray.size() == 0) {
+            if(jsonArray.contains(object)){
+                jsonArray.remove(object);
+                isRemove = true;
+            }else {
                 jsonArray.add(object);
             }
         } else {
@@ -182,7 +182,11 @@ public class RecommendService {
         wishedModel.setPlaces(jsonArray.toString());
         wishedRepository.save(wishedModel);
 
-
+        if(isRemove) {
+            return "찜을 삭제했습니다.";
+        }else {
+            return "찜을 성공했습니다.";
+        }
     }
 
 
