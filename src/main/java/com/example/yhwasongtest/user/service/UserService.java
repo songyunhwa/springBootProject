@@ -69,7 +69,7 @@ public class UserService implements UserDetailsService {
      * @return 저장되는 회원의 PK
      */
     public UserModel signUp(UserModelDto userModelDto) throws Exception {
-        UserModel userModel = userRepository.findByUsername(userModelDto.getEmail());
+        UserModel userModel = userRepository.findByUsername(userModelDto.getUsername());
 
         if (userModel != null) {
             throw new Exception(ErrorMessage.EMAIL_DUPLICATION.getMessage());
@@ -81,15 +81,18 @@ public class UserService implements UserDetailsService {
     }
 
     public UserModel insertUser(UserModelDto userModelDto) throws Exception {
-        Optional<UserModel> userModelOptional = userRepository.findAllByUsername(userModelDto.getEmail());
+        UserModel userModel = userRepository.findByUsername(userModelDto.getUsername());
 
-        if (!userModelOptional.isPresent()) {
+        if (userModel==null) {
             try {
 
-                String resultToken = getToken(userModelDto.getEmail(), userModelDto.getPassword());
+                String resultToken = getToken(userModelDto.getUsername(), userModelDto.getPassword());
                 resultToken = getHashed(resultToken);
 
-                UserModel userModel = new UserModel(userModelDto.getEmail(), resultToken, "ROLE_USER");
+                userModel = new UserModel();
+                userModel.setUsername(userModelDto.getUsername());
+                userModel.setRole("ROLE_USER");
+                userModel.setPassword(resultToken);
 
                 return userModel;
             } catch (Exception e) {
@@ -97,7 +100,6 @@ public class UserService implements UserDetailsService {
             }
             ;
         }
-        UserModel userModel = userRepository.findByUsername(userModelDto.getEmail());
         return userModel;
     }
 
@@ -140,6 +142,9 @@ public class UserService implements UserDetailsService {
         // 구글 로그인을 사용한 경우
         if(userModel == null){
             userModel = userRepository.findByEmail(name);
+        }
+        if(userModel == null) {
+            throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
         }
         if(userModel.getPassword().length()==0 || userModel.getPassword() == null) {
             throw new Exception(ErrorMessage.SIGNUP_GOOGLE_PREV_INVALID.getMessage());

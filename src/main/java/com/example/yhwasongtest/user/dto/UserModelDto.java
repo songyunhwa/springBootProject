@@ -5,22 +5,22 @@ import lombok.Setter;
 import org.apache.catalina.User;
 
 public class UserModelDto {
-    private String email;
+    private String username;
     private String password;
 
     private String authority;
 
-    public UserModelDto(String email, String password, String role){
-        this.email = email;
+    public UserModelDto(String username, String password, String role){
+        this.username = username;
         this.password = password;
         this.authority = role;
     }
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
