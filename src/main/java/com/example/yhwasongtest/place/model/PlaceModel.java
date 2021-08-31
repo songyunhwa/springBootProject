@@ -1,6 +1,8 @@
 package com.example.yhwasongtest.place.model;
 
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "place")
 public class PlaceModel implements Serializable {
 
@@ -39,83 +43,5 @@ public class PlaceModel implements Serializable {
 
     private Long fileId;
 
-    public long getId() {
-        return id;
-    }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getArea() {
-        return area;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(String subCategory) {
-        this.subCategory = subCategory;
-    }
-
-    public int getRecommend() {
-        return recommend;
-    }
-
-    public void setRecommend(int recommend) {
-        this.recommend = recommend;
-    }
-
-    public int getView() {
-        return view;
-    }
-
-    public void setView(int view) {
-        this.view = view;
-    }
-
-    public Long getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(Long fileId) {
-        this.fileId = fileId;
-    }
-
-    public List<YoutubeModel> getYoutubes() {
-        return youtubes;
-    }
-
-    public void setYoutubes(List<YoutubeModel> youtubes) {
-        this.youtubes = youtubes;
-    }
-
-    public void setYoutube(YoutubeModel youtube) {
-        this.youtubes.add(youtube);
-    }
 }
