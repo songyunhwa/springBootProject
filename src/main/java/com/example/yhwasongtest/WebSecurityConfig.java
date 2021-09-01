@@ -1,7 +1,6 @@
 package com.example.yhwasongtest;
 
 import com.example.yhwasongtest.user.model.CustomOAuth2User;
-import com.example.yhwasongtest.user.service.CustomOAuth2UserService;
 import com.example.yhwasongtest.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,12 +25,10 @@ import java.io.IOException;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserService userService;
-    private CustomOAuth2UserService customOAuth2UserService;
 
     @Autowired
-   public WebSecurityConfig(UserService userService, CustomOAuth2UserService customOAuth2UserService){
+   public WebSecurityConfig(UserService userService){
         this.userService= userService;
-        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Override
@@ -46,8 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http.csrf().disable();
             http
                     .oauth2Login()
-                    .userInfoEndpoint()
-                    .userService(customOAuth2UserService);
+                    .userInfoEndpoint();
 
     }
 

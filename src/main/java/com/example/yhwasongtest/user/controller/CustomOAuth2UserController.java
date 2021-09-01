@@ -5,7 +5,6 @@ import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.user.model.CustomOAuth2User;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.repository.UserRepository;
-import com.example.yhwasongtest.user.service.CustomOAuth2UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.catalina.User;
 import org.json.simple.JSONArray;
