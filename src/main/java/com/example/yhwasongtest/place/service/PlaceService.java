@@ -213,7 +213,7 @@ public class PlaceService {
 
     public void getDessertCategory() {
 
-        List<DessertModel> dessertModelList = dessertRepository.findAll();
+        List<DessertModel> dessertModelList = dessertRepository.findBySubCategory("etc");
         List<PlaceModel> placeModelList;
         for (DessertModel dessertModel : dessertModelList) {
             placeModelList = placeRepository.findByNameContaining(dessertModel.getIncluded());
@@ -236,7 +236,7 @@ public class PlaceService {
 
     // 유투브 중복인것 제거
     public void deletePlaceYoutube() {
-        List<PlaceModel> places = placeRepository.findAll();
+        List<PlaceModel> places = placeRepository.findBySubCategory("etc");
         for (PlaceModel place : places) {
             List<YoutubeModel> youtubeModels = place.getYoutubes();
 

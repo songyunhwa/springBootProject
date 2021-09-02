@@ -41,7 +41,7 @@ public class SearchYoutube {
     @Autowired
     PlaceRepository placeRepository;
 
-
+    public int saveYoutube = 0;
     public void SearchService(YoutubeRepository youtubeRepository) {
         this.youtubeRepository = youtubeRepository;
     }
@@ -50,6 +50,8 @@ public class SearchYoutube {
 
     public String searchYoutube(String msg, String category, String nextToken) throws Exception {
         String result = "";
+       saveYoutube = 0;
+
         Properties properties = new Properties();
         try {
             InputStream in = SearchYoutube.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
@@ -120,7 +122,7 @@ public class SearchYoutube {
             if (store.size() == 0) continue;
 
             // 같은 채널명이 아니면 continue;
-             if (!channelTitle.contains(msg)) {
+             if (!channelTitle.replaceAll(" ", "").contains(msg.replaceAll(" ", ""))) {
                  continue;
              }
 
@@ -144,6 +146,9 @@ public class SearchYoutube {
         }
 
         if (nextToken != null) {
+            if(saveYoutube >= 100) {
+                return result;
+            }
             searchYoutube(msg, category, nextToken);
         }
 
@@ -160,7 +165,7 @@ public class SearchYoutube {
             if (placeModel == null) {
                 placeModel = new PlaceModel();
                 placeModel.setName(name.replace(" ", ""));
-                placeModel.setSubCategory(category);
+                placeModel.setSubCategory("etc");
                 placeModel.setView(1);
                 placeModel.setRecommend(0);
                 placeModel.setArea("");
@@ -190,7 +195,8 @@ public class SearchYoutube {
                 placeModel.setYoutubes(youtubes);
             }
 
-             placeRepository.save(placeModel);
+            placeRepository.save(placeModel);
+            saveYoutube++;
 
         }
 
