@@ -40,7 +40,6 @@ defineRule('required', required);
 defineRule('email', email);
 defineRule('alpha_dash', alpha_dash);
 
-const resourceHost = "http://localhost:9000/api/v1"
 export default {
   name: 'Login',
   components: {
@@ -106,12 +105,12 @@ export default {
 
     Login() {
       if (this.$cookies.get('sessionId') != null) {
-        this.url = `${resourceHost}/login/check?id=${this.$cookies.get('sessionId')}`
+        this.url = `http://localhost:9000/login/check?id=${this.$cookies.get('sessionId')}`
       } else {
         if (!this.username || !this.password) {
           alert("Your email or password is empty.");
         }
-        this.url = `${resourceHost}/login?username=${this.username}&password=${this.password}`
+        this.url = `http://localhost:9000/login?username=${this.username}&password=${this.password}`
       }
       axios.defaults.withCredentials = true;
       return axios
@@ -135,7 +134,7 @@ export default {
       this.result = "";
       if (this.title == '로그인') {
         this.title = '회원가입';
-        this.url = resourceHost + '/user';
+        this.url = 'http://localhost:9000/api/v1/user';
       } else {
         this.title = '로그인';
       }

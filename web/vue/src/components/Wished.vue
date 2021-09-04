@@ -26,7 +26,7 @@ export default {
   data: () => ({
     username: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/wished', //
+    url: '',
     places: [{
       name: '',
       area: '',
@@ -56,6 +56,7 @@ export default {
   }),
   created() {
     this.username = this.$cookies.get('username');
+    this.url = this.resourceHost + '/wished';
     this.getYoutube();
   },
   methods: {

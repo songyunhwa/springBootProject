@@ -14,7 +14,7 @@
       <button>찜한 장소</button>
     </router-link>
 
-    <button @click="onToggleModal">
+    <button @click="onTogglePlaceModal">
       나만 아는 맛집
     </button>
 
@@ -45,7 +45,7 @@ export default {
   data: () => ({
     usename: '',
     role: '',
-    url: 'http://localhost:9000/api/v1/history',
+    url: '',
     input: '', // 입력하는 값
     msg: '',   // 실질적으로 넘어가는 값
     views: '0', // 하루 접속량,
@@ -60,6 +60,7 @@ export default {
   created() {
     this.username = this.$cookies.get('username');
     this.role = this.$cookies.get('role');
+    this.url = this.resourceHost + '/history';
     this.getLoginHistory();
   },
   methods: {

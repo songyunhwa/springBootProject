@@ -22,13 +22,14 @@ export default {
   data: () => ({
     username: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/history',
+    url: '',
     input: '', // 입력하는 값
     msg: '',   // 실질적으로 넘어가는 값
     views : '0', // 하루 접속량,
   }),
   created() {
     this.username = this.$cookies.get('username');
+    this.url = this.resourceHost + '/history';
   },
   methods: {
     scrollUp(){

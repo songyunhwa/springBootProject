@@ -31,7 +31,7 @@ export default {
   data: () => ({
     username: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/places',
+    url: '',
     places: [{
       name: '',
       area: '',
@@ -65,17 +65,18 @@ export default {
     object: [],
   }),
   created() {
+    this.url = this.resourceHost + '/places';
     this.getYoutube();
   },
   methods: {
     getYoutube(params) {
 
       if (this.msg && this.msg.length > 0) {
-        this.url = 'http://localhost:9000/api/v1/places/' + this.msg;
+        this.url = this.resourceHost + '/places/' + this.msg;
       } else if(params && params.length > 0 ) {
-        this.url = 'http://localhost:9000/api/v1/dessert?subCategory=' + params;
+        this.url = this.resourceHost + '/dessert?subCategory=' + params;
       } else {
-        this.url = 'http://localhost:9000/api/v1/places';
+        this.url = this.resourceHost + '/places';
       }
 
 
@@ -122,7 +123,7 @@ export default {
     selectPlace(id){
       this.$refs.youtube.getReview(id);
 
-      this.url = 'http://localhost:9000/api/v1/place?id=' + id;
+      this.url = this.resourceHost + '/place?id=' + id;
       return axios
           .get(this.url)
           .then(({data}) => {

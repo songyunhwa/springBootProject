@@ -8,7 +8,6 @@
 
 <script>
 import axios from 'axios'
-const resourceHost = "http://localhost:9000/api/v1"
 export default {
   name: 'Logout',
   data: () => ({
@@ -16,12 +15,15 @@ export default {
     password: '',
     url: ''
   }),
+    created() {
+        this.url = this.resourceHost + '/history';
+    },
   state: {
     accessToken: null,
   },
   methods: {
     LOGOUT() {
-      this.url = `${resourceHost}/logout`
+      this.url = this.url + '/logout';
       return axios
           .get(this.url)
           .then(() => {

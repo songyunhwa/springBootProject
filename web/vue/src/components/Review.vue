@@ -24,11 +24,11 @@
             <div>
               {{ review.userName }} {{ review.contents }}
             </div>
-            <div v-if="review.fileName">
-              <img
-                  :src="require(`C:/Users/pc/Documents/공부/springBootProject_back/web/vue/src/assets/images/${review.fileName}.png`)"
-                  class="review-img"/>
-            </div>
+              <div v-if="review.fileName">
+                  <img
+                          :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${review.fileName}.png`)"
+                          class="review-img"/>
+              </div>
           </td>
           <div v-show="!review.modify">
             <button @click="onToggle(review)">수정</button>
@@ -68,7 +68,7 @@ export default {
   },
   data: () => ({
         input: '',
-        url: 'http://localhost:9000/api/v1/',
+        url: '',
         image_path: '', //'@/assets/e1e35ffd2e6fa5d6b0d5bf9f53a6182b.png',
         fileId: '',
         reviews: [{
@@ -96,8 +96,11 @@ export default {
         }
       }
   ),
+
   created() {
     this.onReviewTimeout();
+    this.url = this.resourceHost + '/';
+
   },
   methods: {
     getReview(id) {

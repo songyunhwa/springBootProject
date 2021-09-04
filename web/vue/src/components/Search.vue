@@ -17,19 +17,22 @@ export default {
   },
   data: () => ({
     input: '',
-    url: 'http://localhost:9000/api/v1/',
+    url:  '',
     desserts: [{
       id: '',
       included: '',
       subCategory: '',
     }]
   }),
+  created(){
+    this.url = this.resourceHost;
+  },
   computed: {},
   methods: {
     getDessert() {
       return axios
           .get(
-              this.url + 'dessert/list'
+              this.url + '/dessert/list'
           )
           .then((data) => {
             this.desserts = data;

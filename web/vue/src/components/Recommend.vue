@@ -17,7 +17,7 @@ export default {
   name: 'Recommend',
   components: {},
   data: () => ({
-    url: 'http://localhost:9000/api/v1/recommend', //
+    url: '', //
     places: [{
       name: '',
       area: '',
@@ -47,6 +47,7 @@ export default {
   }),
   created() {
     this.getYoutube();
+      this.url = this.resourceHost + '/recommend';
   },
   methods: {
     getYoutube() {

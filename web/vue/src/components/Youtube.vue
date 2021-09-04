@@ -43,7 +43,7 @@ export default {
   data: () => ({
     username: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/',
+    url: '',
     showModal: false,
     showPlaceModal: false,
     modal: {
@@ -60,6 +60,7 @@ export default {
   },
   created() {
     this.username = this.$cookies.get('username');
+    this.url = this.resourceHost + '/';
   },
   methods: {
     setRecommend() {
@@ -81,6 +82,7 @@ export default {
             console.log(error);
 
           })
+
     },
     setWished() {
       if(this.$cookies.get('username')==null){

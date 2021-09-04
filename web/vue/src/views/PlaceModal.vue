@@ -130,8 +130,12 @@ export default {
       footer: ''
     },
     url: '',
+    category_url : '',
     result: '',
   }),
+  created(){
+    this.category_url = this.resourceHost + '/category';
+  },
   methods: {
     initialization() {
       while (this.place.youtubes.length !== 0) {
@@ -206,7 +210,7 @@ export default {
       }
 
       return axios
-          .post('http://localhost:9000/api/v1/admin/place', this.place)
+          .post(this.url + '/admin/place', this.place)
           .then(() => {
             this.$emit('putPlace');
             this.$emit('close');
@@ -220,9 +224,8 @@ export default {
 
     },
     getCategory() {
-      this.url = 'http://localhost:9000/api/v1/category';
       return axios
-          .get(this.url)
+          .get(this.category_url)
           .then(({data}) => {
             this.categorys = data;
           })

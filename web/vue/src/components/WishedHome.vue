@@ -25,11 +25,12 @@ export default {
   data: () => ({
     username: '',
     password: '',
-    url: 'http://localhost:9000/api/v1/history',
+    url: '',
     views : '0', // 하루 접속량
   }),
   created() {
     this.username = this.$cookies.get('username');
+    this.url = this.resourceHost + '/history';
     this.getLoginHistory();
   },
   methods: {
