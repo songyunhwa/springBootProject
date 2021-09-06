@@ -85,7 +85,7 @@
 
 <script>
 import axios from "axios";
-import Modal from "@/views/Modal";
+import Modal from "@/modal/Modal";
 
 export default {
   name: 'PlaceModal',

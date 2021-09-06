@@ -21,9 +21,9 @@
 </template>
 <script>
 import axios from "axios";
-import Youtube from "@/components/Youtube";
+import Youtube from "@/components/youtube/Youtube";
 export default {
-  name: 'YoutubeList',
+  name: 'YoutubeHome',
   components: { Youtube },
   props: {
     msg: Object,

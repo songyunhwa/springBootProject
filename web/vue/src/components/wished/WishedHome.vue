@@ -10,6 +10,9 @@
       오늘 방문자수: {{this.views}}
     </div>
 
+    <router-link to="/myList">
+      <button>내 일기장으로 가기</button>
+    </router-link>
 
   </div>
   <wished-list></wished-list>
@@ -17,8 +20,8 @@
 
 <script>
 import axios from "axios";
-import Recommend from "@/components/Recommend";
-import WishedList from "@/components/Wished";
+import Recommend from "@/components/banner/Recommend";
+import WishedList from "@/components/wished/Wished";
 export default {
   name: 'Home',
   components: {WishedList, Recommend},

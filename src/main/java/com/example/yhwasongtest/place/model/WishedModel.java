@@ -16,7 +16,7 @@ public class WishedModel {
         private long id;
 
 
-        private String userName;
+        private long userId;
 
         private String places;
 

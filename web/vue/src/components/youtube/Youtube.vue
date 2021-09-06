@@ -19,9 +19,11 @@
       </li>
     </ul>
 
+    <div class="tail" @click="setMyList">일기장 추가</div>
     <div class="tail" @click="setWished">찜</div>
     <div class="tail" @click="setRecommend">추천</div>
     <div class="tail" @click="onTogglePlaceModal">수정</div>
+
   </div>
 
   <Review :select_place="select_place" ref="review"></Review>
@@ -30,13 +32,13 @@
 </template>
 <script>
 import axios from "axios";
-import Modal from "@/views/Modal";
-import PlaceModal from "@/views/PlaceModal";
-import Review from "@/components/Review";
+import Modal from "@/modal/Modal";
+import PlaceModal from "@/modal/PlaceModal";
+import Review from "@/components/youtube/Review";
 
 export default {
   name: 'Youtube',
-  components: { Modal , Review, PlaceModal},
+  components: {Modal, Review, PlaceModal},
   props: {
     select_place: Object
   },
@@ -47,9 +49,9 @@ export default {
     showModal: false,
     showPlaceModal: false,
     modal: {
-      header:'',
-      body:'',
-      footer:''
+      header: '',
+      body: '',
+      footer: ''
     },
     select: '',
   }),
@@ -61,17 +63,18 @@ export default {
   created() {
     this.username = this.$cookies.get('username');
     this.url = this.resourceHost + '/';
+    axios.defaults.withCredentials = true;
   },
   methods: {
     setRecommend() {
-      if(this.$cookies.get('username')==null){
+      if (this.$cookies.get('username') == null) {
         this.modal.body = '로그인을 해야합니다.';
         this.onToggleModal();
         return;
       }
 
       return axios
-          .post(this.url + 'recommend?userName=' + this.username + '&id=' + this.select_place.id)
+          .post(this.url + 'recommend?id=' + this.select_place.id)
           .then((data) => {
             this.modal.body = data.data;
             this.onToggleModal();
@@ -85,14 +88,14 @@ export default {
 
     },
     setWished() {
-      if(this.$cookies.get('username')==null){
+      if (this.$cookies.get('username') == null) {
         this.modal.body = '로그인을 해야합니다.';
         this.onToggleModal();
         return;
       }
 
       return axios
-          .post(this.url + 'wished?userName=' + this.username + '&id=' + this.select_place.id)
+          .post(this.url + 'wished?id=' + this.select_place.id)
           .then((data) => {
             this.modal.body = data.data;
             this.onToggleModal();
@@ -125,6 +128,20 @@ export default {
     },
     getReview(id) {
       this.$refs.review.getReview(id);
+    },
+    setMyList() {
+      console.log("setMyList");
+      return axios
+          .post(this.url + 'myList?id=' + this.select_place.id)
+          .then(() => {
+            this.modal.body = '일기장에 추가했습니다.';
+            this.onToggleModal();
+          })
+          .catch(({error}) => {
+            this.modal.body = '추가를 실패했습니다.';
+            this.onToggleModal();
+            console.log(error);
+          })
     },
   }
 }

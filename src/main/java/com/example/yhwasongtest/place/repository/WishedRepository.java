@@ -5,8 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface WishedRepository extends JpaRepository<WishedModel, Long> {
-    WishedModel findByUserName(String userName);
-
-
     WishedModel findById(long id);
+    WishedModel findByUserId(long userId);
 }

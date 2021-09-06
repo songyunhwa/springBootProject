@@ -32,4 +32,7 @@ public class ReviewModel implements Serializable {
     private long fileId;
     private String fileName;
 
+    // 내 리스트의 댓글인지
+
+    private boolean isMyList;
 }

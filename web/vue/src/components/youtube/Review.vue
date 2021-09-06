@@ -24,11 +24,12 @@
             <div>
               {{ review.userName }} {{ review.contents }}
             </div>
+            <!--
               <div v-if="review.fileName">
                   <img
                           :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${review.fileName}.png`)"
                           class="review-img"/>
-              </div>
+              </div>-->
           </td>
           <div v-show="!review.modify">
             <button @click="onToggle(review)">수정</button>
@@ -56,7 +57,7 @@
 </template>
 <script>
 import axios from "axios";
-import Modal from "@/views/Modal";
+import Modal from "@/modal/Modal";
 
 export default {
   name: 'Review',

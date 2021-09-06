@@ -15,7 +15,7 @@
     </router-link>
 
     <button @click="onTogglePlaceModal">
-      나만 아는 맛집
+      맛집 추가
     </button>
 
 
@@ -37,7 +37,7 @@
 
 <script>
 import axios from "axios";
-import PlaceModal from "@/views/PlaceModal";
+import PlaceModal from "@/modal/PlaceModal";
 
 export default {
   name: 'Banner',

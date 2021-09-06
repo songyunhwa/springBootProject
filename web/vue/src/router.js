@@ -1,7 +1,8 @@
-import Home from "@/components/Home";
-import Login from './components/Login'
-import Logout from "@/components/Logout";
-import WishedHome from "@/components/WishedHome";
+import Home from "@/components/home/Home";
+import Login from './components/user/Login'
+import Logout from "@/components/user/Logout";
+import WishedHome from "@/components/wished/WishedHome";
+import myList from "@/components/myList/myList";
 import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
@@ -16,6 +17,10 @@ const routes = [
     {
         path: "/wished",
         component: WishedHome,
+    },
+    {
+        path: "/myList",
+        component: myList,
     },
     {
         path: "/logout",

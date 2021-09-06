@@ -105,36 +105,36 @@ export default {
 
     Login() {
       if (this.$cookies.get('sessionId') != null) {
-        this.url = `http://localhost:9000/login/check?id=${this.$cookies.get('sessionId')}`
+        this.url = this.resourceHost + `/login/check?id=${this.$cookies.get('sessionId')}`
       } else {
         if (!this.username || !this.password) {
           alert("Your email or password is empty.");
         }
-        this.url = `http://localhost:9000/login?username=${this.username}&password=${this.password}`
+        this.url = this.resourceHost + `/login?username=${this.username}&password=${this.password}`
       }
       axios.defaults.withCredentials = true;
       return axios
           .get(this.url)
           .then(({data}) => {
-            console.log(data);
+            console.log("login => " + data);
             if (this.$cookies.get('username') == null) {
-              this.$cookies.set('username', data[0].username);
-              this.$cookies.set('role', data[0].role);
+              this.$cookies.set('username', data.username);
+              this.$cookies.set('role', data.role);
             }
             this.$router.push({path: '/'});
           })
-          .catch((error) => {
-            this.result = error;
-            if (this.$cookies.get('sessionId') != null)
-              this.$cookies.remove('sessionId');
+          .catch(error => {
+            console.log(error.response);
+            this.result = error.response.data;
+            if (this.$cookies.get('SESSION') != null)
+              this.$cookies.remove('SESSION');
           })
     },
 
     ChangeUrl() {
       this.result = "";
-      if (this.title == '로그인') {
+      if (this.title === '로그인') {
         this.title = '회원가입';
-        this.url = 'http://localhost:9000/api/v1/user';
       } else {
         this.title = '로그인';
       }
@@ -144,13 +144,13 @@ export default {
       this.userModel.password = this.password;
 
       return axios
-          .post(this.url, this.userModel)
+          .post(this.resourceHost + '/user', this.userModel)
           .then(() => {
             this.title = '로그인';
             this.result = '회원가입 되었습니다.';
           })
           .catch((error) => {
-            this.result = error.response.data.split("java.lang.Exception:")[1];
+            this.result = error.response.data;
           })
     },
   }

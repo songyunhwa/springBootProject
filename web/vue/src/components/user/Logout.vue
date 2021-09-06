@@ -16,7 +16,7 @@ export default {
     url: ''
   }),
     created() {
-        this.url = this.resourceHost + '/history';
+        this.url = this.resourceHost;
     },
   state: {
     accessToken: null,

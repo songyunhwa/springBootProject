@@ -61,6 +61,7 @@ public class ReviewService {
         reviewModel.setPrevId(review.getPrevId());
         reviewModel.setStar(0);
         reviewModel.setFileId(review.getFileId());
+        /////reviewModel.setIsMyList(review.getIsMyList());
 
         if(review.getFileId() > 0){
             PictureModel pictureModel = pictureRepository.findById(review.getFileId());

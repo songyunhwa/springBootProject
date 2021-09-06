@@ -55,7 +55,7 @@ export default {
         this.username = 'test1';
       }
       return axios
-          .get(this.url + "?userName=" + this.username)
+          .get(this.url)
           .then(({data}) => {
             this.places = data;
           })

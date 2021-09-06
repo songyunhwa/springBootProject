@@ -24,24 +24,27 @@ public class RecommendService {
     private PlaceRepository placeRepository;
     private RecommendRepository recommendRepository;
     private WishedRepository wishedRepository;
-    private CategoryRepository categoryRepository;
     private DessertRepository dessertRepository;
+    private MyListRepository myListRepository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
     public void RecommendService(PlaceRepository placeRepository,
                                  RecommendRepository recommendRepository,
                                  WishedRepository wishedRepository,
-                                 CategoryRepository categoryRepository,
-                                 DessertRepository dessertRepository) {
+                                 DessertRepository dessertRepository,
+                                 MyListRepository myListRepository,
+                                 ReviewRepository reviewRepository) {
         this.placeRepository = placeRepository;
         this.recommendRepository = recommendRepository;
         this.wishedRepository = wishedRepository;
-        this.categoryRepository = categoryRepository;
         this.dessertRepository = dessertRepository;
+        this.myListRepository = myListRepository;
+        this.reviewRepository = reviewRepository;
     }
 
 
-    public JSONArray getRecommend(String userName) throws Exception {
+    public JSONArray getRecommend(long userId) throws Exception {
         ArrayList<PointDto> maps = new ArrayList<PointDto>();
         List<DessertModel> desserts = dessertRepository.findAll();
 
@@ -49,7 +52,7 @@ public class RecommendService {
 
 
         // 찜에 들어있는 카테고리 별로 점수 부여
-        WishedModel wishedModel = wishedRepository.findByUserName(userName);
+        WishedModel wishedModel = wishedRepository.findByUserId(userId);
 
         JSONParser jsonParser = new JSONParser();
         Object obj = jsonParser.parse(wishedModel.getPlaces());
@@ -88,13 +91,13 @@ public class RecommendService {
         return jsonArray;
     }
 
-    public String putRecommend(String userName, long id) throws Exception {
-        RecommendModel recommendModel = recommendRepository.findByPlaceId(id);
-        PlaceModel place = placeRepository.findById(id);
+    public String putRecommend(long userId, long placeId) throws Exception {
+        RecommendModel recommendModel = recommendRepository.findByPlaceId(placeId);
+        PlaceModel place = placeRepository.findById(placeId);
         JSONArray jsonArray = new JSONArray();
 
         JSONObject object = new JSONObject();
-        object.put("user", userName);
+        object.put("user", userId);
         boolean isRemove = false;
 
         if (recommendModel != null) {
@@ -104,17 +107,17 @@ public class RecommendService {
             if (jsonArray.size() == 0) {
                 jsonArray.add(object);
             } else {
-                if(jsonArray.contains(object)){
-                        jsonArray.remove(object);
-                        isRemove = true;
-                }else {
-                        jsonArray.add(object);
+                if (jsonArray.contains(object)) {
+                    jsonArray.remove(object);
+                    isRemove = true;
+                } else {
+                    jsonArray.add(object);
                 }
             }
 
         } else {
             recommendModel = new RecommendModel();
-            recommendModel.setPlaceId(id);
+            recommendModel.setPlaceId(placeId);
             jsonArray.add(object);
         }
 
@@ -125,15 +128,15 @@ public class RecommendService {
         place.setRecommend(jsonArray.size());
         placeRepository.save(place);
 
-        if(isRemove) {
+        if (isRemove) {
             return "추천을 삭제했습니다.";
-        }else {
+        } else {
             return "추천을 성공했습니다.";
         }
     }
 
-    public JSONArray getWished(String userName) throws Exception {
-        WishedModel wishedModel = wishedRepository.findByUserName(userName);
+    public JSONArray getWished(long userId) throws Exception {
+        WishedModel wishedModel = wishedRepository.findByUserId(userId);
 
         JSONParser jsonParser = new JSONParser();
         Object obj = jsonParser.parse(wishedModel.getPlaces());
@@ -155,9 +158,9 @@ public class RecommendService {
 
     }
 
-    public String putWished(String userName, long id) throws Exception {
-        PlaceModel place = placeRepository.findById(id);
-        WishedModel wishedModel = wishedRepository.findByUserName(userName);
+    public String putWished(long userId, long placeId) throws Exception {
+        PlaceModel place = placeRepository.findById(placeId);
+        WishedModel wishedModel = wishedRepository.findByUserId(userId);
         JSONArray jsonArray = new JSONArray();
 
         JSONObject object = new JSONObject();
@@ -167,27 +170,68 @@ public class RecommendService {
             JSONParser jsonParser = new JSONParser();
             Object obj = jsonParser.parse(wishedModel.getPlaces());
             jsonArray = (JSONArray) obj;
-            if(jsonArray.contains(object)){
+            if (jsonArray.contains(object)) {
                 jsonArray.remove(object);
                 isRemove = true;
-            }else {
+            } else {
                 jsonArray.add(object);
             }
         } else {
             wishedModel = new WishedModel();
-            wishedModel.setUserName(userName);
+            wishedModel.setUserId(userId);
             jsonArray.add(object);
         }
 
         wishedModel.setPlaces(jsonArray.toString());
         wishedRepository.save(wishedModel);
 
-        if(isRemove) {
+        if (isRemove) {
             return "찜을 삭제했습니다.";
-        }else {
+        } else {
             return "찜을 성공했습니다.";
         }
     }
 
+    public JSONArray getMyList(long userId) {
+        List<MyListModel> myListModel = myListRepository.findByUserId(userId);
+        JSONArray jsonArray = new JSONArray();
+
+        if (myListModel != null) {
+            for (MyListModel listModel : myListModel) {
+                PlaceModel placeModel = placeRepository.findById(listModel.getPlaceId());
+                JSONObject object = new JSONObject();
+                object.put("name", placeModel.getName());
+                object.put("area", placeModel.getArea());
+                object.put("subCategory", placeModel.getSubCategory());
+
+                ReviewModel reviewModel = reviewRepository.findByUserIdAndIsMyList(userId, true);
+                if (reviewModel != null) {
+                    JSONObject object1 = new JSONObject();
+                    if (reviewModel.getContents() != null) {
+                        object1.put("contents", reviewModel.getContents());
+                    }
+                    if (reviewModel.getFileName() != null) {
+                        object1.put("fileName", reviewModel.getFileName());
+                    }
+                    object.put("review", object1);
+                }
+
+                jsonArray.add(object);
+            }
+        }
+        return jsonArray;
+    }
+
+    public void putMyList(long userId, long placeId) {
+        MyListModel myListModels = myListRepository.findByUserIdAndPlaceId(userId, placeId);
+        if (myListModels == null) {
+            MyListModel myListModel = new MyListModel();
+            myListModel.setUserId(userId);
+            myListModel.setPlaceId(placeId);
+            myListRepository.save(myListModel);
+        } else {
+            myListRepository.delete(myListModels);
+        }
+    }
 
 }

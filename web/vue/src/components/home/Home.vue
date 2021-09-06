@@ -4,21 +4,21 @@
   <Banner @search="getYoutube"></Banner>
 
   <!-- 유투브 -->
-  <youtube-list :msg="input" ref="youtube_list"></youtube-list>
+  <youtube-home :msg="input" ref="youtube_list"></youtube-home>
 
   <!-- 하단 스크롤 바 -->
   <div class="scoll-menu">
-    <img src="../assets/images/scroll_up.png" v-on:click="scrollUp"/>
+    <img src="src/assets/images/scroll_up.png" v-on:click="scrollUp"/>
   </div>
 </template>
 
 <script>
-import YoutubeList from "@/components/YoutubeList";
-import Recommend from "@/components/Recommend";
-import Banner from "@/components/Banner";
+import YoutubeHome from "@/components/youtube/YoutubeHome";
+import Recommend from "@/components/banner/Recommend";
+import Banner from "@/components/banner/Banner";
 export default {
   name: 'Home',
-  components: {YoutubeList, Recommend, Banner},
+  components: {YoutubeHome, Recommend, Banner},
   data: () => ({
     username: '',
     password: '',

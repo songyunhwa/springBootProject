@@ -12,14 +12,13 @@
         {{ place.subCategory }}
         <hr style="border: none; margin-top:0px;">
         {{ place.youtubers }}
-
       </li>
     </ul>
   </div>
 </template>
 <script>
 import axios from "axios";
-import Youtube from "@/components/Youtube";
+import Youtube from "@/components/youtube/Youtube";
 export default {
   name: 'WishedList',
   components: {Youtube},
@@ -62,7 +61,7 @@ export default {
   methods: {
     getYoutube() {
       return axios
-          .get(this.url+"?userName="+this.username)
+          .get(this.url)
           .then(({data}) => {
             this.places = data;
 
@@ -115,7 +114,7 @@ export default {
           return;
         }
       }
-    }
+    },
   }
 }
 </script>
