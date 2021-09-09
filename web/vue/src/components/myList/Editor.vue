@@ -1,7 +1,4 @@
 <template>
-  <Editor ref="toastuiEditor" />
-  <button id="btn-upload" type="button" style="border: 1px solid #ddd; outline: none;">파일 추가</button>
-  <input id="input_file" multiple="multiple" type="file" style="display:none;" @change="putList">
 
   <button @click="putList">저장하기</button>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
@@ -9,12 +6,10 @@
 </template>
 <script>
 import axios from 'axios'
-import '@toast-ui/editor/dist/toastui-editor.css';
-import { Editor } from '@toast-ui/vue-editor';
-
 export default {
-  name: 'myList',
-  components: {Editor},
+  name: 'Editor',
+  components: {
+  },
   props: {
     select_place: Object,
   },
@@ -26,18 +21,16 @@ export default {
       body: '',
       footer: ''
     },
-    content_files : new Array()
+    content_files : new Array(),
+    content:''
   }),
-  state: {
-    accessToken: null,
-  },
   created() {
     this.url = this.resourceHost + '/myList';
   },
   methods: {
     putList() {
-      let content = this.$refs.toastuiEditor.invoke("getHtml");
-
+      //let content = this.$refs.toastuiEditor.invoke("getHtml");
+      let content = '';
       return axios
           .post(this.url + '?placeId='+this.select_place.id + '&content=' + content)
           .then(() => {

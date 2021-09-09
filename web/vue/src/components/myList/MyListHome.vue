@@ -1,5 +1,5 @@
 <template>
-  <!-- 배너 -->
+
   <recommend class="right-banner"></recommend>
   <Banner></Banner>
 
@@ -9,7 +9,7 @@
 
   <my-list></my-list>
 
-  <!-- 하단 스크롤 바 -->
+  <!-- 하단 스크롤 바-->
   <div class="scoll-menu">
     <img src="src/assets/images/scroll_up.png" v-on:click="scrollUp"/>
   </div>
@@ -18,7 +18,8 @@
 <script>
 import Recommend from "@/components/banner/Recommend";
 import Banner from "@/components/banner/Banner";
-import MyList from "@/components/myList/MyList";
+import MyList from "./MyList";
+
 export default {
   name: 'MyListHome',
   components: {MyList, Recommend, Banner},
@@ -43,4 +44,7 @@ export default {
 </script>
 <style>
 
+    .my-list {
+        height:200px;
+    }
 </style>
