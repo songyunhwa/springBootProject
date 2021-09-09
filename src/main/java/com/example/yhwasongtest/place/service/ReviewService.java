@@ -91,39 +91,34 @@ public class ReviewService {
         reviewRepository.delete(reviewModel);
     }
 
-    public Long saveFile(MultipartFile file) throws Exception {
-        long result = 0;
+    public void saveFile(List<MultipartFile> files) throws Exception {
+        for(MultipartFile file : files) {
 
-        String orgname = file.getOriginalFilename();
-        String filename = new FileSecurity().md5(orgname);
+            String orgname = file.getOriginalFilename();
+            String filename = new FileSecurity().md5(orgname);
 
-        PictureModel pictureModel = pictureRepository.findByFileName(filename);
-        if(pictureModel == null) {
-            String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\web\\vue\\src\\assets\\images\\";
+            PictureModel pictureModel = pictureRepository.findByFileName(filename);
+            if (pictureModel == null) {
+                String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\web\\vue\\src\\assets\\images\\";
 
-            String savePath = root_path + filename + ".png";
+                String savePath = root_path + filename + ".png";
 
-            if (!new File(savePath).exists()) {
-                try {
-                    new File(savePath).mkdir();
-                } catch (Exception e) {
-                    e.getStackTrace();
+                if (!new File(savePath).exists()) {
+                    try {
+                        new File(savePath).mkdir();
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
                 }
+                file.transferTo(new File(savePath));
+
+                pictureModel = new PictureModel();
+                pictureModel.setOriginFileName(orgname);
+                pictureModel.setFileName(filename);
+                pictureModel.setFilePath(savePath);
+                pictureRepository.save(pictureModel);
             }
-            file.transferTo(new File(savePath));
-
-            pictureModel = new PictureModel();
-            pictureModel.setOriginFileName(orgname);
-            pictureModel.setFileName(filename);
-            pictureModel.setFilePath(savePath);
-            pictureRepository.save(pictureModel);
-
-            pictureModel = pictureRepository.findByFileName(filename);
-
         }
-        pictureModel = pictureRepository.findByOriginFileName(orgname);
-        result = pictureModel.getId();
-        return result;
     }
 
     public void deleteFile(long id){

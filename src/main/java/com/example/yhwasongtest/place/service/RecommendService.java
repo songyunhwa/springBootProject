@@ -25,22 +25,16 @@ public class RecommendService {
     private RecommendRepository recommendRepository;
     private WishedRepository wishedRepository;
     private DessertRepository dessertRepository;
-    private MyListRepository myListRepository;
-    private ReviewRepository reviewRepository;
 
     @Autowired
     public void RecommendService(PlaceRepository placeRepository,
                                  RecommendRepository recommendRepository,
                                  WishedRepository wishedRepository,
-                                 DessertRepository dessertRepository,
-                                 MyListRepository myListRepository,
-                                 ReviewRepository reviewRepository) {
+                                 DessertRepository dessertRepository) {
         this.placeRepository = placeRepository;
         this.recommendRepository = recommendRepository;
         this.wishedRepository = wishedRepository;
         this.dessertRepository = dessertRepository;
-        this.myListRepository = myListRepository;
-        this.reviewRepository = reviewRepository;
     }
 
 
@@ -189,48 +183,6 @@ public class RecommendService {
             return "찜을 삭제했습니다.";
         } else {
             return "찜을 성공했습니다.";
-        }
-    }
-
-    public JSONArray getMyList(long userId) {
-        List<MyListModel> myListModel = myListRepository.findByUserId(userId);
-        JSONArray jsonArray = new JSONArray();
-
-        if (myListModel != null) {
-            for (MyListModel listModel : myListModel) {
-                PlaceModel placeModel = placeRepository.findById(listModel.getPlaceId());
-                JSONObject object = new JSONObject();
-                object.put("name", placeModel.getName());
-                object.put("area", placeModel.getArea());
-                object.put("subCategory", placeModel.getSubCategory());
-
-                ReviewModel reviewModel = reviewRepository.findByUserIdAndIsMyList(userId, true);
-                if (reviewModel != null) {
-                    JSONObject object1 = new JSONObject();
-                    if (reviewModel.getContents() != null) {
-                        object1.put("contents", reviewModel.getContents());
-                    }
-                    if (reviewModel.getFileName() != null) {
-                        object1.put("fileName", reviewModel.getFileName());
-                    }
-                    object.put("review", object1);
-                }
-
-                jsonArray.add(object);
-            }
-        }
-        return jsonArray;
-    }
-
-    public void putMyList(long userId, long placeId) {
-        MyListModel myListModels = myListRepository.findByUserIdAndPlaceId(userId, placeId);
-        if (myListModels == null) {
-            MyListModel myListModel = new MyListModel();
-            myListModel.setUserId(userId);
-            myListModel.setPlaceId(placeId);
-            myListRepository.save(myListModel);
-        } else {
-            myListRepository.delete(myListModels);
         }
     }
 

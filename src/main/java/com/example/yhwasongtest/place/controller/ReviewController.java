@@ -1,6 +1,7 @@
 package com.example.yhwasongtest.place.controller;
 
 import com.example.yhwasongtest.common.CommonCode;
+import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.place.repository.PictureRepository;
@@ -88,16 +89,18 @@ public class ReviewController {
     }
 
     @PostMapping(value = "/review/image")
-    public ResponseEntity putFile(@RequestPart(value = "image", required = true) MultipartFile file) {
+    public ResponseEntity putFile(@RequestPart(value = "image", required = true) List<MultipartFile> files) {
         try {
-            long id = reviewService.saveFile(file);
-
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("fileId", id);
-
-            return new ResponseEntity(jsonObject.toString(), HttpStatus.OK);
+            if(files.isEmpty()){
+                throw new Exception(ErrorMessage.PUT_FILE_INVALID.getMessage());
+            }
+            reviewService.saveFile(files);
+            return new ResponseEntity(null, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            if(e.getMessage().equals(ErrorMessage.PUT_FILE_INVALID.getMessage())) {
+                return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

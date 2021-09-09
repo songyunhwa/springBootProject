@@ -16,30 +16,20 @@
           <td>{{ place.subCategory }}</td>
         </tr>
       </table>
-      <ul>
-        <li v-for="review in place.reviews"
-            v-bind:key="review">
-          <!--<div v-if="review.fileName">
-            <img
-                :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${review.fileName}.png`)"
-                class="review-img"/>
-          </div>-->
-
-          <div>{{ review.contents }}</div>
-        </li>
-      </ul>
+      <Viewer v-if="place.review.content != null" :initialValue="place.review.content" />
     </li>
   </ul>
   <div v-if="this.places.length == 0">
     현재 추가된 맛집이 없습니다.
   </div>
+  <Editor :select_place="select" ></Editor>
 </template>
 <script>
 import axios from 'axios'
-
+import Editor from "@/components/myList/Editor";
 export default {
   name: 'myList',
-  components: {},
+  components: {Editor},
   data: () => ({
     title: '맛집리스트',
     username: '',
@@ -48,7 +38,7 @@ export default {
       area: '',
       subCategory: '',
       review: [{
-        contents: '',
+        content: '',
         fileName: ''
       }],
     }],
@@ -56,7 +46,7 @@ export default {
       name: '',
       subCategory: '',
       review: [{
-        contents: '',
+        content: '',
         fileName: ''
       }],
     },

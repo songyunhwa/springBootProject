@@ -1,8 +1,8 @@
-import Home from "@/components/home/Home";
+import Home from "@/components/youtube/Home";
 import Login from './components/user/Login'
 import Logout from "@/components/user/Logout";
 import WishedHome from "@/components/wished/WishedHome";
-import myList from "@/components/myList/myList";
+import MyListHome from "@/components/myList/MyListHome";
 import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
@@ -20,7 +20,7 @@ const routes = [
     },
     {
         path: "/myList",
-        component: myList,
+        component: MyListHome,
     },
     {
         path: "/logout",

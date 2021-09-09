@@ -23,7 +23,7 @@
 import axios from "axios";
 import Youtube from "@/components/youtube/Youtube";
 export default {
-  name: 'YoutubeHome',
+  name: 'YoutubeList',
   components: { Youtube },
   props: {
     msg: Object,
@@ -72,7 +72,7 @@ export default {
     getYoutube(params) {
 
       if (this.msg && this.msg.length > 0) {
-        this.url = this.resourceHost + '/places/' + this.msg;
+        this.url = this.resourceHost + '/place/' + this.msg;
       } else if(params && params.length > 0 ) {
         this.url = this.resourceHost + '/dessert?subCategory=' + params;
       } else {
