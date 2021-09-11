@@ -130,9 +130,12 @@ export default {
       this.$refs.review.getReview(id);
     },
     setMyList() {
-      console.log("setMyList");
+      let form = {
+        placeId : this.select_place.id,
+        content : ''
+      }
       return axios
-          .post(this.url + 'myList?id=' + this.select_place.id)
+          .post(this.url + 'myList', form)
           .then(() => {
             this.modal.body = '일기장에 추가했습니다.';
             this.onToggleModal();

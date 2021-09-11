@@ -1,14 +1,26 @@
 <template>
-
+  <quill-editor
+          v-model="content"
+          :disabled="disabled"
+          @blur="onEditorBlur($event)"
+          @focus="onEditorFocus($event)"
+          @ready="onEditorReady($event)"
+          @change="onEditorChange($event)"
+  />
   <button @click="putList">저장하기</button>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
   {{ this.files }}
 </template>
 <script>
 import axios from 'axios'
+import { quillEditor } from 'vue3-quill'
+//import customQuillModule from 'customQuillModule'
+//Quill.register('modules/customQuillModule', customQuillModule)
+
 export default {
   name: 'Editor',
   components: {
+    quillEditor
   },
   props: {
     select_place: Object,
@@ -22,20 +34,39 @@ export default {
       footer: ''
     },
     content_files : new Array(),
-    content:''
+    content:'',
+    disabled: false,
   }),
   created() {
     this.url = this.resourceHost + '/myList';
   },
   methods: {
+    onEditorBlur (quill) {
+      console.log('editor blur!', quill)
+    },
+    onEditorFocus(quill) {
+      console.log('editor focus!', quill)
+    },
+    onEditorReady(quill) {
+      console.log('editor ready!', quill)
+    },
+    onEditorChange ({ quill, html, text }) {
+      console.log('editor change!', quill, html, text)
+      this.content = html;
+      //state.content = html
+    },
     putList() {
       //let content = this.$refs.toastuiEditor.invoke("getHtml");
-      let content = '';
+      let form = {
+        placeId : this.select_place.id,
+        content : this.content
+      }
       return axios
-          .post(this.url + '?placeId='+this.select_place.id + '&content=' + content)
+          .post(this.url, form)
           .then(() => {
             this.modal.body = '등록했습니다.';
             this.onToggleModal();
+            this.$emit('getPlace');
           })
           .catch(({error}) => {
             this.modal.body = '등록하지 못했습니다.';

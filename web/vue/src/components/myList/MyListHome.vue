@@ -3,9 +3,6 @@
   <recommend class="right-banner"></recommend>
   <Banner></Banner>
 
-  <router-link to="/wished">
-    <button>찜한 장소</button>
-  </router-link>
 
   <my-list></my-list>
 

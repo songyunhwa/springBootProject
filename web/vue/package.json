@@ -10,7 +10,6 @@
   "dependencies": {
     "@expo-google-fonts/noto-serif": "^0.2.0",
     "@fontsource/noto-serif": "^4.5.0",
-    "@toast-ui/vue-editor": "^3.1.0",
     "@vee-validate/rules": "^4.4.7",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
@@ -22,6 +21,7 @@
     "vue-google-oauth2": "^1.5.8",
     "vue-router": "^4.0.11",
     "vue3-cookies": "^1.0.1",
+    "vue3-quill": "^0.2.6",
     "vuex": "^3.6.2"
   },
   "devDependencies": {

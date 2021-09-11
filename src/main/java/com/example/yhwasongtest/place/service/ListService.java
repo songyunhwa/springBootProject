@@ -35,12 +35,17 @@ public class ListService {
             for (MyListModel listModel : myListModel) {
                 PlaceModel placeModel = placeRepository.findById(listModel.getPlaceId());
                 JSONObject object = new JSONObject();
+                object.put("id", placeModel.getId());
                 object.put("name", placeModel.getName());
-                object.put("area", placeModel.getArea());
+                if(placeModel.getArea()!=null) {
+                    object.put("area", placeModel.getArea());
+                };
                 object.put("subCategory", placeModel.getSubCategory());
                 object.put("content", listModel.getContent());
-                object.put("fileId", listModel.getFileId());
-                object.put("fileName", listModel.getFileName());
+                if(listModel.getFileName()!=null) {
+                    object.put("fileId", listModel.getFileId());
+                    object.put("fileName", listModel.getFileName());
+                }
                 jsonArray.add(object);
             }
         }
@@ -48,16 +53,23 @@ public class ListService {
     }
 
     public void putMyList(long userId, long placeId, String content) {
-        MyListModel myListModels = myListRepository.findByUserIdAndPlaceId(userId, placeId);
-        if (myListModels == null) {
-            MyListModel myListModel = new MyListModel();
+        MyListModel myListModel = myListRepository.findByUserIdAndPlaceId(userId, placeId);
+        if (myListModel == null) {
+            myListModel = new MyListModel();
             myListModel.setUserId(userId);
             myListModel.setPlaceId(placeId);
             myListModel.setContent(content);
             myListRepository.save(myListModel);
         } else {
-            myListRepository.delete(myListModels);
+            myListModel.setContent(content);
+            myListRepository.save(myListModel);
         }
     }
 
+    public void deletetMyList(long userId, long placeId) {
+        MyListModel myListModel = myListRepository.findByUserIdAndPlaceId(userId, placeId);
+        if (myListModel != null) {
+            myListRepository.save(myListModel);
+        }
+    }
 }

@@ -1,137 +1,136 @@
 <template>
-  <!-- 추천 배너 -->
-  <recommend class="right-banner"></recommend>
+    <!-- 추천 배너 -->
+    <recommend class="right-banner"></recommend>
 
-  <!-- 배너 -->
-  <Banner @search="getYoutube"></Banner>
-  <div v-if="this.username&&this.username.length>0">
+    <!-- 배너 -->
+    <Banner @search="getYoutube"></Banner>
     <router-link to="/wished">
-      <button>찜한 장소</button>
+        <button>찜한 장소</button>
     </router-link>
     <router-link to="/myList">
-      <button>내 일기장으로 가기</button>
+        <button>내 일기장으로 가기</button>
     </router-link>
     <button @click="onTogglePlaceModal">
-      맛집 추가
+        맛집 추가
     </button>
-  </div>
 
-  <!-- 검색 -->
-  <div class="search">
-    <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube(input)">
-    <button @click="getYoutube(input)">검색</button>
-  </div>
 
-  <!-- 아래는 맛집 추가할 때 쓰는 Modal - success 알림창 / placeModal  추가창 -->
-  <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
-  <PlaceModal v-show="showPlaceModal" :select_modal="modal" @close="onTogglePlaceModal" @putPlace="onToggleModal"
-              ref="placeModal"></PlaceModal>
+    <!-- 검색 -->
+    <div class="search">
+        <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube(input)">
+        <button @click="getYoutube(input)">검색</button>
+    </div>
 
-  <!-- 유투브 -->
-  <youtube-list :msg="input" ref="youtube_list"></youtube-list>
+    <!-- 아래는 맛집 추가할 때 쓰는 Modal - success 알림창 / placeModal  추가창 -->
+    <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
+    <PlaceModal v-show="showPlaceModal" :select_modal="modal" @close="onTogglePlaceModal" @putPlace="onToggleModal"
+                ref="placeModal"></PlaceModal>
 
-  <!-- 하단 스크롤 바 -->
-  <div class="scoll-menu">
-    <img src="src/assets/images/scroll_up.png" v-on:click="scrollUp"/>
-  </div>
+    <!-- 유투브 -->
+    <youtube-list :msg="input" ref="youtube_list"></youtube-list>
+
+    <!-- 하단 스크롤 바 -->
+    <div class="scoll-menu">
+        <img src="src/assets/images/scroll_up.png" v-on:click="scrollUp"/>
+    </div>
 </template>
 
 <script>
-import YoutubeList from "@/components/youtube/YoutubeList";
-import Recommend from "@/components/banner/Recommend";
-import Banner from "@/components/banner/Banner";
-import PlaceModal from "@/modal/PlaceModal";
+    import YoutubeList from "@/components/youtube/YoutubeList";
+    import Recommend from "@/components/banner/Recommend";
+    import Banner from "@/components/banner/Banner";
+    import PlaceModal from "@/modal/PlaceModal";
 
-export default {
-  name: 'Home',
-  components: {YoutubeList, Recommend, Banner, PlaceModal},
-  data: () => ({
-    username: '',
-    password: '',
-    url: '',
-    input: '', // 입력하는 값
-    msg: '',   // 실질적으로 넘어가는 값
-    views: '0', // 하루 접속량,
-    showModal: false,
-    showPlaceModal: false,
-    modal: {
-      header: '',
-      body: '',
-      footer: ''
+    export default {
+        name: 'Home',
+        components: {YoutubeList, Recommend, Banner, PlaceModal},
+        data: () => ({
+            username: '',
+            password: '',
+            url: '',
+            input: '', // 입력하는 값
+            msg: '',   // 실질적으로 넘어가는 값
+            views: '0', // 하루 접속량,
+            showModal: false,
+            showPlaceModal: false,
+            modal: {
+                header: '',
+                body: '',
+                footer: ''
+            }
+        }),
+        created() {
+            this.username = this.$cookies.get('username');
+            this.url = this.resourceHost + '/history';
+        },
+        methods: {
+            onToggleModal() {
+                if (this.showModal) {
+                    this.showModal = false;
+                } else {
+                    this.modal.body = "맛집이 저장되었습니다.";
+                    this.showModal = true;
+                }
+            },
+            onTogglePlaceModal() {
+                if (this.showPlaceModal) {
+                    this.showPlaceModal = false;
+                } else {
+                    this.showPlaceModal = true;
+                    this.$refs.placeModal.initialization();
+                }
+            },
+            scrollUp() {
+                window.scrollTo(0, 0);
+            },
+            getYoutube(param) {
+                console.log(param);
+                this.$refs.youtube_list.getYoutube(param);
+            }
+        }
     }
-  }),
-  created() {
-    this.username = this.$cookies.get('username');
-    this.url = this.resourceHost + '/history';
-  },
-  methods: {
-    onToggleModal() {
-      if (this.showModal) {
-        this.showModal = false;
-      } else {
-        this.modal.body = "맛집이 저장되었습니다.";
-        this.showModal = true;
-      }
-    },
-    onTogglePlaceModal() {
-      if (this.showPlaceModal) {
-        this.showPlaceModal = false;
-      } else {
-        this.showPlaceModal = true;
-        this.$refs.placeModal.initialization();
-      }
-    },
-    scrollUp() {
-      window.scrollTo(0, 0);
-    },
-    getYoutube(param) {
-      console.log(param);
-      this.$refs.youtube_list.getYoutube(param);
-    }
-  }
-}
 </script>
 <style>
 
-button {
-  color: #444444;
-  background: #F3F3F3;
-  border: 1px #DADADA solid;
-  padding: 5px 10px;
-  font-weight: bold;
-  font-size: 9pt;
-  outline: none;
-  float: left;
-  margin: 10px 10px;
-}
+    button {
+        color: #444444;
+        background: #F3F3F3;
+        border: 1px #DADADA solid;
+        padding: 5px 10px;
+        font-weight: bold;
+        font-size: 9pt;
+        outline: none;
+        float: left;
+        margin: 10px 10px;
+    }
 
-button:hover {
-  border: 1px #C6C6C6 solid;
-  box-shadow: 1px 1px 1px #EAEAEA;
-  color: #333333;
-  background: #F7F7F7;
-}
+    button:hover {
+        border: 1px #C6C6C6 solid;
+        box-shadow: 1px 1px 1px #EAEAEA;
+        color: #333333;
+        background: #F7F7F7;
+    }
 
-button:active {
-  box-shadow: inset 1px 1px 1px #DFDFDF;
-}
+    button:active {
+        box-shadow: inset 1px 1px 1px #DFDFDF;
+    }
 
-.right-banner {
-  float: right;
-  width: 20%;
-}
+    .right-banner {
+        float: right;
+        width: 20%;
+    }
 
-.scoll-menu {
-  position: fixed;
-  right: 10px;
-  bottom: 10px;
-  height: 100px;
-  width: 100px;
-  text-decoration: none;
+    .scoll-menu {
+        position: fixed;
+        right: 10px;
+        bottom: 10px;
+        height: 100px;
+        width: 100px;
+        text-decoration: none;
 
-}
+    }
 
-.search {
-  float: right;
-}
+    .search {
+        float: right;
+    }
 </style>

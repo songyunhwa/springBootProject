@@ -1,6 +1,7 @@
 package com.example.yhwasongtest.place.controller;
 
 import com.example.yhwasongtest.common.ErrorMessage;
+import com.example.yhwasongtest.place.dto.ListDto;
 import com.example.yhwasongtest.place.service.ListService;
 import com.example.yhwasongtest.user.model.UserModel;
 import org.json.simple.JSONArray;
@@ -48,29 +49,43 @@ public class ListController {
 
     /**
      * 내 맛집 리스트 추가
-     * @param placeId
-     * @param content
+     * @param listDto
      * @param request
      * @return
      */
     @PostMapping(value = "/myList")
-    public ResponseEntity putMyList(@RequestParam(name = "placeId",required = true) long placeId ,
-                                    @RequestParam(name = "content",required = true) String content ,
+    public ResponseEntity putMyList(@RequestBody ListDto listDto,
                                     HttpServletRequest request){
         try {
-            HttpSession httpSession = request.getSession(false);
+            /*HttpSession httpSession = request.getSession(false);
             UserModel user = (UserModel)httpSession.getAttribute("login");
 
             if(user==null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
-            }
-
-            listService.putMyList(user.getId(), placeId, content);
+            }*/
+            long userId = 159;
+            listService.putMyList(userId, listDto.getPlaceId(), listDto.getContent());
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
     }
 
+    @DeleteMapping(value = "/myList")
+    public ResponseEntity deleteMyList(@RequestBody ListDto listDto,
+                                    HttpServletRequest request){
+        try {
+            /*HttpSession httpSession = request.getSession(false);
+            UserModel user = (UserModel)httpSession.getAttribute("login");
 
+            if(user==null) {
+                throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
+            }*/
+            long userId = 159;
+            listService.deletetMyList(userId, listDto.getPlaceId());
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
+        }
+    }
 }
