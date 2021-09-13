@@ -16,12 +16,11 @@
                         <th>카테고리</th>
                         <td>{{ place.subCategory }}</td>
                     </tr>
-                    <tr>
-                        {{place.content}}
-                    </tr>
+                    <div id="{{place.id}}"></div>
+                    <div>{{place.content}}</div>
                     <tr>
                         <th>
-                        <div class="tail" style="font-size: 15px; color:gray" @click="selectPlace(place)">변경</div>
+                            <div class="tail" style="font-size: 15px; color:gray" @click="selectPlace(place)">변경</div>
                         </th>
                     </tr>
                 </table>
@@ -32,7 +31,7 @@
         현재 추가된 맛집이 없습니다.
     </div>
     <div v-show="showEditor">
-        <Editor  :select_place="select" @getPlace="getMyList"></Editor>
+        <Editor ref="editor" @getPlace="getMyList"></Editor>
     </div>
 </template>
 <script>
@@ -63,7 +62,7 @@
                 fileId: '',
                 fileName: ''
             },
-            showEditor : false
+            showEditor: false
         }),
         state: {
             accessToken: null,
@@ -76,8 +75,8 @@
         },
         methods: {
             selectPlace(place) {
-                this.select = place;
-                this.showEditor=!this.showEditor;
+                this.showEditor = !this.showEditor;
+                this.$refs.editor.setPlace(place);
             },
             getMyList() {
                 axios.defaults.withCredentials = true;
@@ -85,11 +84,27 @@
                 return axios
                     .get(this.url)
                     .then((data) => {
-                        this.places = data.data;
+                        while(this.places.length!==0) {
+                            this.places.pop();
+                        }
+                        data.data.forEach(place => {
+                            this.places.push(place);
+                            /*
+                      console.log(place.content);
+                     const element =  document.getElementById(place.id);
+                     element.innerHtml = place.content;
+                     console.log(element);
+
+                      if(place.content!=null&&place.content.length>0) {
+
+
+                      }*/
+                        })
                     })
                     .catch(({error}) => {
-                        console.log(error);
+                        console.log("error => " + error);
                     })
+
             },
         }
     }

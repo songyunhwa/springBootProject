@@ -1,6 +1,6 @@
 <template>
   <quill-editor
-          v-model="content"
+          v-model:value="content"
           :disabled="disabled"
           @blur="onEditorBlur($event)"
           @focus="onEditorFocus($event)"
@@ -23,7 +23,6 @@ export default {
     quillEditor
   },
   props: {
-    select_place: Object,
   },
   data: () => ({
     files: '',
@@ -33,6 +32,7 @@ export default {
       body: '',
       footer: ''
     },
+    place_id: '',
     content_files : new Array(),
     content:'',
     disabled: false,
@@ -47,7 +47,7 @@ export default {
     onEditorFocus(quill) {
       console.log('editor focus!', quill)
     },
-    onEditorReady(quill) {
+    onEditorReady (quill) {
       console.log('editor ready!', quill)
     },
     onEditorChange ({ quill, html, text }) {
@@ -58,7 +58,7 @@ export default {
     putList() {
       //let content = this.$refs.toastuiEditor.invoke("getHtml");
       let form = {
-        placeId : this.select_place.id,
+        placeId : this.place_id,
         content : this.content
       }
       return axios
@@ -118,6 +118,12 @@ export default {
       } else {
         this.showModal = true;
       }
+    },
+    setPlace(place){
+      this.place_id=place.id;
+      this.content=place.content
+      this.quillEditor.setup(this.content);
+      console.log("setPlace" + this.content);
     }
   }
 }
