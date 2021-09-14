@@ -9,4 +9,5 @@ public class ListDto {
 
     public long placeId;
     public String content;
+    public String text;
 }

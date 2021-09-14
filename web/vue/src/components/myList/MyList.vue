@@ -1,7 +1,7 @@
 <template>
     <div>
         <ul>
-            <li v-for="place in this.places"
+            <li v-for="(place) in this.places"
                 v-bind:key="place">
                 <table>
                     <tr>
@@ -16,8 +16,7 @@
                         <th>카테고리</th>
                         <td>{{ place.subCategory }}</td>
                     </tr>
-                    <div id="{{place.id}}"></div>
-                    <div>{{place.content}}</div>
+                    <div>{{place.text}}</div>
                     <tr>
                         <th>
                             <div class="tail" style="font-size: 15px; color:gray" @click="selectPlace(place)">변경</div>
@@ -50,6 +49,7 @@
                 area: '',
                 subCategory: '',
                 content: '',
+                text: '',
                 fileId: '',
                 fileName: ''
             }],
@@ -59,6 +59,7 @@
                 area: '',
                 subCategory: '',
                 content: '',
+                text: '',
                 fileId: '',
                 fileName: ''
             },
@@ -87,18 +88,8 @@
                         while(this.places.length!==0) {
                             this.places.pop();
                         }
-                        data.data.forEach(place => {
+                        data.data.forEach((place) => {
                             this.places.push(place);
-                            /*
-                      console.log(place.content);
-                     const element =  document.getElementById(place.id);
-                     element.innerHtml = place.content;
-                     console.log(element);
-
-                      if(place.content!=null&&place.content.length>0) {
-
-
-                      }*/
                         })
                     })
                     .catch(({error}) => {
@@ -106,6 +97,7 @@
                     })
 
             },
+
         }
     }
 </script>

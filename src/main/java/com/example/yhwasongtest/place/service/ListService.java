@@ -1,5 +1,6 @@
 package com.example.yhwasongtest.place.service;
 
+import com.example.yhwasongtest.place.dto.ListDto;
 import com.example.yhwasongtest.place.model.MyListModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
@@ -42,6 +43,7 @@ public class ListService {
                 };
                 object.put("subCategory", placeModel.getSubCategory());
                 object.put("content", listModel.getContent());
+                object.put("text", listModel.getText());
                 if(listModel.getFileName()!=null) {
                     object.put("fileId", listModel.getFileId());
                     object.put("fileName", listModel.getFileName());
@@ -52,16 +54,18 @@ public class ListService {
         return jsonArray;
     }
 
-    public void putMyList(long userId, long placeId, String content) {
-        MyListModel myListModel = myListRepository.findByUserIdAndPlaceId(userId, placeId);
+    public void putMyList(long userId, ListDto listDto) {
+        MyListModel myListModel = myListRepository.findByUserIdAndPlaceId(userId, listDto.getPlaceId());
         if (myListModel == null) {
             myListModel = new MyListModel();
             myListModel.setUserId(userId);
-            myListModel.setPlaceId(placeId);
-            myListModel.setContent(content);
+            myListModel.setPlaceId(listDto.getPlaceId());
+            myListModel.setContent(listDto.getContent());
+            myListModel.setText(listDto.getText());
             myListRepository.save(myListModel);
         } else {
-            myListModel.setContent(content);
+            myListModel.setContent(listDto.getContent());
+            myListModel.setText(listDto.getText());
             myListRepository.save(myListModel);
         }
     }

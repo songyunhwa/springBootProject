@@ -26,6 +26,7 @@ public class MyListModel implements Serializable {
     private long placeId; // 장소 아이디
 
     private String content;
+    private String text;
 
     private long fileId;
     private String fileName;

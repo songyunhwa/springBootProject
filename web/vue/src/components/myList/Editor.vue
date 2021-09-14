@@ -1,11 +1,14 @@
 <template>
+    <input type="file" @change="putFile" id="file" hidden>
   <quill-editor
+          id="quill-editor"
+          ref="quillEdits"
           v-model:value="content"
           :disabled="disabled"
           @blur="onEditorBlur($event)"
           @focus="onEditorFocus($event)"
           @ready="onEditorReady($event)"
-          @change="onEditorChange($event)"
+          @change="onEditorChange($event);"
   />
   <button @click="putList">저장하기</button>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
@@ -53,13 +56,16 @@ export default {
     onEditorChange ({ quill, html, text }) {
       console.log('editor change!', quill, html, text)
       this.content = html;
+      this.text = text;
+
       //state.content = html
     },
     putList() {
       //let content = this.$refs.toastuiEditor.invoke("getHtml");
       let form = {
         placeId : this.place_id,
-        content : this.content
+        content : this.content,
+          text: this.text
       }
       return axios
           .post(this.url, form)
@@ -74,23 +80,26 @@ export default {
             console.log(error);
           })
     },
-    putFile() {
-      let formData = new FormData();
+    putFile(e) {
+        console.log("들어옴");
+        console.log(e.target);
+        this.content_files = e.target.files[0];
 
-      if(this.content_files.length === 0) {
-        return;
-      }
-
-      this.content_files.forEach(file => {
-        formData.append("image", file);
-      })
+        var formData = new FormData();
+        formData.append("file", this.content_files);
+        formData.append("name", this.content_files.name);
 
       axios.post(this.url + 'review/image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }).then((data) => {
-        console.log(data.data);
+        console.log(data);
+          //this code to set your position cursor
+          const range = this.$refs.quillEdit.quill.getSelection()
+//this code to set image on your server to quill editor
+          this.$refs.quillEdit.quill.insertEmbed(range.index , 'image', `http://your.api/${data}`)
+
       }).catch((error) => {
         console.log(error);
       })

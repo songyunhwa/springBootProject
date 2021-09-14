@@ -64,7 +64,7 @@ public class ListController {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }*/
             long userId = 159;
-            listService.putMyList(userId, listDto.getPlaceId(), listDto.getContent());
+            listService.putMyList(userId, listDto);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
