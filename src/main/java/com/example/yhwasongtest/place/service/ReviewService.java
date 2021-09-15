@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,6 +93,20 @@ public class ReviewService {
         }
 
         reviewRepository.delete(reviewModel);
+    }
+
+    public byte[] loadFile(String filename, InputStream is) throws Exception{
+        String savePath = root_path + filename + ".png";
+        File file  = new File(savePath);
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            int read;
+            byte[] bytes = new byte[1024];
+
+            while ((read = is.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+            return bytes;
+        }
     }
 
     public String saveFile(List<MultipartFile> files) throws Exception {

@@ -9,6 +9,7 @@ import com.example.yhwasongtest.place.repository.ReviewRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.place.service.ReviewService;
 import com.nimbusds.jose.util.IOUtils;
+import org.apache.http.client.methods.HttpHead;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -18,9 +19,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -93,6 +97,17 @@ public class ReviewController {
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping(value = "/review/image/{fileName}")
+    public @ResponseBody byte[] getImageWithMediaType(@PathVariable String fileName, InputStream is) throws IOException {
+        byte[] result = new byte[0];
+        try {
+            result = reviewService.loadFile(fileName, is);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @PostMapping(value = "/review/image")

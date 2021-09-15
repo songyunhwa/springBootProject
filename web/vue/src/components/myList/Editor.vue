@@ -1,5 +1,6 @@
 <template>
   <input type="file" @change="putFile" id="file" hidden>
+  <div id="file-byte"></div>
   <quill-editor
       id="quill-editor"
       v-model:value="content"
@@ -95,7 +96,7 @@ export default {
         text: this.text
       }
       return axios
-          .post(this.url, form)
+          .post(this.url + '/myList', form)
           .then(() => {
             this.modal.body = '등록했습니다.';
             this.onToggleModal();
@@ -118,11 +119,16 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       }).then((data) => {
-        this.content += '<p><img src="/src/assets/images/'+data.data +'.png"/></p>';
+        const fileName = data.data;
+        axios.get('http://localhost:9000/api/v1/review/image/' + fileName)
+                .then((data=> {
+                  this.content += '<img src="data:image/jpeg;base64,'+data+'>';
+                }))
+
 
       }).catch((error) => {
         console.log(error);
-      })
+      })c
     },
     onToggleModal() {
       if (this.showModal) {
