@@ -44,31 +44,34 @@ public class RecommendService {
 
         desserts.forEach(dessert -> maps.add(new PointDto(dessert.getSubCategory(), 0)));
 
-
-        // 찜에 들어있는 카테고리 별로 점수 부여
-        WishedModel wishedModel = wishedRepository.findByUserId(userId);
-
-        JSONParser jsonParser = new JSONParser();
-        Object obj = jsonParser.parse(wishedModel.getPlaces());
-        JSONArray arr = (JSONArray) obj;
-
+        // 사용자가 찜한 place
         ArrayList<PlaceModel> placeModels = new ArrayList<>();
-        for (int i = 0; i < arr.size(); i++) {
-            JSONObject jsonObject = (JSONObject) arr.get(i);
-            String place = jsonObject.get("place").toString();
-            // 사용자가 찜한 place
-            PlaceModel placeModel = placeRepository.findByName(place);
-            placeModels.add(placeModel);
 
-            if (placeModel != null) {
-                String subCategory = placeModel.getSubCategory();
-                // 카테고리 명에 따라 점수 추가
-                maps.forEach(map -> {
-                    if (map.category.equals(subCategory)) {
-                        map.point = map.point + 1;
-                    }
-                });
+        if (userId > -1) {
+            // 찜에 들어있는 카테고리 별로 점수 부여
+            WishedModel wishedModel = wishedRepository.findByUserId(userId);
 
+            JSONParser jsonParser = new JSONParser();
+            Object obj = jsonParser.parse(wishedModel.getPlaces());
+            JSONArray arr = (JSONArray) obj;
+
+            for (int i = 0; i < arr.size(); i++) {
+                JSONObject jsonObject = (JSONObject) arr.get(i);
+                String place = jsonObject.get("place").toString();
+
+                PlaceModel placeModel = placeRepository.findByName(place);
+                placeModels.add(placeModel);
+
+                if (placeModel != null) {
+                    String subCategory = placeModel.getSubCategory();
+                    // 카테고리 명에 따라 점수 추가
+                    maps.forEach(map -> {
+                        if (map.category.equals(subCategory)) {
+                            map.point = map.point + 1;
+                        }
+                    });
+
+                }
             }
         }
         // 카테고리 점수가 높은 순대로 결과에 추가

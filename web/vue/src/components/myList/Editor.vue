@@ -1,14 +1,14 @@
 <template>
-    <input type="file" @change="putFile" id="file" hidden>
+  <input type="file" @change="putFile" id="file" hidden>
   <quill-editor
-          id="quill-editor"
-          ref="quillEdits"
-          v-model:value="content"
-          :disabled="disabled"
-          @blur="onEditorBlur($event)"
-          @focus="onEditorFocus($event)"
-          @ready="onEditorReady($event)"
-          @change="onEditorChange($event);"
+      id="quill-editor"
+      v-model:value="content"
+      :disabled="disabled"
+      :options="editorOption"
+      @blur="onEditorBlur($event)"
+      @focus="onEditorFocus($event)"
+      @ready="onEditorReady($event)"
+      @change="onEditorChange($event);"
   />
   <button @click="putList">저장하기</button>
   <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
@@ -16,10 +16,10 @@
 </template>
 <script>
 import axios from 'axios'
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
 import { quillEditor } from 'vue3-quill'
-//import customQuillModule from 'customQuillModule'
-//Quill.register('modules/customQuillModule', customQuillModule)
-
 export default {
   name: 'Editor',
   components: {
@@ -36,12 +36,41 @@ export default {
       footer: ''
     },
     place_id: '',
-    content_files : new Array(),
     content:'',
     disabled: false,
+    editorOption: {
+      modules: {
+        toolbar: {
+          container: [
+            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+            ['blockquote', 'code-block'],
+
+            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+            [{ 'direction': 'rtl' }],                         // text direction
+
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+
+            ['image']
+          ],
+          handlers: {
+            image: function() {
+              document.getElementById('file').click()
+            }
+          }
+        },
+      }
+    },
   }),
   created() {
-    this.url = this.resourceHost + '/myList';
+    this.url = this.resourceHost;
   },
   methods: {
     onEditorBlur (quill) {
@@ -57,15 +86,13 @@ export default {
       console.log('editor change!', quill, html, text)
       this.content = html;
       this.text = text;
-
-      //state.content = html
     },
     putList() {
       //let content = this.$refs.toastuiEditor.invoke("getHtml");
       let form = {
         placeId : this.place_id,
         content : this.content,
-          text: this.text
+        text: this.text
       }
       return axios
           .post(this.url, form)
@@ -81,45 +108,21 @@ export default {
           })
     },
     putFile(e) {
-        console.log("들어옴");
-        console.log(e.target);
-        this.content_files = e.target.files[0];
+      let file = e.target.files[0];
 
-        var formData = new FormData();
-        formData.append("file", this.content_files);
-        formData.append("name", this.content_files.name);
+      var formData = new FormData();
+      formData.append("image", file);
 
-      axios.post(this.url + 'review/image', formData, {
+      axios.post(this.url + '/review/image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }).then((data) => {
-        console.log(data);
-          //this code to set your position cursor
-          const range = this.$refs.quillEdit.quill.getSelection()
-//this code to set image on your server to quill editor
-          this.$refs.quillEdit.quill.insertEmbed(range.index , 'image', `http://your.api/${data}`)
+        this.content += '<p><img src="/src/assets/images/'+data.data +'.png"/></p>';
 
       }).catch((error) => {
         console.log(error);
       })
-    },
-    inputFile(e) {
-      let files = e.target.value;
-      let filesArr = Array.prototype.slice.call(files);
-
-      this.content_files.slice(0, this.content_files.length);
-      this.files = '';
-
-      filesArr.forEach(function(file , i) {
-        this.content_files.push(file);
-        console.log(file);
-        this.file = '<div onclick="this.deleteFile(\''+i+'\')">' + file.name +'</div>'
-      })
-
-    },
-    deleteFile(i) {
-      this.content_files.slice(i, 1);
     },
     onToggleModal() {
       if (this.showModal) {
@@ -131,8 +134,8 @@ export default {
     setPlace(place){
       this.place_id=place.id;
       this.content=place.content
-      this.quillEditor.setup(this.content);
-      console.log("setPlace" + this.content);
+      //this.quillEditor.setup(this.content);
+      //console.log("setPlace" + this.content);
     }
   }
 }

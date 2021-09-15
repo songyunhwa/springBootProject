@@ -46,14 +46,15 @@ export default {
     object: [],
   }),
   created() {
+    this.url = this.resourceHost + '/recommend';
     this.getYoutube();
-      this.url = this.resourceHost + '/recommend';
   },
   methods: {
     getYoutube() {
       if(this.username===undefined){
         this.username = 'test1';
       }
+
       return axios
           .get(this.url)
           .then(({data}) => {

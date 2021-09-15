@@ -108,14 +108,16 @@ public class RecommendController {
     public ResponseEntity getRecommend(HttpServletRequest request) {
 
         try {
-            HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
+            long userId = -1;
 
-            if(user==null) {
-                throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
+            // user  정보 있던 없던 상관없음.
+            HttpSession httpSession = request.getSession(false);
+            if(httpSession != null) {
+                UserModel user = (UserModel) httpSession.getAttribute("login");
+                userId = user.getId();
             }
 
-            JSONArray jsonArray = recommendService.getRecommend(user.getId());
+            JSONArray jsonArray = recommendService.getRecommend(userId);
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {

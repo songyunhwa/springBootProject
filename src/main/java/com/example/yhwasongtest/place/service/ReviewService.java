@@ -10,6 +10,7 @@ import com.example.yhwasongtest.place.repository.ReviewRepository;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ import java.util.Optional;
 
 @Service
 public class ReviewService {
+
+    @Value(value = "${image-path}")
+    String root_path;
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
@@ -91,18 +95,16 @@ public class ReviewService {
         reviewRepository.delete(reviewModel);
     }
 
-    public void saveFile(List<MultipartFile> files) throws Exception {
-        for(MultipartFile file : files) {
+    public String saveFile(List<MultipartFile> files) throws Exception {
+        String filename = "";
 
+        for(MultipartFile file : files) {
             String orgname = file.getOriginalFilename();
-            String filename = new FileSecurity().md5(orgname);
+            filename = new FileSecurity().md5(orgname);
 
             PictureModel pictureModel = pictureRepository.findByFileName(filename);
             if (pictureModel == null) {
-                String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\web\\vue\\src\\assets\\images\\";
-
                 String savePath = root_path + filename + ".png";
-
                 if (!new File(savePath).exists()) {
                     try {
                         new File(savePath).mkdir();
@@ -119,6 +121,7 @@ public class ReviewService {
                 pictureRepository.save(pictureModel);
             }
         }
+        return filename;
     }
 
     public void deleteFile(long id){

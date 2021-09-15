@@ -8,16 +8,21 @@ import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.repository.ReviewRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.place.service.ReviewService;
+import com.nimbusds.jose.util.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
@@ -27,11 +32,13 @@ public class ReviewController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
+    @Value(value = "${image-path}")
+    String root_path;
+
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
     private final PictureRepository pictureRepository;
     private final PlaceService placeService;
-
 
     @Autowired
     public ReviewController(ReviewService reviewService, ReviewRepository reviewRepository, PictureRepository pictureRepository, PlaceService placeService) {
@@ -94,8 +101,8 @@ public class ReviewController {
             if(files.isEmpty()){
                 throw new Exception(ErrorMessage.PUT_FILE_INVALID.getMessage());
             }
-            reviewService.saveFile(files);
-            return new ResponseEntity(null, HttpStatus.OK);
+            String fileName = reviewService.saveFile(files);
+            return new ResponseEntity(fileName, HttpStatus.OK);
         } catch (Exception e) {
             if(e.getMessage().equals(ErrorMessage.PUT_FILE_INVALID.getMessage())) {
                 return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
@@ -114,7 +121,6 @@ public class ReviewController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
 
 
