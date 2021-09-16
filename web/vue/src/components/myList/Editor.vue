@@ -120,15 +120,22 @@ export default {
         }
       }).then((data) => {
         const fileName = data.data;
+        console.log(fileName);
         axios.get('http://localhost:9000/api/v1/review/image/' + fileName)
                 .then((data=> {
-                  this.content += '<img src="data:image/jpeg;base64,'+data+'>';
-                }))
+                  var img = new Image();
+                  let ext = fileName.slice(fileName.lastIndexOf(".")+1);
+                  img.src =  "data:image/" + ext + ";base64," + data.data;
+                  this.content += img.innerHTML;
+                  console.log(img.innerHTML);
+                  console.log(img.innerText);
+                  console.log(data.data);
 
+                }))
 
       }).catch((error) => {
         console.log(error);
-      })c
+      })
     },
     onToggleModal() {
       if (this.showModal) {

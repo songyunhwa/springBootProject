@@ -95,18 +95,33 @@ public class ReviewService {
         reviewRepository.delete(reviewModel);
     }
 
-    public byte[] loadFile(String filename, InputStream is) throws Exception{
-        String savePath = root_path + filename + ".png";
+    public byte[] loadFile(String fileName, InputStream is) throws Exception{
+        //String savePath = root_path + filename + ".png";
+        String savePath = "C:\\Users\\pc\\Documents\\springBootProject_image\\" + fileName;
         File file  = new File(savePath);
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            int read;
-            byte[] bytes = new byte[1024];
 
-            while ((read = is.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
-            }
-            return bytes;
+        FileInputStream fis = null;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        try{
+            fis = new FileInputStream(file);
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
         }
+
+        int readCount = 0;
+        byte[] buffer = new byte[1024];
+
+        try{
+            while((readCount = fis.read(buffer)) != -1){
+                System.out.write(buffer, 0, readCount);
+            }
+            fis.close();
+            stream.close();
+        } catch(IOException e){
+            throw new RuntimeException("File Error");
+        }
+
+        return buffer;
     }
 
     public String saveFile(List<MultipartFile> files) throws Exception {
@@ -115,10 +130,11 @@ public class ReviewService {
         for(MultipartFile file : files) {
             String orgname = file.getOriginalFilename();
             filename = new FileSecurity().md5(orgname);
+            filename += orgname.substring(orgname.lastIndexOf("."));
 
             PictureModel pictureModel = pictureRepository.findByFileName(filename);
             if (pictureModel == null) {
-                String savePath = root_path + filename + ".png";
+                String savePath = root_path + filename;
                 if (!new File(savePath).exists()) {
                     try {
                         new File(savePath).mkdir();

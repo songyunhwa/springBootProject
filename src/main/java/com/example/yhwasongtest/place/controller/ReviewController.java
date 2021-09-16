@@ -8,6 +8,7 @@ import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.repository.ReviewRepository;
 import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.place.service.ReviewService;
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.nimbusds.jose.util.IOUtils;
 import org.apache.http.client.methods.HttpHead;
 import org.json.simple.JSONArray;
@@ -100,14 +101,14 @@ public class ReviewController {
     }
 
     @GetMapping(value = "/review/image/{fileName}")
-    public @ResponseBody byte[] getImageWithMediaType(@PathVariable String fileName, InputStream is) throws IOException {
+    public @ResponseBody String getImageWithMediaType(@PathVariable String fileName, InputStream is) throws IOException {
         byte[] result = new byte[0];
         try {
             result = reviewService.loadFile(fileName, is);
         }catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+        return Base64.encodeBase64String(result);
     }
 
     @PostMapping(value = "/review/image")
