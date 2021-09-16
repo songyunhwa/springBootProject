@@ -21,6 +21,9 @@
                         <th>
                             <div class="tail" style="font-size: 15px; color:gray" @click="selectPlace(place)">변경</div>
                         </th>
+                        <th>
+                            <div class="tail" style="font-size: 15px; color:gray" @click="deletePlace(place)">삭제</div>
+                        </th>
                     </tr>
                 </table>
             </li>
@@ -32,14 +35,18 @@
     <div v-show="showEditor">
         <Editor ref="editor" @getPlace="getMyList"></Editor>
     </div>
+
+    <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
+
 </template>
 <script>
     import axios from 'axios'
     import Editor from "./Editor";
+    import Modal from "@/modal/Modal";
 
     export default {
         name: 'myList',
-        components: {Editor},
+        components: {Editor, Modal},
         data: () => ({
             title: '맛집리스트',
             username: '',
@@ -63,7 +70,13 @@
                 fileId: '',
                 fileName: ''
             },
-            showEditor: false
+            showEditor: false,
+            showModal: false,
+            modal: {
+                header: '',
+                body: '',
+                footer: ''
+            }
         }),
         state: {
             accessToken: null,
@@ -75,6 +88,13 @@
             this.getMyList();
         },
         methods: {
+            onToggleModal() {
+                if (this.showModal) {
+                    this.showModal = false;
+                } else {
+                    this.showModal = true;
+                }
+            },
             selectPlace(place) {
                 this.showEditor = !this.showEditor;
                 this.$refs.editor.setPlace(place);
@@ -97,7 +117,19 @@
                     })
 
             },
-
+            deletePlace(place) {
+                return axios
+                    .delete(this.url + '?placeId=' + place.placeId)
+                    .then(() => {
+                        this.modal.body = "삭제됐습니다."
+                        this.onToggleModal();
+                    })
+                    .catch(({error}) => {
+                        this.modal.body = "삭제를 실패했습니다."
+                        this.onToggleModal();
+                        console.log("error => " + error);
+                    })
+            },
         }
     }
 </script>
