@@ -93,8 +93,7 @@ public class PlaceController {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
-            if(user==null){
+            if(httpSession == null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
             /*

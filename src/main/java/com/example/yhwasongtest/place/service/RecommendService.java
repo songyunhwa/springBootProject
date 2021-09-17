@@ -9,6 +9,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -49,20 +51,13 @@ public class RecommendService {
 
         if (userId > -1) {
             // 찜에 들어있는 카테고리 별로 점수 부여
-            WishedModel wishedModel = wishedRepository.findByUserId(userId);
+            List<WishedModel> wishedModels = wishedRepository.findByUserId(userId);
 
-            JSONParser jsonParser = new JSONParser();
-            Object obj = jsonParser.parse(wishedModel.getPlaces());
-            JSONArray arr = (JSONArray) obj;
-
-            for (int i = 0; i < arr.size(); i++) {
-                JSONObject jsonObject = (JSONObject) arr.get(i);
-                String place = jsonObject.get("place").toString();
-
-                PlaceModel placeModel = placeRepository.findByName(place);
-                placeModels.add(placeModel);
+            for (int i = 0; i < wishedModels.size(); i++) {
+                PlaceModel placeModel = placeRepository.findById(wishedModels.get(i).getPlaceId());
 
                 if (placeModel != null) {
+                    placeModels.add(placeModel);
                     String subCategory = placeModel.getSubCategory();
                     // 카테고리 명에 따라 점수 추가
                     maps.forEach(map -> {
@@ -73,6 +68,7 @@ public class RecommendService {
 
                 }
             }
+
         }
         // 카테고리 점수가 높은 순대로 결과에 추가
         Collections.sort(maps);
@@ -132,60 +128,42 @@ public class RecommendService {
         }
     }
 
-    public JSONArray getWished(long userId) throws Exception {
-        WishedModel wishedModel = wishedRepository.findByUserId(userId);
+    public JSONObject getWished(long userId, Pageable pageable) throws Exception {
+        Page<WishedModel> wishedModels = wishedRepository.findByUserId(userId, pageable);
 
-        JSONParser jsonParser = new JSONParser();
-        Object obj = jsonParser.parse(wishedModel.getPlaces());
-        JSONArray arr = (JSONArray) obj;
+        JSONObject jsonObject = new JSONObject();
+        JSONObject page = new JSONObject();
+        page.put("totalElements", wishedModels.getTotalElements());
+        page.put("totalPages", wishedModels.getTotalPages());
+        jsonObject.put("page", page);
 
-        ArrayList<PlaceModel> placeModels = new ArrayList<>();
-        for (int i = 0; i < arr.size(); i++) {
-            JSONObject jsonObject = (JSONObject) arr.get(i);
-            String place = jsonObject.get("place").toString();
-            PlaceModel placeModel = placeRepository.findByName(place);
+        List<PlaceModel> placeModels = new ArrayList<>();
+        for (int i=0; i<wishedModels.getContent().size(); i++) {
+            WishedModel wishedModel = wishedModels.getContent().get(i);
+            PlaceModel placeModel = placeRepository.findById(wishedModel.getPlaceId());
             if (placeModel != null) {
                 placeModels.add(placeModel);
             }
         }
         JSONArray jsonArray = CommonCode.convertToJSON(placeModels);
+        jsonObject.put("placeModels", jsonArray);
 
-
-        return jsonArray;
-
+        return jsonObject;
     }
 
     public String putWished(long userId, long placeId) throws Exception {
-        PlaceModel place = placeRepository.findById(placeId);
-        WishedModel wishedModel = wishedRepository.findByUserId(userId);
-        JSONArray jsonArray = new JSONArray();
+        WishedModel wishedModel = wishedRepository.findByUserIdAndPlaceId(userId, placeId);
 
-        JSONObject object = new JSONObject();
-        object.put("place", place.getName());
-        boolean isRemove = false;
-        if (wishedModel != null) {
-            JSONParser jsonParser = new JSONParser();
-            Object obj = jsonParser.parse(wishedModel.getPlaces());
-            jsonArray = (JSONArray) obj;
-            if (jsonArray.contains(object)) {
-                jsonArray.remove(object);
-                isRemove = true;
-            } else {
-                jsonArray.add(object);
-            }
-        } else {
+        if (wishedModel == null) {
             wishedModel = new WishedModel();
             wishedModel.setUserId(userId);
-            jsonArray.add(object);
-        }
-
-        wishedModel.setPlaces(jsonArray.toString());
-        wishedRepository.save(wishedModel);
-
-        if (isRemove) {
-            return "찜을 삭제했습니다.";
-        } else {
+            wishedModel.setPlaceId(placeId);
+            wishedRepository.save(wishedModel);
             return "찜을 성공했습니다.";
+        } else {
+            wishedRepository.delete(wishedModel);
+            return "찜을 삭제했습니다.";
+
         }
     }
 

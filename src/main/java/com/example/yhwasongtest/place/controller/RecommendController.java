@@ -1,12 +1,18 @@
 package com.example.yhwasongtest.place.controller;
 
+import com.example.yhwasongtest.common.CommonCode;
 import com.example.yhwasongtest.common.ErrorMessage;
+import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.RecommendService;
 import com.example.yhwasongtest.user.model.UserModel;
+import com.mysql.cj.xdevapi.JsonArray;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 //@CrossOrigin(origins = "http://localhost:8080")
@@ -42,12 +49,10 @@ public class RecommendController {
 
         try {
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
-
-            if(user==null) {
+            if (httpSession == null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
-
+            UserModel user = (UserModel)httpSession.getAttribute("login");
             String result = recommendService.putRecommend(user.getId(), id);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
@@ -65,12 +70,10 @@ public class RecommendController {
                                     HttpServletRequest request){
         try {
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
-
-            if(user==null) {
+            if (httpSession == null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
-
+            UserModel user = (UserModel)httpSession.getAttribute("login");
             String result = recommendService.putWished(user.getId(), id);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
@@ -82,19 +85,18 @@ public class RecommendController {
      * @return
      */
     @GetMapping(value = "/wished")
-    public ResponseEntity getWished(HttpServletRequest request) {
+    public ResponseEntity getWished(HttpServletRequest request, Pageable pageable) {
 
         try {
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
-
-            if(user==null) {
+            if(httpSession == null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
+            UserModel       user = (UserModel)httpSession.getAttribute("login");
+            JSONObject jsonObject = recommendService.getWished(user.getId(), pageable);
 
-            JSONArray jsonArray = recommendService.getWished(user.getId());
 
-            return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
+            return new ResponseEntity<>(jsonObject, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
@@ -108,16 +110,12 @@ public class RecommendController {
     public ResponseEntity getRecommend(HttpServletRequest request) {
 
         try {
-            long userId = -1;
-
-            // user  정보 있던 없던 상관없음.
             HttpSession httpSession = request.getSession(false);
-            if(httpSession != null) {
-                UserModel user = (UserModel) httpSession.getAttribute("login");
-                userId = user.getId();
+            if(httpSession == null) {
+                throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
-
-            JSONArray jsonArray = recommendService.getRecommend(userId);
+            UserModel user = (UserModel) httpSession.getAttribute("login");
+            JSONArray jsonArray = recommendService.getRecommend(user.getId());
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {

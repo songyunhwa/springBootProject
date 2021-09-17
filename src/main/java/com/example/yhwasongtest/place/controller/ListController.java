@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping(value = "/api/v1")
 public class ListController {
@@ -33,11 +33,10 @@ public class ListController {
 
         try {
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
-
-            if(user==null) {
+            if(httpSession == null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
+            UserModel user = (UserModel)httpSession.getAttribute("login");
 
             JSONArray jsonArray = listService.getMyList(user.getId());
 
@@ -76,11 +75,10 @@ public class ListController {
                                     HttpServletRequest request){
         try {
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel)httpSession.getAttribute("login");
-
-            if(user==null) {
+            if(httpSession == null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
             }
+            UserModel user = (UserModel)httpSession.getAttribute("login");
 
             listService.deletetMyList(user.getId(), placeId);
             return new ResponseEntity<>(null, HttpStatus.OK);

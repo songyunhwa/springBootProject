@@ -19,10 +19,10 @@
                     <div>{{place.text}}</div>
                     <tr>
                         <th>
-                            <div class="tail" style="font-size: 15px; color:gray" @click="selectPlace(place)">변경</div>
+                            <div class="list-tail" @click="selectPlace(place)">변경</div>
                         </th>
                         <th>
-                            <div class="tail" style="font-size: 15px; color:gray" @click="deletePlace(place)">삭제</div>
+                            <div class="list-tail" @click="deletePlace(place)">삭제</div>
                         </th>
                     </tr>
                 </table>
@@ -119,7 +119,7 @@
             },
             deletePlace(place) {
                 return axios
-                    .delete(this.url + '?placeId=' + place.placeId)
+                    .delete(this.url + '?placeId=' + place.id)
                     .then(() => {
                         this.modal.body = "삭제됐습니다."
                         this.onToggleModal();
@@ -134,5 +134,8 @@
     }
 </script>
 <style>
-
+.list-tail {
+  font-size: 15px;
+  color:gray;
+}
 </style>

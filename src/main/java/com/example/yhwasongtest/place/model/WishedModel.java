@@ -18,6 +18,6 @@ public class WishedModel {
 
         private long userId;
 
-        private String places;
+        private long placeId;
 
 }

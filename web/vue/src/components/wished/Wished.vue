@@ -14,11 +14,14 @@
         {{ place.youtubers }}
       </li>
     </ul>
+    <button  class="wished-tail" @click="prevPage" :disabled="this.currentPage.page === 0">이전</button>
+    <button class="wished-tail"  @click="nextPage" :disabled="this.currentPage.page === this.currentPage.totalPages">다음</button>
   </div>
 </template>
 <script>
 import axios from "axios";
 import Youtube from "@/components/youtube/Youtube";
+
 export default {
   name: 'WishedList',
   components: {Youtube},
@@ -38,7 +41,7 @@ export default {
         videoId: '',
         channelTitle: '',
         title: '',
-        url : '',
+        url: '',
       }],
     }],
     select: {
@@ -52,6 +55,12 @@ export default {
       youtube: Object,
     },
     object: [],
+    currentPage: {
+      page: 0,
+      size: 3,
+      totalElements: '',
+      totalPages: '',
+    },
   }),
   created() {
     this.username = this.$cookies.get('username');
@@ -59,17 +68,28 @@ export default {
     this.getYoutube();
   },
   methods: {
+    prevPage() {
+      this.currentPage.page -= 1;
+      this.getYoutube();
+    },
+    nextPage() {
+      this.currentPage.page += 1;
+      this.getYoutube();
+
+    },
     getYoutube() {
+
       return axios
-          .get(this.url)
+          .get(this.url + '?page=' + this.currentPage.page + '&size=' + this.currentPage.size + '&sort=id,DESC')
           .then(({data}) => {
-            this.places = data;
 
+            this.currentPage.totalElements = data.page.totalElements;
+            this.currentPage.totalPages = data.page.totalPages-1; // 0부터 시작하기 때문에 totalPage -1
+
+            this.places = data.placeModels;
             this.places.forEach(place => {
-              // 만약 정보가 없으면 - 로 바꾸기
-
-              place.area =  place.area&&place.area.length>0?   place.area : "-";
-              place.number = place.number&&place.number.length>0 ? place.number : "-";
+              place.area = place.area && place.area.length > 0 ? place.area : "-";
+              place.number = place.number && place.number.length > 0 ? place.number : "-";
 
               // 유투브 설정
               let titles = [];
@@ -80,23 +100,20 @@ export default {
                 if (!titles.includes(youtube.channelTitle)) {
                   titles.push(youtube.channelTitle);
 
-                  youtube.url = "https://www.youtube.com/watch?v="+youtube.videoId;
+                  youtube.url = "https://www.youtube.com/watch?v=" + youtube.videoId;
                   place.youtubers += "#" + youtube.channelTitle;
                   youtubes.push(youtube);
                 }
 
                 // 한번 더 겹치는 거 없는지 filtering
                 place.youtube = youtubes;
-
-                /*처음 들어갈 때 - 리스트 맨 앞으로 설정
-                if (this.place == null) {
-                  this.select = this.places[0];
-                  this.$refs.youtube.getReview(this.select.id);
-                }*/
               })
             })
-
-
+            //처음 들어갈 때 - 리스트 맨 앞으로 설정
+            if (this.places.length > 0) {
+              this.select = this.places[0];
+              this.$refs.youtube.getReview(this.select.id);
+            }
           })
           .catch(({error}) => {
             console.log("error");
@@ -106,10 +123,10 @@ export default {
     selectPlace(place) {
       this.select = place;
     },
-    deletePlace(place){
+    deletePlace(place) {
       console.log("deletePlace", place);
-      for(let i=0; i< this.places.length ; i++) {
-        if(this.places[i].name === place.name && this.places[i].subCategory === place.subCategory) {
+      for (let i = 0; i < this.places.length; i++) {
+        if (this.places[i].name === place.name && this.places[i].subCategory === place.subCategory) {
           this.places.splice(i, 1);
           return;
         }
@@ -127,4 +144,18 @@ li {
   margin-bottom: 10px;
 }
 
+.wished-tail {
+  font-size: 17px;
+  background-color: #7C7877;
+  color: lightgray;
+  float: right;
+  margin-right: 20px;
+  border: 0px;
+  outline : 0px;
+}
+
+button:disabled {
+  background-color: #7C7877;
+  color: gray;
+}
 </style>
