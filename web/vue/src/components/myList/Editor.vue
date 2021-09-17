@@ -20,14 +20,14 @@ import axios from 'axios'
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
-import { quillEditor } from 'vue3-quill'
+import {quillEditor} from 'vue3-quill'
+
 export default {
   name: 'Editor',
   components: {
     quillEditor
   },
-  props: {
-  },
+  props: {},
   data: () => ({
     files: '',
     showModal: false,
@@ -37,7 +37,7 @@ export default {
       footer: ''
     },
     place_id: '',
-    content:'',
+    content: '',
     disabled: false,
     editorOption: {
       modules: {
@@ -46,23 +46,23 @@ export default {
             ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
             ['blockquote', 'code-block'],
 
-            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-            [{ 'direction': 'rtl' }],                         // text direction
+            [{'header': 1}, {'header': 2}],               // custom button values
+            [{'list': 'ordered'}, {'list': 'bullet'}],
+            [{'script': 'sub'}, {'script': 'super'}],      // superscript/subscript
+            [{'indent': '-1'}, {'indent': '+1'}],          // outdent/indent
+            [{'direction': 'rtl'}],                         // text direction
 
-            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{'size': ['small', false, 'large', 'huge']}],  // custom dropdown
+            [{'header': [1, 2, 3, 4, 5, 6, false]}],
 
-            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-            [{ 'font': [] }],
-            [{ 'align': [] }],
+            [{'color': []}, {'background': []}],          // dropdown with defaults from theme
+            [{'font': []}],
+            [{'align': []}],
 
             ['image']
           ],
           handlers: {
-            image: function() {
+            image: function () {
               document.getElementById('file').click()
             }
           }
@@ -74,16 +74,16 @@ export default {
     this.url = this.resourceHost;
   },
   methods: {
-    onEditorBlur (quill) {
+    onEditorBlur(quill) {
       console.log('editor blur!', quill)
     },
     onEditorFocus(quill) {
       console.log('editor focus!', quill)
     },
-    onEditorReady (quill) {
+    onEditorReady(quill) {
       console.log('editor ready!', quill)
     },
-    onEditorChange ({ quill, html, text }) {
+    onEditorChange({quill, html, text}) {
       console.log('editor change!', quill, html, text)
       this.content = html;
       this.text = text;
@@ -91,8 +91,8 @@ export default {
     putList() {
       //let content = this.$refs.toastuiEditor.invoke("getHtml");
       let form = {
-        placeId : this.place_id,
-        content : this.content,
+        placeId: this.place_id,
+        content: this.content,
         text: this.text
       }
       return axios
@@ -110,22 +110,39 @@ export default {
     },
     putFile(e) {
       let file = e.target.files[0];
-
-      var formData = new FormData();
-      formData.append("image", file);
-
-      axios.post(this.url + '/review/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      return new Promise((resolve, reject) => {
+        let reader = new FileReader()
+        // convert the file to base64 text
+        reader.readAsDataURL(file)
+        // on reader load somthing...
+        reader.onload = (event) => {
+         this.content += '<img src="' + event.target.result + '">';
         }
-      }).then((data) => {
-        const fileName = data.data;
-        console.log(fileName);
-        axios.get('http://localhost:9000/api/v1/review/image/' + fileName)
-                .then((data=> {
+        reader.onerror = (error) => {
+          reject(error)
+        }
+      })
+    }
+    ,
+    /*
+        putFile(e) {
+          let file = e.target.files[0];
+
+          var formData = new FormData();
+          formData.append("image", file);
+
+          axios.post(this.url + '/review/image', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then((data) => {
+            const fileName = data.data;
+            axios.get('http://localhost:9000/api/v1/review/image/' + fileName)
+                .then((data => {
                   var img = new Image();
-                  let ext = fileName.slice(fileName.lastIndexOf(".")+1);
-                  img.src =  "data:image/" + ext + ";base64," + data.data;
+                  //let ext = fileName.slice(fileName.lastIndexOf(".") + 1);
+                  //"data:image/" + ext + ";base64," +
+                  img.src = data.data;
                   this.content += img.innerHTML;
                   console.log(img.innerHTML);
                   console.log(img.innerText);
@@ -133,20 +150,21 @@ export default {
 
                 }))
 
-      }).catch((error) => {
-        console.log(error);
-      })
-    },
+          }).catch((error) => {
+            console.log(error);
+          })
+        },*/
     onToggleModal() {
       if (this.showModal) {
         this.showModal = false;
       } else {
         this.showModal = true;
       }
-    },
-    setPlace(place){
-      this.place_id=place.id;
-      this.content=place.content
+    }
+    ,
+    setPlace(place) {
+      this.place_id = place.id;
+      this.content = place.content
       //this.quillEditor.setup(this.content);
       //console.log("setPlace" + this.content);
     }
