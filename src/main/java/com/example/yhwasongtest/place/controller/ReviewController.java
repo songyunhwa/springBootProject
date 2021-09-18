@@ -112,13 +112,17 @@ public class ReviewController {
     }
 
     @PostMapping(value = "/review/image")
-    public ResponseEntity putFile(@RequestPart(value = "image", required = true) List<MultipartFile> files) {
+    public ResponseEntity putFile(@RequestPart(value = "image", required = true) MultipartFile file) {
         try {
-            if(files.isEmpty()){
+            if(file.isEmpty()){
                 throw new Exception(ErrorMessage.PUT_FILE_INVALID.getMessage());
             }
-            String fileName = reviewService.saveFile(files);
-            return new ResponseEntity(fileName, HttpStatus.OK);
+            PictureModel reviewModel = reviewService.saveFile(file);
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("fileId", reviewModel.getId());
+            jsonObject.put("fileName", reviewModel.getFileName());
+            return new ResponseEntity(jsonObject.toString(), HttpStatus.OK);
         } catch (Exception e) {
             if(e.getMessage().equals(ErrorMessage.PUT_FILE_INVALID.getMessage())) {
                 return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);

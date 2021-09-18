@@ -18,6 +18,7 @@
     <div class="scoll-menu">
         <img src="../../../src/assets/images/scroll_up.png" v-on:click="scrollUp"/>
     </div>
+
 </template>
 
 <script>
@@ -27,7 +28,7 @@
 
     export default {
         name: 'Home',
-        components: {YoutubeList, Recommend, Banner},
+        components: { YoutubeList, Recommend, Banner},
         data: () => ({
             username: '',
             password: '',

@@ -2,9 +2,11 @@ package com.example.yhwasongtest.place.service;
 
 import com.example.yhwasongtest.place.dto.ListDto;
 import com.example.yhwasongtest.place.model.MyListModel;
+import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.place.repository.MyListRepository;
+import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.place.repository.PlaceRepository;
 import com.example.yhwasongtest.place.repository.ReviewRepository;
 import org.json.simple.JSONArray;
@@ -20,12 +22,17 @@ public class ListService {
     private MyListRepository myListRepository;
     private ReviewRepository reviewRepository;
     private PlaceRepository placeRepository;
+    private PictureRepository pictureRepository;
+    private ReviewService reviewService;
 
     @Autowired
-    public ListService(MyListRepository myListRepository, ReviewRepository reviewRepository, PlaceRepository placeRepository) {
+    public ListService(MyListRepository myListRepository, ReviewRepository reviewRepository, PlaceRepository placeRepository, PictureRepository pictureRepository,
+                       ReviewService reviewService) {
         this.myListRepository = myListRepository;
         this.reviewRepository = reviewRepository;
         this.placeRepository = placeRepository;
+        this.pictureRepository = pictureRepository;
+        this.reviewService = reviewService;
     }
 
     public JSONArray getMyList(long userId) {
@@ -44,10 +51,17 @@ public class ListService {
                 object.put("subCategory", placeModel.getSubCategory());
                 object.put("content", listModel.getContent());
                 object.put("text", listModel.getText());
-                if(listModel.getFileName()!=null) {
-                    object.put("fileId", listModel.getFileId());
-                    object.put("fileName", listModel.getFileName());
+
+                JSONArray files = new JSONArray();
+                List<PictureModel> pictureModels = pictureRepository.findByListId(listModel.getId());
+                if (pictureModels != null) {
+                    for(PictureModel pictureModel : pictureModels) {
+                        JSONObject file = new JSONObject();
+                        file.put("fileName", pictureModel.getFileName());
+                        files.add(file);
+                    }
                 }
+                object.put("file", files);
                 jsonArray.add(object);
             }
         }
@@ -60,20 +74,32 @@ public class ListService {
             myListModel = new MyListModel();
             myListModel.setUserId(userId);
             myListModel.setPlaceId(listDto.getPlaceId());
-            myListModel.setContent(listDto.getContent());
-            myListModel.setText(listDto.getText());
-            myListRepository.save(myListModel);
-        } else {
-            myListModel.setContent(listDto.getContent());
-            myListModel.setText(listDto.getText());
-            myListRepository.save(myListModel);
+        }
+
+        myListModel.setContent(listDto.getContent());
+        myListModel.setText(listDto.getText());
+        myListRepository.save(myListModel);
+
+        myListModel = myListRepository.findByUserIdAndPlaceId(userId, listDto.getPlaceId());
+        if(listDto.getFileId()!=null) {
+            for(long id : listDto.getFileId()) {
+                PictureModel pictureModel = pictureRepository.findById(id);
+                pictureModel.setListId(myListModel.getId());
+                pictureRepository.save(pictureModel);
+            }
         }
     }
 
     public void deletetMyList(long userId, long placeId) {
         MyListModel myListModel = myListRepository.findByUserIdAndPlaceId(userId, placeId);
         if (myListModel != null) {
-            myListRepository.save(myListModel);
+            List<PictureModel> pictureModels = pictureRepository.findByListId(myListModel.getId());
+            if (pictureModels!=null) {
+                for (PictureModel pictureModel : pictureModels) {
+                    reviewService.deleteFile(pictureModel.getId());
+                }
+            }
+            myListRepository.delete(myListModel);
         }
     }
 }

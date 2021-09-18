@@ -28,6 +28,4 @@ public class MyListModel implements Serializable {
     private String content;
     private String text;
 
-    private long fileId;
-    private String fileName;
 }

@@ -189,8 +189,8 @@ export default {
       const formData = new FormData();
       var image = document.getElementById("image");
 
-      if (image != null && image.files[0] != null) {
-        formData.append("image", image.files[0]);
+      if (image != null && image.file != null) {
+        formData.append("image", image.file);
         axios.post(this.url + 'review/image', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'

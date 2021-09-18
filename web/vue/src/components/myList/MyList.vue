@@ -16,13 +16,26 @@
                         <th>카테고리</th>
                         <td>{{ place.subCategory }}</td>
                     </tr>
-                    <div>{{place.text}}</div>
+                    <tr>{{place.text.substring(0,50)}}</tr>
                     <tr>
                         <th>
                             <div class="list-tail" @click="selectPlace(place)">변경</div>
                         </th>
                         <th>
                             <div class="list-tail" @click="deletePlace(place)">삭제</div>
+                        </th>
+                    </tr>
+                    <tr v-show="showEditor">
+                        <th>
+                            <ul>
+                                <li v-for="file in place.file"
+                                    v-bind:key="file">
+                                    <img
+                                            :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${file.fileName}`)"
+                                            class="review-img"/>
+                                    <!--<img src='../../assets/images/${{file.fileName}}'>-->
+                                </li>
+                            </ul>
                         </th>
                     </tr>
                 </table>
@@ -57,8 +70,9 @@
                 subCategory: '',
                 content: '',
                 text: '',
-                fileId: '',
-                fileName: ''
+                file: [{
+                    fileName: ''
+                }],
             }],
             select: {
                 id: '',

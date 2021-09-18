@@ -19,6 +19,7 @@ public class PictureModel implements Serializable {
 
     @NotNull
     private long placeId; // 연결된 place 아이디
+    private long listId; //연결된 일기장 아이디
 
     private String originFileName;
 

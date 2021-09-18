@@ -43,7 +43,7 @@ public class ReviewService {
         this.pictureRepository = pictureRepository;
     }
 
-    public List<ReviewModel> getReview(long id){
+    public List<ReviewModel> getReview(long id) {
         return reviewRepository.findByPlaceId(id);
     }
 
@@ -67,7 +67,7 @@ public class ReviewService {
         reviewModel.setFileId(review.getFileId());
         /////reviewModel.setIsMyList(review.getIsMyList());
 
-        if(review.getFileId() > 0){
+        if (review.getFileId() > 0) {
             PictureModel pictureModel = pictureRepository.findById(review.getFileId());
             reviewModel.setFileName(pictureModel.getFileName());
         }
@@ -75,7 +75,7 @@ public class ReviewService {
         return reviewRepository.save(reviewModel);
     }
 
-    public void modifyReview(ReviewModel review){
+    public void modifyReview(ReviewModel review) {
         ReviewModel reviewModel = reviewRepository.findById(review.getId());
         reviewModel.setContents(review.getContents());
         reviewModel.setStar(review.getStar());
@@ -86,7 +86,7 @@ public class ReviewService {
 
     public void deleteReview(long id) {
         ReviewModel reviewModel = reviewRepository.findById(id);
-        if(reviewModel!=null) {
+        if (reviewModel != null) {
             if (reviewModel.getFileId() > 0 && reviewModel.getFileName() != null) {
                 deleteFile(reviewModel.getFileId());
             }
@@ -95,71 +95,71 @@ public class ReviewService {
         reviewRepository.delete(reviewModel);
     }
 
-    public byte[] loadFile(String fileName, InputStream is) throws Exception{
+    public byte[] loadFile(String fileName, InputStream is) throws Exception {
         //String savePath = root_path + filename + ".png";
         String savePath = "C:\\Users\\pc\\Documents\\springBootProject_image\\" + fileName;
-        File file  = new File(savePath);
+        File file = new File(savePath);
 
         FileInputStream fis = null;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try{
+        try {
             fis = new FileInputStream(file);
-        } catch(FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         int readCount = 0;
         byte[] buffer = new byte[1024];
 
-        try{
-            while((readCount = fis.read(buffer)) != -1){
+        try {
+            while ((readCount = fis.read(buffer)) != -1) {
                 System.out.write(buffer, 0, readCount);
             }
             fis.close();
             stream.close();
-        } catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException("File Error");
         }
 
         return buffer;
     }
 
-    public String saveFile(List<MultipartFile> files) throws Exception {
+    public PictureModel saveFile(MultipartFile file) throws Exception {
         String filename = "";
 
-        for(MultipartFile file : files) {
-            String orgname = file.getOriginalFilename();
-            filename = new FileSecurity().md5(orgname);
-            filename += orgname.substring(orgname.lastIndexOf("."));
+        String orgname = file.getOriginalFilename();
+        List<PictureModel> pictures = pictureRepository.findByOriginFileName(orgname);
+        if (pictures != null) {
+           filename = orgname + "_" + pictures.size();
+        }
+        filename = new FileSecurity().md5(filename);
+        filename += orgname.substring(orgname.lastIndexOf("."));
 
-            PictureModel pictureModel = pictureRepository.findByFileName(filename);
-            if (pictureModel == null) {
-                String savePath = root_path + filename;
-                if (!new File(savePath).exists()) {
-                    try {
-                        new File(savePath).mkdir();
-                    } catch (Exception e) {
-                        e.getStackTrace();
-                    }
+        String savePath = root_path + filename;
+        if (pictures == null) {
+            if (!new File(savePath).exists()) {
+                try {
+                    new File(savePath).mkdir();
+                } catch (Exception e) {
+                    e.getStackTrace();
                 }
-                file.transferTo(new File(savePath));
-
-                pictureModel = new PictureModel();
-                pictureModel.setOriginFileName(orgname);
-                pictureModel.setFileName(filename);
-                pictureModel.setFilePath(savePath);
-                pictureRepository.save(pictureModel);
             }
         }
-        return filename;
+        file.transferTo(new File(savePath));
+
+        PictureModel pictureModel = new PictureModel();
+        pictureModel.setOriginFileName(orgname);
+        pictureModel.setFileName(filename);
+        pictureModel.setFilePath(savePath);
+        pictureRepository.save(pictureModel);
+        return pictureRepository.findByFileName(filename);
     }
 
-    public void deleteFile(long id){
+    public void deleteFile(long id) {
 
         PictureModel pictureModel = pictureRepository.findById(id);
-        if(pictureModel != null) {
-            String root_path = "C:\\Users\\pc\\Documents\\공부\\springBootProject_back\\web\\vue\\src\\assets\\images\\";
-            String savePath = root_path + pictureModel.getFileName() + ".png";
+        if (pictureModel != null) {
+            String savePath = root_path + pictureModel.getFileName();
             File deleteFile = new File(savePath);
             if (deleteFile.exists()) {
                 try {

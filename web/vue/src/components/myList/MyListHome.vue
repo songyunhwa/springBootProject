@@ -1,6 +1,4 @@
 <template>
-
-  <recommend class="right-banner"></recommend>
   <Banner></Banner>
 
 
@@ -13,13 +11,12 @@
 </template>
 
 <script>
-import Recommend from "@/components/banner/Recommend";
 import Banner from "@/components/banner/Banner";
 import MyList from "./MyList";
 
 export default {
   name: 'MyListHome',
-  components: {MyList, Recommend, Banner},
+  components: {MyList, Banner},
   data: () => ({
     username: '',
     password: '',
