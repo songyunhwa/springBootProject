@@ -25,19 +25,6 @@
                             <div class="list-tail" @click="deletePlace(place)">삭제</div>
                         </th>
                     </tr>
-                    <tr v-show="showEditor">
-                        <th>
-                            <ul>
-                                <li v-for="file in place.file"
-                                    v-bind:key="file">
-                                    <img
-                                            :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${file.fileName}`)"
-                                            class="review-img"/>
-                                    <!--<img src='../../assets/images/${{file.fileName}}'>-->
-                                </li>
-                            </ul>
-                        </th>
-                    </tr>
                 </table>
             </li>
         </ul>
@@ -58,19 +45,16 @@
                 <th>카테고리</th>
                 <td>{{ select.subCategory }}</td>
             </tr>
-            <tr>
-                <th>
-                    <ul>
-                        <li v-for="file in select.file"
-                            v-bind:key="file">
-                            <img
-                                    :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${file.fileName}`)"
-                                    class="review-img"/>
-                            <!--<img src='../../assets/images/${{file.fileName}}'>-->
-                        </li>
-                    </ul>
-                </th>
-            </tr>
+            <ul>
+                <li v-for="file in select.file"
+                    v-bind:key="file"
+                    style="float:left; margin-left:10px;">
+                    <img
+                            :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${file.fileName}`)"
+                            class="review-img"/>
+                    <!--<img src='../../assets/images/${{file.fileName}}'>-->
+                </li>
+            </ul>
         </table>
 
         <Editor ref="editor" @getPlace="getMyList" @close="showEditor=false"></Editor>
