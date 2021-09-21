@@ -46,7 +46,17 @@
     * 파일을 추가할 수 있음.  
     * 자신이 쓴 댓글만 수정/삭제 가능
     * 10초마다 리뷰 리프레시
+
+* 일기장
+        ![Base  width="10%"](./web/vue/src/assets/images/my_list.png)
+
+1) 에디터
+    * vue3-quill 이용
     
+2) 파일 저장
+    * 여러개 저장 가능
+       
+       
 * 로그 확인
     * Interceptor 사용
 

@@ -57,6 +57,7 @@ public class ListService {
                 if (pictureModels != null) {
                     for(PictureModel pictureModel : pictureModels) {
                         JSONObject file = new JSONObject();
+                        file.put("fileId", pictureModel.getId());
                         file.put("fileName", pictureModel.getFileName());
                         files.add(file);
                     }
@@ -81,7 +82,16 @@ public class ListService {
         myListRepository.save(myListModel);
 
         myListModel = myListRepository.findByUserIdAndPlaceId(userId, listDto.getPlaceId());
-        if(listDto.getFileId()!=null) {
+
+        /** 파일 수정 **/
+        List<PictureModel> pictureModels= pictureRepository.findByListId(myListModel.getId());
+        for (PictureModel pictureModel : pictureModels) {
+            if (!listDto.getFileId().contains(pictureModel.getId())) {
+                pictureModel.setListId(-1);
+                pictureRepository.save(pictureModel);
+            }
+        }
+        if (listDto.getFileId()!=null) {
             for(long id : listDto.getFileId()) {
                 PictureModel pictureModel = pictureRepository.findById(id);
                 pictureModel.setListId(myListModel.getId());
@@ -96,7 +106,8 @@ public class ListService {
             List<PictureModel> pictureModels = pictureRepository.findByListId(myListModel.getId());
             if (pictureModels!=null) {
                 for (PictureModel pictureModel : pictureModels) {
-                    reviewService.deleteFile(pictureModel.getId());
+                    pictureModel.setListId(-1);
+                    pictureRepository.save(pictureModel);
                 }
             }
             myListRepository.delete(myListModel);

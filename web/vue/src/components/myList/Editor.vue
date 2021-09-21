@@ -3,7 +3,7 @@
     <div id="file-byte"></div>
     <quill-editor
             id="quill-editor"
-            v-model:value="content"
+            v-model:value="place.content"
             :disabled="disabled"
             :options="editorOption"
             @blur="onEditorBlur($event)"
@@ -13,7 +13,9 @@
     />
     <ul>
         <li v-for="file in file_name" v-bind:key="file">
-            {{file}}
+            <div>{{file}}
+                <div style="float: right; margin-right: 100px;" @click="removeFile(file)">x</div>
+            </div>
         </li>
         {{file_name.size}}
     </ul>
@@ -21,6 +23,7 @@
     <input name="image" id="image" type="file"/>-->
 
     <button @click="putList">저장하기</button>
+    <button @click="$emit('close')">취소</button>
     <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
 
 </template>
@@ -45,8 +48,17 @@
                 body: '',
                 footer: ''
             },
-            place_id: '',
-            content: '',
+            place: {
+                id: '',
+                name: '',
+                area: '',
+                subCategory: '',
+                content: '',
+                text: '',
+                file: [{
+                    fileName: ''
+                }],
+            },
             file_id: [],
             file_name: [],
             disabled: false,
@@ -96,36 +108,37 @@
             },
             onEditorChange({quill, html, text}) {
                 console.log('editor change!', quill, html, text)
-                this.content = html;
-                this.text = text;
+                this.place.content = html;
+                this.place.text = text;
             },
             uploadFile(e) {
                 const formData = new FormData();
                 console.log(e.target);
-                    formData.append("image", e.target.files[0]);
-                    axios.post(this.url + '/review/image', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }).then((data) => {
-                        console.log(data.data);
-                        this.file_id.push(data.data.fileId);
-                        this.file_name.push(data.data.fileName);
-                        console.log(this.fileId);
-                    }).catch((error) => {
-                        console.log(error);
-                    })
+                formData.append("image", e.target.files[0]);
+                axios.post(this.url + '/review/image', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then((data) => {
+                    console.log(data.data);
+                    this.file_id.push(data.data.fileId);
+                    this.file_name.push(data.data.fileName);
+                    console.log("upload " + this.file_id);
+                }).catch((error) => {
+                    console.log(error);
+                })
 
 
             },
             putList() {
                 //let content = this.$refs.toastuiEditor.invoke("getHtml");
                 let form = {
-                    placeId: this.place_id,
-                    content: this.content,
-                    text: this.text,
+                    placeId: this.place.id,
+                    content: this.place.content,
+                    text: this.place.text,
                     fileId: this.file_id,
                 }
+                console.log(form);
                 return axios
                     .post(this.url + '/myList', form)
                     .then(() => {
@@ -153,38 +166,21 @@
                         reject(error)
                     }
                 })
-            }
-            ,
-            /*
-                putFile(e) {
-                  let file = e.target.files[0];
+            },
+            removeFile(file) {
+                for (let i = 0; i < this.file_name.length; i++) {
 
-                  var formData = new FormData();
-                  formData.append("image", file);
-
-                  axios.post(this.url + '/review/image', formData, {
-                    headers: {
-                      'Content-Type': 'multipart/form-data'
+                    if (this.file_name[i] == file) {
+                        if (i === 0) {
+                            this.file_name.shift();
+                            this.file_id.shift();
+                        } else {
+                            this.file_name.splice(i);
+                            this.file_id.splice(i);
+                        }
                     }
-                  }).then((data) => {
-                    const fileName = data.data;
-                    axios.get('http://localhost:9000/api/v1/review/image/' + fileName)
-                        .then((data => {
-                          var img = new Image();
-                          //let ext = fileName.slice(fileName.lastIndexOf(".") + 1);
-                          //"data:image/" + ext + ";base64," +
-                          img.src = data.data;
-                          this.content += img.innerHTML;
-                          console.log(img.innerHTML);
-                          console.log(img.innerText);
-                          console.log(data.data);
-
-                        }))
-
-                  }).catch((error) => {
-                    console.log(error);
-                  })
-                },*/
+                }
+            },
             onToggleModal() {
                 if (this.showModal) {
                     this.showModal = false;
@@ -194,8 +190,19 @@
             }
             ,
             setPlace(place) {
-                this.place_id = place.id;
-                this.content = place.content
+                this.place = place;
+
+                while (this.file_name.length != 0) {
+                    this.file_name.pop();
+                    this.file_id.pop();
+                }
+                if (place.file.length > 0) {
+                    place.file.forEach(file => {
+                        this.file_name.push(file.fileName);
+                        this.file_id.push(file.fileId);
+                    });
+                }
+
                 //this.quillEditor.setup(this.content);
                 //console.log("setPlace" + this.content);
             }

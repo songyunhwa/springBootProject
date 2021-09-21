@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div v-if="!showEditor">
         <ul>
             <li v-for="(place) in this.places"
                 v-bind:key="place">
-                <table>
+                <table class="list-table">
                     <tr>
                         <th>이름</th>
                         <td>{{ place.name }}</td>
@@ -16,7 +16,7 @@
                         <th>카테고리</th>
                         <td>{{ place.subCategory }}</td>
                     </tr>
-                    <tr>{{place.text.substring(0,50)}}</tr>
+                    <tr v-if="place.text!=null">{{place.text.substring(0,50)}}</tr>
                     <tr>
                         <th>
                             <div class="list-tail" @click="selectPlace(place)">변경</div>
@@ -42,13 +42,43 @@
             </li>
         </ul>
     </div>
+
+    <div v-show="showEditor">
+
+        <table class="list-table">
+            <tr>
+                <th>이름</th>
+                <td>{{ select.name }}</td>
+            </tr>
+            <tr>
+                <th>지역</th>
+                <td>{{ select.area }}</td>
+            </tr>
+            <tr>
+                <th>카테고리</th>
+                <td>{{ select.subCategory }}</td>
+            </tr>
+            <tr>
+                <th>
+                    <ul>
+                        <li v-for="file in select.file"
+                            v-bind:key="file">
+                            <img
+                                    :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${file.fileName}`)"
+                                    class="review-img"/>
+                            <!--<img src='../../assets/images/${{file.fileName}}'>-->
+                        </li>
+                    </ul>
+                </th>
+            </tr>
+        </table>
+
+        <Editor ref="editor" @getPlace="getMyList" @close="showEditor=false"></Editor>
+    </div>
+
     <div v-if="this.places.length == 0">
         현재 추가된 맛집이 없습니다.
     </div>
-    <div v-show="showEditor">
-        <Editor ref="editor" @getPlace="getMyList"></Editor>
-    </div>
-
     <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
 
 </template>
@@ -71,6 +101,7 @@
                 content: '',
                 text: '',
                 file: [{
+                    fileId: '',
                     fileName: ''
                 }],
             }],
@@ -81,8 +112,10 @@
                 subCategory: '',
                 content: '',
                 text: '',
-                fileId: '',
-                fileName: ''
+                file: [{
+                    fileId: '',
+                    fileName: ''
+                }],
             },
             showEditor: false,
             showModal: false,
@@ -111,6 +144,7 @@
             },
             selectPlace(place) {
                 this.showEditor = !this.showEditor;
+                this.select = place;
                 this.$refs.editor.setPlace(place);
             },
             getMyList() {
@@ -119,12 +153,14 @@
                 return axios
                     .get(this.url)
                     .then((data) => {
-                        while(this.places.length!==0) {
+                        while (this.places.length !== 0) {
                             this.places.pop();
                         }
                         data.data.forEach((place) => {
                             this.places.push(place);
                         })
+
+                        this.select = this.places[0];
                     })
                     .catch(({error}) => {
                         console.log("error => " + error);
@@ -148,8 +184,14 @@
     }
 </script>
 <style>
-.list-tail {
-  font-size: 15px;
-  color:gray;
-}
+    .list-tail {
+        font-size: 15px;
+        color: gray;
+    }
+
+    .list-table {
+        color: #ABD0CE;
+        list-style-type: none;
+    }
+
 </style>
