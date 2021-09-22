@@ -16,7 +16,7 @@
 
     <!-- 하단 스크롤 바 -->
     <div class="scoll-menu">
-        <img src="../../../src/assets/images/scroll_up.png" v-on:click="scrollUp"/>
+        <img :src="require(`@/assets/images/scroll_up.png`)" v-on:click="scrollUp"/>
     </div>
 
 </template>

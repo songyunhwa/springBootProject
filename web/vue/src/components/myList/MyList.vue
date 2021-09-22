@@ -50,7 +50,7 @@
                     v-bind:key="file"
                     style="float:left; margin-left:10px;">
                     <img
-                            :src="require(`C:\\Users\\82107\\Downloads\\yhwasongtest\\web\\vue\\src\\assets\\images/${file.fileName}`)"
+                            :src="require(`@/assets/images/${file.fileName}`)"
                             class="review-img"/>
                     <!--<img src='../../assets/images/${{file.fileName}}'>-->
                 </li>
@@ -114,6 +114,7 @@
         },
         created() {
             this.url = this.resourceHost + '/myList';
+            this.imageSrc = this.resourceImg;
             this.places.splice(0, this.places.length);
 
             this.getMyList();

@@ -6,13 +6,13 @@
   
 1) 로그인
     * json web token 을 이용해서 회원 정보 저장 / 확인  
-    * 세션과 쿠키에 저장
+    * 세션과 쿠키에 저장 (Redis 연계)
     * vee-validate 사용
     ![Base  width="10%"](./web/vue/src/assets/images/validation.png)
    
 
 2) 로그아웃
-    * 세션과 쿠키 삭게
+    * 세션과 쿠키 삭제 (Redis 연계)
 
 
 3) 구글 로그인 연동 완성  
@@ -57,7 +57,7 @@
     * 여러개 저장 가능
        
        
-* 로그 확인
+* 로그 확인web
     * Interceptor 사용
 
 * 배포
@@ -66,8 +66,7 @@
 <h3>앞으로 해야할 기능들</h3>
 
 * 프론트단 수정
-* Redis 추가
 * backend, frontend 분리해서 배포 예정.
 * 테스트코드 집어넣기
-* 이미지 엑박 해결해야함. (에디터 관련)
 * 팝업창
+* 이미지 경로 따로 빼기.
