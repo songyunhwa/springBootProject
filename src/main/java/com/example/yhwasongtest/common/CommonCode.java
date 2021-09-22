@@ -1,19 +1,28 @@
 package com.example.yhwasongtest.common;
 
 import com.example.yhwasongtest.place.model.DessertModel;
+import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
-import com.example.yhwasongtest.place.repository.DessertRepository;
+import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import lombok.AllArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 public class CommonCode {
+
+    static PictureRepository pictureRepository;
+
+    @Autowired
+    public void CommonCode(PictureRepository pictureRepository) {
+        this.pictureRepository = pictureRepository;
+    }
 
     public static JSONArray convertToJSON(List<PlaceModel> placeModels) {
         JSONArray jsonArray = new JSONArray();
@@ -42,23 +51,6 @@ public class CommonCode {
             }
             jsonObject.put("youtube", subArray);
 
-            jsonArray.add(jsonObject);
-        }
-        return jsonArray;
-    }
-
-    public static JSONArray reviewConvertToJSON(List<ReviewModel> reviewModels) {
-        JSONArray jsonArray = new JSONArray();
-        for (ReviewModel reviewModel : reviewModels) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", reviewModel.getId());
-            jsonObject.put("userName" , reviewModel.getUserName());
-            jsonObject.put("userId" , reviewModel.getUserId());
-            jsonObject.put("contents" , reviewModel.getContents());
-            jsonObject.put("star" , reviewModel.getStar());
-            jsonObject.put("prevId" , reviewModel.getPrevId());
-            jsonObject.put("fileId", reviewModel.getFileId());
-            jsonObject.put("fileName", reviewModel.getFileName());
             jsonArray.add(jsonObject);
         }
         return jsonArray;

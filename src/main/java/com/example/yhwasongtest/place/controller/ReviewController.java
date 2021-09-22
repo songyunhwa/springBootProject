@@ -2,6 +2,7 @@ package com.example.yhwasongtest.place.controller;
 
 import com.example.yhwasongtest.common.CommonCode;
 import com.example.yhwasongtest.common.ErrorMessage;
+import com.example.yhwasongtest.place.dto.ReviewDto;
 import com.example.yhwasongtest.place.model.PictureModel;
 import com.example.yhwasongtest.place.model.ReviewModel;
 import com.example.yhwasongtest.place.repository.PictureRepository;
@@ -59,8 +60,23 @@ public class ReviewController {
         try {
             List<ReviewModel> reviewModels = reviewService.getReview(id);
             JSONArray jsonArray = new JSONArray();
-            if(reviewModels.size() > 0) {
-                jsonArray = CommonCode.reviewConvertToJSON(reviewModels);
+            if (reviewModels.size() > 0) {
+                for (ReviewModel reviewModel : reviewModels) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("id", reviewModel.getId());
+                    jsonObject.put("userName", reviewModel.getUserName());
+                    jsonObject.put("userId", reviewModel.getUserId());
+                    jsonObject.put("contents", reviewModel.getContents());
+                    jsonObject.put("star", reviewModel.getStar());
+                    jsonObject.put("prevId", reviewModel.getPrevId());
+
+                    PictureModel pictureModel = pictureRepository.findByReviewId(reviewModel.getId());
+                    if (pictureModel != null) {
+                        jsonObject.put("fileId", pictureModel.getId());
+                        jsonObject.put("fileName", pictureModel.getFileName());
+                    }
+                    jsonArray.add(jsonObject);
+                }
             }
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
         } catch (Exception e) {
@@ -69,7 +85,7 @@ public class ReviewController {
     }
 
     @PostMapping(value = "/review")
-    public ResponseEntity putReview(@RequestBody ReviewModel review) {
+    public ResponseEntity putReview(@RequestBody ReviewDto review) {
 
         try {
             ReviewModel reviewModel = reviewService.putReview(review);
@@ -80,7 +96,7 @@ public class ReviewController {
     }
 
     @PostMapping(value = "/review/{id}")
-    public ResponseEntity modifyReview(@PathVariable Long id, @RequestBody ReviewModel review) {
+    public ResponseEntity modifyReview(@PathVariable Long id, @RequestBody ReviewDto review) {
 
         try {
             reviewService.modifyReview(review);
@@ -101,11 +117,12 @@ public class ReviewController {
     }
 
     @GetMapping(value = "/review/image/{fileName}")
-    public @ResponseBody String getImageWithMediaType(@PathVariable String fileName, InputStream is) throws IOException {
+    public @ResponseBody
+    String getImageWithMediaType(@PathVariable String fileName, InputStream is) throws IOException {
         byte[] result = new byte[0];
         try {
             result = reviewService.loadFile(fileName, is);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return Base64.encodeBase64String(result);
@@ -114,7 +131,7 @@ public class ReviewController {
     @PostMapping(value = "/review/image")
     public ResponseEntity putFile(@RequestPart(value = "image", required = true) MultipartFile file) {
         try {
-            if(file.isEmpty()){
+            if (file.isEmpty()) {
                 throw new Exception(ErrorMessage.PUT_FILE_INVALID.getMessage());
             }
             PictureModel reviewModel = reviewService.saveFile(file);
@@ -124,7 +141,7 @@ public class ReviewController {
             jsonObject.put("fileName", reviewModel.getFileName());
             return new ResponseEntity(jsonObject.toString(), HttpStatus.OK);
         } catch (Exception e) {
-            if(e.getMessage().equals(ErrorMessage.PUT_FILE_INVALID.getMessage())) {
+            if (e.getMessage().equals(ErrorMessage.PUT_FILE_INVALID.getMessage())) {
                 return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -28,11 +28,4 @@ public class ReviewModel implements Serializable {
     public int star; // 별 개수
 
     public long prevId; // 대댓글이라면 리뷰 아이디
-
-    private long fileId;
-    private String fileName;
-
-    // 내 리스트의 댓글인지
-
-    private boolean isMyList;
 }
