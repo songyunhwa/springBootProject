@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping(value = "/api/v1")
 public class BaseController {
 
