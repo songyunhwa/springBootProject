@@ -25,7 +25,7 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @ApiOperation(value="장소 검색")
+    @ApiOperation(value="장소 검색", notes = "카테고리(subCategory) 리스트 검색으로 카테고리를 본 다음 하면 됩니다.")
     @ApiImplicitParam(name = "subCategory",value ="카테고리/이름" ,required = true , dataType="String", paramType="query")
     @GetMapping(value = "/dessert")
     public ResponseEntity selectDessert(@RequestParam("subCategory") String subCategory) {

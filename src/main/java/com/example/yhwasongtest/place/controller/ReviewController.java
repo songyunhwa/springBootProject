@@ -13,6 +13,7 @@ import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.nimbusds.jose.util.IOUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.http.client.methods.HttpHead;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -136,8 +137,7 @@ public class ReviewController {
         }
     }
 
-    @ApiOperation(value="파일 업로드")
-    @ApiImplicitParam(name = "file",value ="파일" ,required = true , dataType="MultipartFile")
+    @ApiOperation(value="파일 업로드" , produces = "multipart/form-data")
     @PostMapping(value = "/review/image")
     public ResponseEntity putFile(@RequestPart(value = "image", required = true) MultipartFile file) {
         try {
