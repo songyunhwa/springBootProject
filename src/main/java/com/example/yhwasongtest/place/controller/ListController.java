@@ -4,6 +4,7 @@ import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.place.dto.ListDto;
 import com.example.yhwasongtest.place.service.ListService;
 import com.example.yhwasongtest.user.model.UserModel;
+import io.swagger.annotations.*;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,7 @@ public class ListController {
         this.listService = listService;
     }
 
-    /**
-     * 내 맛집 리스트 가져오기
-     */
+    @ApiOperation(value="맛집 리스트 검색")
     @GetMapping(value = "/myList")
     public ResponseEntity getMyList(HttpServletRequest request) {
 
@@ -45,12 +44,8 @@ public class ListController {
         }
     }
 
-    /**
-     * 내 맛집 리스트 추가
-     * @param listDto
-     * @param request
-     * @return
-     */
+
+    @ApiOperation(value="내 맛집 리스트 추가")
     @PostMapping(value = "/myList")
     public ResponseEntity putMyList(@RequestBody ListDto listDto,
                                     HttpServletRequest request){
@@ -69,6 +64,10 @@ public class ListController {
         }
     }
 
+    @ApiOperation(value="내 맛집 리스트 삭제")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "placeId",value ="장소 아이디" ,required = true , dataType="long", paramType="query"),
+    })
     @DeleteMapping(value = "/myList")
     public ResponseEntity deleteMyList(@RequestParam long placeId,
                                     HttpServletRequest request){

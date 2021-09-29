@@ -17,6 +17,7 @@
     "store": "^2.0.12",
     "vee-validate": "^4.4.9",
     "vue": "^3.0.0",
+    "vue-axios-cors": "^1.0.1",
     "vue-cookies": "^1.7.4",
     "vue-google-oauth2": "^1.5.8",
     "vue-router": "^4.0.11",

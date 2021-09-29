@@ -4,6 +4,9 @@ import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.service.BaseService;
 import com.example.yhwasongtest.user.service.UserService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.slf4j.Logger;
@@ -21,7 +24,7 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping(value = "/api/v1")
-public class BaseController {
+    public class BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
@@ -35,6 +38,8 @@ public class BaseController {
         this.userService = userService;
 
     }
+
+    @ApiOperation(value="회원가입")
     @RequestMapping(method = RequestMethod.POST, value = "/user")
     public ResponseEntity signup(@RequestBody  UserModelDto userModelDto){ // 회원 추가
         try {
@@ -45,6 +50,7 @@ public class BaseController {
         }
     }
 
+    @ApiOperation(value="로그아웃")
     @GetMapping(value = "/logout")
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -55,6 +61,11 @@ public class BaseController {
         }
     }
 
+    @ApiOperation(value="로그인")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "username",value ="이름" ,required = true , dataType="String", paramType="query"),
+            @ApiImplicitParam(name = "password",value ="비밀번호" ,required =true ,  dataType="String", paramType="query")
+    })
     @GetMapping(value = "/login")
     public ResponseEntity login(@RequestParam(name = "username", required = true) String username,
                            @RequestParam(name = "password", required = true) String password,

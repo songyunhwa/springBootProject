@@ -11,6 +11,8 @@ import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.service.YoutubeService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ public class PlaceController {
         this.youtubeService = youtubeService;
     }
 
+    @ApiOperation(value="모든 장소 검색")
     @GetMapping(value = "/places")
     public ResponseEntity getPlaces(){
 
@@ -58,6 +61,8 @@ public class PlaceController {
 
     }
 
+    @ApiOperation(value="장소 검색")
+    @ApiImplicitParam(name = "id",value ="장소 아이디" ,required = true , dataType="long", paramType="query")
     @GetMapping(value = "/place")
     public ResponseEntity getPlace(@RequestParam(name = "id") long id){
         try {
@@ -73,7 +78,14 @@ public class PlaceController {
 
     }
 
-
+    @ApiOperation(value="장소 검색")
+    @ApiImplicitParam(
+            name = "msg"
+            , value = "이름에 포함한 단어/채널"
+            , required = true
+            , dataType = "string"
+            , paramType = "path"
+            , defaultValue = "None")
     @GetMapping(value = "/place/{msg}")
     public ResponseEntity getPlaceByCategory(@PathVariable String msg){
         try {
@@ -110,31 +122,19 @@ public class PlaceController {
 
         }
     }
-
+    @ApiOperation(value="장소 삭제")
+    @ApiImplicitParam(
+            name = "name"
+            , value = "장소 이름"
+            , required = true
+            , dataType = "string"
+            , paramType = "path"
+            , defaultValue = "None")
     @DeleteMapping(value = "/place/{name}")
     public ResponseEntity deletePlace(@PathVariable(name = "name",required = true) String name) {
 
         placeService.deletePlace(name);
         return new ResponseEntity(HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/location")
-    public ResponseEntity getLocation(){
-        String result = placeService.getLocation();
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    public void addView(@CookieValue(name = "login", defaultValue = "null") String cookie,
-                             @RequestParam(name = "id") long id,
-                             @RequestParam(name = "placeName") String placeName,
-                             HttpServletResponse response){
-        // 쿠키에 아이디가 없다면 추가해주기.
-        if(!cookie.contains("loginCookie" + placeName)){
-            cookie += id + "/";
-            placeService.addView(placeName);
-        }
-        response.addCookie(new Cookie("loginCookie" +placeName, cookie));
-
     }
 
     @GetMapping(value = "/classification")
@@ -145,6 +145,8 @@ public class PlaceController {
         placeService.getDessertCategory();
     }
 
+
+    @ApiOperation(value="카테고리(subCategory) 리스트 검색")
     @GetMapping(value = "/category")
     public ResponseEntity getCategory(){
         try {

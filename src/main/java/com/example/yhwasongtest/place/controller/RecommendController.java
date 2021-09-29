@@ -6,6 +6,8 @@ import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.RecommendService;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.mysql.cj.xdevapi.JsonArray;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -37,11 +39,8 @@ public class RecommendController {
         this.recommendService = recommendService;
     }
 
-    /**
-     *  장소 추천하기
-     * @param id       장소 아이디
-     * @return
-     */
+    @ApiOperation(value="장소 추천하기")
+    @ApiImplicitParam(name = "id",value ="장소 아이디" ,required = true , dataType="long", paramType="query")
     @PostMapping(value = "/recommend")
     public ResponseEntity putRecommend(@RequestParam(name = "id",required = true) long id,
                                        HttpServletRequest request){
@@ -59,11 +58,8 @@ public class RecommendController {
         }
     }
 
-    /**
-     * 장소 찜하기
-     * @param id    장소 아이디
-     * @return
-     */
+    @ApiOperation(value="장소 찜하기")
+    @ApiImplicitParam(name = "id",value ="장소 아이디" ,required = true , dataType="long", paramType="query")
     @PostMapping(value = "/wished")
     public ResponseEntity putWished(@RequestParam(name = "id",required = true) long id,
                                     HttpServletRequest request){
@@ -79,10 +75,7 @@ public class RecommendController {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);
         }
     }
-    /**
-     * 장소 찜한 것 가져오기
-     * @return
-     */
+    @ApiOperation(value="장소 찜한 것 검색")
     @GetMapping(value = "/wished")
     public ResponseEntity getWished(HttpServletRequest request, Pageable pageable) {
 
@@ -101,10 +94,7 @@ public class RecommendController {
         }
     }
 
-    /**
-     * 추천 배너
-     * @return
-     */
+    @ApiOperation(value="장소 추천 리스트 검색")
     @GetMapping(value = "/recommend")
     public ResponseEntity getRecommend(HttpServletRequest request) {
 

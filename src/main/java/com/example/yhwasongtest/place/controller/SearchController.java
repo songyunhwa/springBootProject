@@ -4,6 +4,9 @@ import com.example.yhwasongtest.common.CommonCode;
 import com.example.yhwasongtest.place.model.DessertModel;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.SearchService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -22,25 +25,8 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @GetMapping(value = "/dessert/list")
-    public ResponseEntity getDessert() {
-
-        try {
-            List<DessertModel> dessertModels = searchService.getDessert();
-            JSONArray jsonArray = new JSONArray();
-            for (DessertModel dessertModel : dessertModels) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("id", dessertModel.getId());
-                jsonObject.put("included", dessertModel.getIncluded());
-                jsonObject.put("subCategory", dessertModel.getSubCategory());
-                jsonArray.add(jsonObject);
-            }
-            return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
+    @ApiOperation(value="장소 검색")
+    @ApiImplicitParam(name = "subCategory",value ="카테고리/이름" ,required = true , dataType="String", paramType="query")
     @GetMapping(value = "/dessert")
     public ResponseEntity selectDessert(@RequestParam("subCategory") String subCategory) {
 

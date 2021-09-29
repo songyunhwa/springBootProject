@@ -152,47 +152,6 @@ public class PlaceService {
         placeRepository.delete(placeModel);
     }
 
-    // 서울 구/ 동 구분해서 => location table 저장
-    public String getLocation() {
-        try {
-            //파일 객체 생성
-            File rootfile = new File(".");
-            String rootPath = rootfile.getAbsolutePath();
-            String filePath = rootPath + "/src/main/java/com/example/yhwasongtest/place/txt/seoul_location.txt";
-            File file = new File(filePath);
-            String result = "";
-            if (file.exists()) {
-                BufferedReader inFile = new BufferedReader(new FileReader(file));
-                String sLine = null;
-
-                while ((sLine = inFile.readLine()) != null) {
-                    if (!sLine.equals("")) {
-                        String[] line = sLine.split(",");
-                        LocationModel location = new LocationModel();
-                        location.setCity("서울특별시");
-                        location.setDistrict(line[0]);
-                        location.setNeighborhood(line[1]);
-                        locationRepository.save(location);
-                    }
-                    result += sLine; //읽어들인 문자열을 출력 합니다.
-                }
-                return result;
-            }
-        } catch (FileNotFoundException e) {
-            // TODO: handle exception
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        return null;
-    }
-
-    public void addView(String placeName) {
-        PlaceModel placeModel = placeRepository.findByName(placeName);
-        placeModel.setView(placeModel.getView() + 1);
-        placeRepository.save(placeModel);
-
-    }
-
     // place 카테고리별로 분류하기
     public void getFoodCategory() {
 

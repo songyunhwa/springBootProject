@@ -11,6 +11,8 @@ import com.example.yhwasongtest.place.service.PlaceService;
 import com.example.yhwasongtest.place.service.ReviewService;
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.nimbusds.jose.util.IOUtils;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.apache.http.client.methods.HttpHead;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -53,6 +55,8 @@ public class ReviewController {
         this.placeService = placeService;
     }
 
+    @ApiOperation(value="장소 리뷰 검색")
+    @ApiImplicitParam(name = "id",value ="장소 아이디" ,required = true , dataType="long", paramType="query")
     @GetMapping(value = "/review")
     public ResponseEntity getReview(@RequestParam("id") long id) {
 
@@ -83,6 +87,7 @@ public class ReviewController {
         }
     }
 
+
     @PostMapping(value = "/review")
     public ResponseEntity putReview(@RequestBody ReviewDto review) {
 
@@ -94,6 +99,14 @@ public class ReviewController {
         }
     }
 
+    @ApiOperation(value = "리뷰 수정")
+    @ApiImplicitParam(
+            name = "id"
+            , value = "리뷰 아이디"
+            , required = true
+            , dataType = "long"
+            , paramType = "path"
+            , defaultValue = "None")
     @PostMapping(value = "/review/{id}")
     public ResponseEntity modifyReview(@PathVariable Long id, @RequestBody ReviewDto review) {
 
@@ -105,6 +118,14 @@ public class ReviewController {
         }
     }
 
+    @ApiOperation(value="리뷰 삭제")
+    @ApiImplicitParam(
+            name = "id"
+            , value = "리뷰 아이디"
+            , required = true
+            , dataType = "long"
+            , paramType = "path"
+            , defaultValue = "None")
     @DeleteMapping(value = "/review/{id}")
     public ResponseEntity deleteReview(@PathVariable long id) {
         try {
@@ -115,18 +136,8 @@ public class ReviewController {
         }
     }
 
-    @GetMapping(value = "/review/image/{fileName}")
-    public @ResponseBody
-    String getImageWithMediaType(@PathVariable String fileName, InputStream is) throws IOException {
-        byte[] result = new byte[0];
-        try {
-            result = reviewService.loadFile(fileName, is);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return Base64.encodeBase64String(result);
-    }
-
+    @ApiOperation(value="파일 업로드")
+    @ApiImplicitParam(name = "file",value ="파일" ,required = true , dataType="MultipartFile")
     @PostMapping(value = "/review/image")
     public ResponseEntity putFile(@RequestPart(value = "image", required = true) MultipartFile file) {
         try {
@@ -147,6 +158,8 @@ public class ReviewController {
         }
     }
 
+    @ApiOperation(value="파일 삭제")
+    @ApiImplicitParam(name = "id",value ="파일 아이디" ,required = true , dataType="long", paramType="query")
     @GetMapping(value = "/review/image")
     public ResponseEntity removeFile(@RequestParam("id") long id) {
         try {

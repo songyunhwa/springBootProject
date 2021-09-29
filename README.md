@@ -77,6 +77,9 @@ java,
 redis,
 mariadb,
 vue
+현재 
+TypeError: Cannot read property 'version' of undefined at module.exports
+
 
 
 * 현재 서버에서 설치 작업 중
