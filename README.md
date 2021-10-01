@@ -72,24 +72,15 @@ http://15.152.18.84:8080/
 
 * 프론트단 수정
 * 테스트코드 집어넣기
-* 팝업창
+* nginx
+* 회원가입, 일기장 서버 점검
 
-
-
-서버 설치완료된 것.
-
+* 서버 설치완료된 것.
 java,
 redis,
 mariadb,
 vue
-현재 
-TypeError: Cannot read property 'version' of undefined at module.exports
 
 
-
-* 현재 서버에서 설치 작업 중
-
-nginx
-회원가입, 일기장 서버 점검
 
 
