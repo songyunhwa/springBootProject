@@ -1,5 +1,10 @@
 ![Base  width="10%"](./web/vue/src/assets/images/base_image.png)
 
+
+홈화면
+<tr>
+http://15.152.18.84:8080/ 
+
 <h3>구현기능</h3>
  
 * 회원 관리
@@ -85,3 +90,6 @@ TypeError: Cannot read property 'version' of undefined at module.exports
 * 현재 서버에서 설치 작업 중
 
 nginx
+회원가입, 일기장 서버 점검
+
+
