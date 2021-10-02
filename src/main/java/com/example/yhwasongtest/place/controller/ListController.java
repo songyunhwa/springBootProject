@@ -50,14 +50,13 @@ public class ListController {
     public ResponseEntity putMyList(@RequestBody ListDto listDto,
                                     HttpServletRequest request){
         try {
-            /*HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(false);
             UserModel user = (UserModel)httpSession.getAttribute("login");
 
             if(user==null) {
                 throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
-            }*/
-            long userId = 159;
-            listService.putMyList(userId, listDto);
+            }
+            listService.putMyList(user.getId(), listDto);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.toString(),HttpStatus.BAD_REQUEST);

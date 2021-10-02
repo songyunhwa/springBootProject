@@ -10,3 +10,4 @@ const app = createApp(App).use(router).use(VueCookies).use(store);
 //app.config.globalProperties.$store = store;
 app.config.globalProperties.resourceHost = "http://localhost:9000/api/v1";
 app.mount('#app');
+

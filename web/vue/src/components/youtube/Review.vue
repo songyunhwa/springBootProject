@@ -26,7 +26,7 @@
                         </div>
                         <div v-if="review.fileName">
                             <img
-                                    :src="require(`@/assets/images/${review.fileName}`)"
+                                    :src="'../assets/images/' + review.fileName"
                                     class="review-img"/>
                         </div>
                     </td>

@@ -31,7 +31,6 @@
     </div>
 
     <div v-show="showEditor">
-
         <table class="list-table">
             <tr>
                 <th>이름</th>
@@ -45,18 +44,16 @@
                 <th>카테고리</th>
                 <td>{{ select.subCategory }}</td>
             </tr>
-            <ul>
+            <ul v-if="select.file != null">
                 <li v-for="file in select.file"
                     v-bind:key="file"
                     style="float:left; margin-left:10px;">
                     <img
-                            :src="require(`@/assets/images/${file.fileName}`)"
+                            :src="'../assets/images/' + file.fileName "
                             class="review-img"/>
-                    <!--<img src='../../assets/images/${{file.fileName}}'>-->
                 </li>
             </ul>
         </table>
-
         <Editor ref="editor" @getPlace="getMyList" @close="showEditor=false"></Editor>
     </div>
 
@@ -113,7 +110,7 @@
             accessToken: null,
         },
         created() {
-            this.url = this.resourceHost + '/myList';
+            this.url = this.resourceHost;
             this.imageSrc = this.resourceImg;
             this.places.splice(0, this.places.length);
 
@@ -136,16 +133,18 @@
                 axios.defaults.withCredentials = true;
                 this.showEditor = false;
                 return axios
-                    .get(this.url)
+                    .get(this.url + '/myList')
                     .then((data) => {
-                        while (this.places.length !== 0) {
-                            this.places.pop();
-                        }
-                        data.data.forEach((place) => {
-                            this.places.push(place);
-                        })
+                        if (data.data.length > 0) {
+                            while (this.places.length !== 0) {
+                                this.places.pop();
+                            }
+                            data.data.forEach((place) => {
+                                this.places.push(place);
+                            })
 
-                        this.select = this.places[0];
+                            this.select = this.places[0];
+                        }
                     })
                     .catch(({error}) => {
                         console.log("error => " + error);
@@ -153,8 +152,13 @@
 
             },
             deletePlace(place) {
+                axios.defaults.withCredentials = true;
                 return axios
-                    .delete(this.url + '?placeId=' + place.id)
+                    .delete(this.url + '/myList?placeId=' + place.id ,  {
+                        headers: {
+                            Authorization: `${localStorage.getItem("token")}`,
+                        },
+                    })
                     .then(() => {
                         this.modal.body = "삭제됐습니다."
                         this.onToggleModal();

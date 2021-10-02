@@ -14,7 +14,7 @@
         <button @click="this.$router.push({path: '/'});">홈</button>
         <button @click="goUrl('wished')">찜한 장소</button>
         <button @click="goUrl('myList')">내 일기장으로 가기</button>
-        <button @click="onTogglePlaceModal">
+        <button  @click="onTogglePlaceModal">
             맛집 추가
         </button>
 
@@ -68,7 +68,6 @@
                 }
             },
             onTogglePlaceModal() {
-                console.log(this.showPlaceModal);
 
                 if (this.showPlaceModal) {
                     this.showPlaceModal = false;

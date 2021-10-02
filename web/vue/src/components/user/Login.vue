@@ -55,7 +55,7 @@ export default {
     userModel: {
       username: '',
       password: '',
-      authority: 'ROLE_USER',
+      role: 'ROLE_USER',
     },
     errors: [],
     isLoaded: false,
@@ -116,7 +116,7 @@ export default {
       return axios
           .get(this.url)
           .then(({data}) => {
-            console.log("login => " + data);
+            console.log("login => " + data.token);
             if (this.$cookies.get('username') == null) {
               this.$cookies.set('username', data.username);
               this.$cookies.set('role', data.role);

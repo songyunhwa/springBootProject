@@ -87,8 +87,7 @@ public class ListService {
         List<PictureModel> pictureModels= pictureRepository.findByListId(myListModel.getId());
         for (PictureModel pictureModel : pictureModels) {
             if (!listDto.getFileId().contains(pictureModel.getId())) {
-                pictureModel.setListId(-1);
-                pictureRepository.save(pictureModel);
+                pictureRepository.delete(pictureModel);
             }
         }
         if (listDto.getFileId()!=null) {

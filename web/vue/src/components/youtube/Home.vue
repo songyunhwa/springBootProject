@@ -14,11 +14,11 @@
     <!-- 유투브 -->
     <youtube-list :msg="input" ref="youtube_list"></youtube-list>
 
-    <!-- 하단 스크롤 바 -->
+    <!-- 하단 스크롤 바
     <div class="scoll-menu">
-        <img :src="require(`@/assets/images/scroll_up.png`)" v-on:click="scrollUp"/>
+        <img  :src="'../../assets/images/scroll_up.png'" v-on:click="scrollUp"/>
     </div>
-
+-->
 </template>
 
 <script>

@@ -7,8 +7,11 @@ import org.apache.catalina.User;
 public class UserModelDto {
     private String username;
     private String password;
-
     private String authority;
+
+    public UserModelDto() {
+
+    }
 
     public UserModelDto(String username, String password, String role){
         this.username = username;
