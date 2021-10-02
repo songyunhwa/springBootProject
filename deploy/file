@@ -1,4 +1,13 @@
+* api
+git pull
+./run.sh
 
+* web
+git pull
+=> nginx
+sudo /etc/init.d/nginx start
+
+* mysql
 mysql 백업한 방법.
 alter database test character set euckr;
 안되서

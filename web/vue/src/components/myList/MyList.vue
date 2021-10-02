@@ -111,7 +111,6 @@
         },
         created() {
             this.url = this.resourceHost;
-            this.imageSrc = this.resourceImg;
             this.places.splice(0, this.places.length);
 
             this.getMyList();
@@ -120,6 +119,7 @@
             onToggleModal() {
                 if (this.showModal) {
                     this.showModal = false;
+
                 } else {
                     this.showModal = true;
                 }
@@ -130,15 +130,15 @@
                 this.$refs.editor.setPlace(place);
             },
             getMyList() {
+                while (this.places.length !== 0) {
+                    this.places.pop();
+                }
                 axios.defaults.withCredentials = true;
                 this.showEditor = false;
                 return axios
                     .get(this.url + '/myList')
                     .then((data) => {
                         if (data.data.length > 0) {
-                            while (this.places.length !== 0) {
-                                this.places.pop();
-                            }
                             data.data.forEach((place) => {
                                 this.places.push(place);
                             })
@@ -154,14 +154,11 @@
             deletePlace(place) {
                 axios.defaults.withCredentials = true;
                 return axios
-                    .delete(this.url + '/myList?placeId=' + place.id ,  {
-                        headers: {
-                            Authorization: `${localStorage.getItem("token")}`,
-                        },
-                    })
+                    .delete(this.url + '/myList?placeId=' + place.id )
                     .then(() => {
                         this.modal.body = "삭제됐습니다."
                         this.onToggleModal();
+                        this.getMyList();
                     })
                     .catch(({error}) => {
                         this.modal.body = "삭제를 실패했습니다."

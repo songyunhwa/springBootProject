@@ -2,8 +2,7 @@
 
 
 홈화면
-<tr>
-http://15.152.18.84:8080/ 
+<tr> go to http://15.152.18.84:3000/
 
 <h3>구현기능</h3>
  
@@ -67,20 +66,21 @@ http://15.152.18.84:8080/
 
 * 배포
     * 현재 mariadb, redis - 아마존 웹서비스 이용해서 띄움.
+    * nginx 로 연결
+    
     
 <h3>앞으로 해야할 기능들</h3>
 
 * 프론트단 수정
 * 테스트코드 집어넣기
-* nginx
-* delete error
+* jwt token
 
 * 서버 설치완료된 것.
 java,
 redis,
 mariadb,
 vue
-
+nginx
 
 
 
