@@ -2,7 +2,12 @@
 
 
 홈화면
-<tr> go to http://15.152.18.84:3000/
+<div> 
+[현재 aws 배포 서버](http://15.152.18.84:3000/) 
+<div>
+이메일: user
+패스워드 : password 
+로 로그인 가능
 
 <h3>구현기능</h3>
  
@@ -67,20 +72,24 @@
 * 배포
     * 현재 mariadb, redis - 아마존 웹서비스 이용해서 띄움.
     * nginx 로 연결
-    
+
+
+* 서버 설치완료된 것.
+    * java,
+    * redis,
+    * mariadb,
+    * vue
+    * nginx
+
     
 <h3>앞으로 해야할 기능들</h3>
 
 * 프론트단 수정
 * 테스트코드 집어넣기
 * jwt token
-
-* 서버 설치완료된 것.
-java,
-redis,
-mariadb,
-vue
-nginx
+* 추천 리스트
+* swagger
+* 댓글 파일 확인
 
 
 
