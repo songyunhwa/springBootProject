@@ -101,11 +101,12 @@ public class RecommendController {
 
         try {
             HttpSession httpSession = request.getSession(false);
-            UserModel user = (UserModel) httpSession.getAttribute("login");
-            if(user == null) {
+            UserModel user = null;
+            if(httpSession == null) {
                 user = userService.getUser("test1");
+            }else {
+                user = (UserModel) httpSession.getAttribute("login");
             }
-
             JSONArray jsonArray = recommendService.getRecommend(user.getId());
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);

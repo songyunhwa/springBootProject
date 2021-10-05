@@ -1,8 +1,9 @@
 * api
 git pull
-./run.sh
+nohup ./run.sh &
 
 * web
+root 권한으로
 git pull
 => nginx
 sudo /etc/init.d/nginx start
@@ -16,4 +17,7 @@ my.ini basedir 에 붙여넣음
  mysql 다시 시작한 다음
 >mysqldump --databases test -uroot -p --default-character-set=latin1
 백업 -> 복원
+
+
+
 
