@@ -5,6 +5,7 @@ import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.RecommendService;
 import com.example.yhwasongtest.user.model.UserModel;
+import com.example.yhwasongtest.user.service.UserService;
 import com.mysql.cj.xdevapi.JsonArray;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +34,7 @@ public class RecommendController {
     private static final Logger logger = LoggerFactory.getLogger(RecommendController.class);
 
     private RecommendService recommendService;
-
+    private UserService userService;
     @Autowired
     public void RecommendController(RecommendService recommendService){
         this.recommendService = recommendService;
@@ -100,10 +101,11 @@ public class RecommendController {
 
         try {
             HttpSession httpSession = request.getSession(false);
-            if(httpSession == null) {
-                throw new Exception(ErrorMessage.NOT_LOGIN_INVALID.getMessage());
-            }
             UserModel user = (UserModel) httpSession.getAttribute("login");
+            if(user == null) {
+                user = userService.getUser("test1");
+            }
+
             JSONArray jsonArray = recommendService.getRecommend(user.getId());
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);

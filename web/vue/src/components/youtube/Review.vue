@@ -193,7 +193,6 @@
                 }).then((data) => {
                     this.fileId = data.data.fileId;
                     console.log(data);
-                    this.putReview();
                 }).catch((error) => {
                     console.log(error);
                 })
