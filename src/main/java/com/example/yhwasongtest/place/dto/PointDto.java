@@ -11,9 +11,11 @@ public class PointDto implements Comparable<PointDto> {
 
     @Override
     public int compareTo(PointDto o) {
-        if (this.point >= o.point) { // 점수 내림차순
+        if (this.point > o.point) { // 점수 내림차순
+            return 1;
+        } else if(this.point < o.point) {
             return -1;
-        } else return 1;
+        }else return 0;
     }
 
 

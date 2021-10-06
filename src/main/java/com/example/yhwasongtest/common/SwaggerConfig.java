@@ -1,5 +1,5 @@
-package com.example.yhwasongtest;
-/*
+package com.example.yhwasongtest.common;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -15,11 +15,8 @@ public class SwaggerConfig {
     public Docket commonApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
+                .apis(RequestHandlerSelectors.any()) //basePackage("com.base.swagger.api.v1") api 스펙이 작성되어 있는 패키지를 지정
+                .paths(PathSelectors.ant("/api/v1/**"))
                 .build();
     }
-}
-*/
-public class SwaggerConfig {
 }

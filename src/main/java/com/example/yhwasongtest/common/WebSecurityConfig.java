@@ -1,4 +1,4 @@
-package com.example.yhwasongtest;
+package com.example.yhwasongtest.common;
 
 import com.example.yhwasongtest.user.model.CustomOAuth2User;
 import com.example.yhwasongtest.user.service.UserService;
@@ -41,8 +41,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
             http.csrf().disable();
+            /*
+                    .authorizeRequests()
+                    .antMatchers("/api/v1/token").permitAll()
+                    .anyRequest().authenticated(); */
             http
-                    .oauth2Login()
+                    .oauth2Login() // 구글 로그인
                     .userInfoEndpoint();
 
     }

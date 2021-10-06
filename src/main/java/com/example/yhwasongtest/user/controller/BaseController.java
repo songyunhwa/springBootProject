@@ -1,5 +1,8 @@
 package com.example.yhwasongtest.user.controller;
 
+import com.example.yhwasongtest.common.CommonCode;
+import com.example.yhwasongtest.common.ErrorMessage;
+import com.example.yhwasongtest.common.JwtUtil;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.service.BaseService;
@@ -14,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -28,8 +33,9 @@ import javax.servlet.http.HttpSession;
 
     private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
+    private JwtUtil jwtUtil;
+    private AuthenticationManager authenticationManager;
     private final BaseService baseService;
-
     private final UserService userService;
 
     @Autowired
@@ -118,5 +124,20 @@ import javax.servlet.http.HttpSession;
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @ApiOperation(value="토큰 생성")
+    @PostMapping("/token")
+    public String generateToken(@RequestBody UserModelDto userModelDto) throws Exception {
+        try {
+            // 아이디와 비밀번호 기반으로 token 발급
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userModelDto.getUsername(), userModelDto.getPassword())
+            );
+        } catch (Exception ex) {
+            throw new Exception(ErrorMessage.SIGNUP_INVALID.getMessage());
+        }
+        return jwtUtil.generateToken(userModelDto.getUsername());
+    }
+
 
 }

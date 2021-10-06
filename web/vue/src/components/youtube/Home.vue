@@ -14,11 +14,10 @@
     <!-- 유투브 -->
     <youtube-list :msg="input" ref="youtube_list"></youtube-list>
 
-    <!-- 하단 스크롤 바
+    <!-- 하단 스크롤 바 -->
     <div class="scoll-menu">
-        <img  :src="'../../assets/images/scroll_up.png'" v-on:click="scrollUp"/>
+        <img  :src="image_path + 'scroll_up.png'" v-on:click="scrollUp"/>
     </div>
--->
 </template>
 
 <script>
@@ -33,6 +32,7 @@
             username: '',
             password: '',
             url: '',
+            image_path : '',
             input: '', // 입력하는 값
             msg: '',   // 실질적으로 넘어가는 값
             views: '0', // 하루 접속량,
@@ -40,6 +40,7 @@
         created() {
             this.username = this.$cookies.get('username');
             this.url = this.resourceHost + '/history';
+            this.image_path = this.imagePath;
         },
         methods: {
             scrollUp() {
