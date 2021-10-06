@@ -130,6 +130,12 @@ export default {
       this.$refs.review.getReview(id);
     },
     setMyList() {
+      if (this.$cookies.get('username') == null) {
+        this.modal.body = '로그인을 해야합니다.';
+        this.onToggleModal();
+        return;
+      }
+
       let form = {
         placeId : this.select_place.id,
         content : ''

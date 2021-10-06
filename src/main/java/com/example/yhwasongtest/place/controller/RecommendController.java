@@ -35,9 +35,11 @@ public class RecommendController {
 
     private RecommendService recommendService;
     private UserService userService;
+
     @Autowired
-    public void RecommendController(RecommendService recommendService){
+    public void RecommendController(RecommendService recommendService, UserService userService){
         this.recommendService = recommendService;
+        this.userService = userService;
     }
 
     @ApiOperation(value="장소 추천하기")
@@ -107,6 +109,7 @@ public class RecommendController {
             }else {
                 user = (UserModel) httpSession.getAttribute("login");
             }
+
             JSONArray jsonArray = recommendService.getRecommend(user.getId());
 
             return new ResponseEntity<>(jsonArray.toString(), HttpStatus.OK);

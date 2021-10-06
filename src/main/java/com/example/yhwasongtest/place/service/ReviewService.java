@@ -102,8 +102,8 @@ public class ReviewService {
     }
 
     public byte[] loadFile(String fileName, InputStream is) throws Exception {
-        //String savePath = root_path + filename + ".png";
-        String savePath = "C:\\Users\\pc\\Documents\\springBootProject_image\\" + fileName;
+        String savePath = root_path + fileName;
+        //  String savePath = "C:\\Users\\pc\\Documents\\springBootProject_image\\" + fileName;
         File file = new File(savePath);
 
         FileInputStream fis = null;

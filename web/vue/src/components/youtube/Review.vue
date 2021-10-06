@@ -26,7 +26,7 @@
                         </div>
                         <div v-if="review.fileName">
                             <img
-                                    :src="'../assets/images/' + review.fileName"
+                                    :src="image_path+ review.fileName"
                                     class="review-img"/>
                         </div>
                     </td>
@@ -100,6 +100,7 @@
         created() {
             this.onReviewTimeout();
             this.url = this.resourceHost + '/';
+            this.image_path = this.imagePath;
             this.imageSrc = this.resourceImg;
         },
         methods: {
@@ -125,6 +126,7 @@
                     prevId: '',
                     fileId: this.fileId,
                 };
+              console.log("this.fileId => " + this.fileId);
                 return axios
                     .post(
                         this.url + 'review',
@@ -192,7 +194,7 @@
                     }
                 }).then((data) => {
                     this.fileId = data.data.fileId;
-                    console.log(data);
+                    console.log("this.fileId => " + this.fileId);
                 }).catch((error) => {
                     console.log(error);
                 })
