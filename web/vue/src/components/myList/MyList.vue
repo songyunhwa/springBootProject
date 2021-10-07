@@ -49,7 +49,7 @@
                     v-bind:key="file"
                     style="float:left; margin-left:10px;">
                     <img
-                            :src="'../assets/images/' + file.fileName "
+                        :src="require(`@/assets/images/${file.fileName}`)"
                             class="review-img"/>
                 </li>
             </ul>

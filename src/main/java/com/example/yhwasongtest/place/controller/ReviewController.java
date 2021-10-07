@@ -40,9 +40,6 @@ public class ReviewController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
-    @Value(value = "${image-path}")
-    String root_path;
-
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
     private final PictureRepository pictureRepository;

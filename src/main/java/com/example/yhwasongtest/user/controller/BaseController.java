@@ -106,6 +106,7 @@ import javax.servlet.http.HttpSession;
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             HttpSession httpSession = request.getSession(false);
+
             Object user = httpSession.getAttribute("login");
             return  new ResponseEntity<>(user, HttpStatus.OK);
         }catch (Exception e){
