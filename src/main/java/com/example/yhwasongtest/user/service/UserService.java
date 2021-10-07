@@ -1,6 +1,7 @@
 package com.example.yhwasongtest.user.service;
 
 import com.example.yhwasongtest.common.ErrorMessage;
+import com.example.yhwasongtest.common.TokenProvider;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.Authority;
 import com.example.yhwasongtest.user.model.CustomUserDetails;
@@ -11,6 +12,8 @@ import com.example.yhwasongtest.user.repository.LoginHistoryRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -45,13 +48,16 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final LoginHistoryRepository loginHistoryRepository;
+    private final TokenProvider tokenProvider;
 
     public UserService(UserRepository userRepository,
                        AuthorityRepository authorityRepository,
-                       LoginHistoryRepository loginHistoryRepository) {
+                       LoginHistoryRepository loginHistoryRepository,
+                       TokenProvider tokenProvider) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.loginHistoryRepository = loginHistoryRepository;
+        this.tokenProvider = tokenProvider;
     }
 
     @Override
@@ -143,6 +149,20 @@ public class UserService implements UserDetailsService {
         if(userModel == null){
             userModel = userRepository.findByEmail(name);
         }
+
+        /* 토큰을 사용한 경우
+        if (token != null) {
+            if (tokenProvider.validateToken(token)) {
+                String subject = tokenProvider.getSubject(token);
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse( subject );
+                JSONObject jsonObj = (JSONObject) obj;
+
+                Long id = (Long) jsonObj.get("id");
+                userModel = userRepository.findById(id).get();
+            }
+        }*/
+
         if(userModel == null) {
             throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
         }
@@ -167,16 +187,9 @@ public class UserService implements UserDetailsService {
                     this.keepLogin(userModel.getUsername(), session.getId(), date);
 
                     this.putHistory(userModel.getUsername(), ip);
-                    /*
-                    // 토큰 생성
-                    String accessToken = JwtUtil.createToken(userModel.getId(), userModel.getUsername());
-                    String url ="/session";
-                    return ResponseEntity.created(new URI(url)).body(SessionResponseDto
-                            .builder()
-                            .email(userModel.getUsername())
-                            .token(accessToken)
-                            .build()); */
 
+                    // 토큰 생성
+                    //  token= tokenProvider.createToken(userModel.toString());
 
             }
             else throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
