@@ -1,10 +1,8 @@
 package com.example.yhwasongtest.user.service;
 
 import com.example.yhwasongtest.common.ErrorMessage;
-import com.example.yhwasongtest.common.TokenProvider;
+import com.example.yhwasongtest.common.GmailSender;
 import com.example.yhwasongtest.user.dto.UserModelDto;
-import com.example.yhwasongtest.user.model.Authority;
-import com.example.yhwasongtest.user.model.CustomUserDetails;
 import com.example.yhwasongtest.user.model.LoginHistory;
 import com.example.yhwasongtest.user.model.UserModel;
 import com.example.yhwasongtest.user.repository.AuthorityRepository;
@@ -12,12 +10,8 @@ import com.example.yhwasongtest.user.repository.LoginHistoryRepository;
 import com.example.yhwasongtest.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -26,38 +20,33 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.SessionScope;
-import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService{
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final LoginHistoryRepository loginHistoryRepository;
-    private final TokenProvider tokenProvider;
+
+    private final GmailSender mailSender;
+
 
     public UserService(UserRepository userRepository,
                        AuthorityRepository authorityRepository,
                        LoginHistoryRepository loginHistoryRepository,
-                       TokenProvider tokenProvider) {
+                       GmailSender mailSender) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.loginHistoryRepository = loginHistoryRepository;
-        this.tokenProvider = tokenProvider;
+        this.mailSender = mailSender;
     }
 
     @Override
@@ -65,47 +54,49 @@ public class UserService implements UserDetailsService {
         UserModel userModel = userRepository.findByUsername(username);
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority(userModel.getRole()));
-        return new User(userModel.getUsername() , userModel.getPassword() , authorityList);
+        return new User(userModel.getUsername(), userModel.getPassword(), authorityList);
     }
 
-    /**
-     * 회원정보 저장
-     *
-     * @param userModelDto 회원정보가 들어있는 DTO
-     * @return 저장되는 회원의 PK
-     */
     public UserModel signUp(UserModelDto userModelDto) throws Exception {
-        UserModel userModel = userRepository.findByUsername(userModelDto.getUsername());
+        UserModel userModel = userRepository.findByEmail(userModelDto.getEmail());
 
         if (userModel != null) {
             throw new Exception(ErrorMessage.EMAIL_DUPLICATION.getMessage());
         }
 
         userModel = insertUser(userModelDto);
-        userRepository.save(userModel);
         return userModel;
     }
 
-    public UserModel insertUser(UserModelDto userModelDto) throws Exception {
-        UserModel userModel = userRepository.findByUsername(userModelDto.getUsername());
-
-        if (userModel==null) {
-            try {
-
-                String resultToken = getToken(userModelDto.getUsername(), userModelDto.getPassword());
-                resultToken = getHashed(resultToken);
-
-                userModel = new UserModel();
-                userModel.setUsername(userModelDto.getUsername());
-                userModel.setRole("ROLE_USER");
-                userModel.setPassword(resultToken);
-
-                return userModel;
-            } catch (Exception e) {
-                logger.info("Exception ===>   ", e);
-            }
-            ;
+    public void changePassword(UserModelDto userModelDto) throws Exception{
+        // 가입된 것이 있는지 확인
+        UserModel userModel = userRepository.findByEmail(userModelDto.getEmail());
+        if  (userModel == null) {
+            throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
         }
+
+        if(userModel.getPassword().equals(userModelDto.getPassword())) {
+            throw new Exception(ErrorMessage.PASSWORD_EQUIL.getMessage());
+        }
+        this.insertUser(userModelDto);
+    }
+
+    public UserModel insertUser(UserModelDto userModelDto) throws Exception {
+        String resultToken = getToken(userModelDto.getUsername(), userModelDto.getPassword());
+        resultToken = getHashed(resultToken);
+
+        // 회원가입과 비밀번호 변경에 쓰임
+        UserModel userModel = userRepository.findByEmail(userModelDto.getEmail());
+        if(userModel == null) {
+            userModel = new UserModel();
+            userModel.setUsername(userModelDto.getUsername());
+            userModel.setEmail(userModelDto.getEmail());
+            userModel.setRole("ROLE_USER");
+            userModel.setPassword(resultToken);
+        }else {
+            userModel.setPassword(resultToken);
+        }
+        userRepository.save(userModel);
         return userModel;
     }
 
@@ -146,7 +137,7 @@ public class UserService implements UserDetailsService {
         UserModel userModel = userRepository.findByUsername(name);
 
         // 구글 로그인을 사용한 경우
-        if(userModel == null){
+        if (userModel == null) {
             userModel = userRepository.findByEmail(name);
         }
 
@@ -163,10 +154,10 @@ public class UserService implements UserDetailsService {
             }
         }*/
 
-        if(userModel == null) {
+        if (userModel == null) {
             throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
         }
-        if(userModel.getPassword().length()==0 || userModel.getPassword() == null) {
+        if (userModel.getPassword().length() == 0 || userModel.getPassword() == null) {
             throw new Exception(ErrorMessage.SIGNUP_GOOGLE_PREV_INVALID.getMessage());
         }
 
@@ -177,24 +168,22 @@ public class UserService implements UserDetailsService {
             //if (userModel.getPassword().equals(resultToken)) {
             if (BCrypt.checkpw(resultToken, userModel.getPassword())) {
 
-                    // 세션 설정
-                    HttpSession session = request.getSession();
-                    session.setAttribute("login", userModel);
-                    session.setMaxInactiveInterval(1800); //30분
+                // 세션 설정
+                HttpSession session = request.getSession();
+                session.setAttribute("login", userModel);
+                session.setMaxInactiveInterval(1800); //30분
 
-                    // 세션 유효시간 설정
-                    Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
-                    this.keepLogin(userModel.getUsername(), session.getId(), date);
+                // 세션 유효시간 설정
+                Date date = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
+                this.keepLogin(userModel.getUsername(), session.getId(), date);
 
-                    this.putHistory(userModel.getUsername(), ip);
+                this.putHistory(userModel.getUsername(), ip);
 
-                    // 토큰 생성
-                    //  token= tokenProvider.createToken(userModel.toString());
+                // 토큰 생성
+                //  token= tokenProvider.createToken(userModel.toString());
 
-            }
-            else throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
-        }
-        else throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
+            } else throw new Exception(ErrorMessage.SIGNUP_PWD_INVALID.getMessage());
+        } else throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
 
         return userModel;
     }
@@ -281,5 +270,28 @@ public class UserService implements UserDetailsService {
         List<LoginHistory> loginHistories = loginHistoryRepository.findByStatusAndLoginDateBetween("LOGIN", format.parse(start), format.parse(end));
         return loginHistories.size();
     }
+
+    public void sendGoogleMail(String username, String email) throws Exception{
+        // 정보가 유효한지 확인
+        UserModel userModel = userRepository.findByEmail(email);
+        if (userModel == null) {
+            throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
+        }
+        if (!userModel.getUsername().equals(username)) {
+            throw new Exception(ErrorMessage.SIGNUP_MATCH_INVALID.getMessage());
+        }
+
+        /* 메일 전송 */
+        String subject = "[맛따라멋따라] 비밀번호 변경 안내";
+        String body  = "비밀번호를 변경하시려면 아래의 url 를 클릭하세요. \n" +
+                "http://localhost:3000/password?email=" + email;
+        try {
+            mailSender.sendEmail(email, subject, body);
+        } catch (Exception e) {
+            logger.info("sendGoogleMail error => " + e.getMessage());
+        }
+
+    }
+
 
 }

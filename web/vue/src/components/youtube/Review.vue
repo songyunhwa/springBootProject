@@ -1,21 +1,14 @@
 <!-- 댓글창 -->
 <template>
   <div style="margin-left: 50px;">
-    <table style="margin-left: 50px;">
-      <thead>
-      <tr>
-        <th>댓글</th>
-      </tr>
-      </thead>
-      <tbody>
-      <div>
-        <td><textarea type="text" rows="5" style="width:500px;" v-model="this.input"/></td>
-      </div>
+    <div>댓글</div>
+    <div>
+      <textarea type="text" rows="5" style="width:80%; margin-top: 10px;" v-model="this.input"/>
+    </div>
+    <div>
       <button class="review-register" @click="putReview">등록</button>
       <input name="image" id="image" type="file" @change="uploadFile"/>
-      </tbody>
-    </table>
-
+    </div>
     <ul>
       <li v-for="review in reviews" v-bind:key="review" class="review">
         <table>
@@ -27,7 +20,7 @@
             <div v-if="review.fileName">
               <img
                   :src="require(`@/assets/images/${review.fileName}`)"
-              class="review-img"/>
+                  class="review-img"/>
 
             </div>
           </td>
