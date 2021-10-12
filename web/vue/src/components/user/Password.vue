@@ -101,7 +101,8 @@ export default {
 
       axios
           .post(this.url + '/changePassword', form)
-          .then(() => {
+          .then((data) => {
+            this.result = data.data;
             this.modal.body = '비밀번호를 변경했습니다.';
             this.onToggleModal();
 
