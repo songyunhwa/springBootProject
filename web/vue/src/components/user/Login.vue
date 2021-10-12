@@ -25,7 +25,7 @@
   </div>
   <div>
 
-    <a href="http://localhost:9000/oauth2/authorization/google">
+    <a :href="this.url + '/oauth2/authorization/google'">
       <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
       Sign in with google</a>
   </div>
@@ -64,11 +64,9 @@ export default {
     accessToken: null,
   },
   created() {
-    let url = 'http://localhost:9000/auth/google/callback';
-
     if (this.$route.query.code) {
       axios
-          .get(url + '?code=' + this.$route.query.code)
+          .get( this.url + '/auth/google/callback?code=' + this.$route.query.code)
           .then(({data}) => {
             this.$route.query = '';
             console.log(data);
