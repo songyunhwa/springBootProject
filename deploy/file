@@ -19,5 +19,29 @@ my.ini basedir 에 붙여넣음
 백업 -> 복원
 
 
+* nignx
+default.conf
+server {
+    listen       3000;
+    server_name  youtube_follow.com;
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    root /home/ubuntu/springBootProject_back/web/src/main/resources/static;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+        #root /home/ubuntu/springBootProject_back/web/src/main/resources/static;
+        #root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+}
 
 

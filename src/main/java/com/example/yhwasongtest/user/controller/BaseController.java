@@ -1,10 +1,7 @@
 package com.example.yhwasongtest.user.controller;
 
-import com.example.yhwasongtest.common.CommonCode;
-import com.example.yhwasongtest.common.ErrorMessage;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.UserModel;
-import com.example.yhwasongtest.user.service.BaseService;
 import com.example.yhwasongtest.user.service.UserService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -17,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -28,21 +24,23 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping(value = "/api/v1")
-    public class BaseController {
+    public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    private AuthenticationManager authenticationManager;
-    private final BaseService baseService;
     private final UserService userService;
 
     @Autowired
-    public BaseController(BaseService baseService,  UserService userService) {
-        this.baseService = baseService;
+    public UserController( UserService userService) {
         this.userService = userService;
 
     }
-
+    /**
+     * 회원가입
+     *
+     * @param userModelDto 회원정보가 들어있는 DTO
+     * @return 저장되는 회원의 PK
+     */
     @ApiOperation(value="회원가입")
     @RequestMapping(method = RequestMethod.POST, value = "/user")
     public ResponseEntity signup(@RequestBody  UserModelDto userModelDto){ // 회원 추가
@@ -124,5 +122,26 @@ import javax.servlet.http.HttpSession;
         }
     }
 
+    @GetMapping(value = "/sendEmail")
+    public ResponseEntity sendGoogleMail(@RequestParam(value = "username", required = true) String username,
+                                        @RequestParam(value = "email", required = true) String email) {
+        try {
 
+
+            userService.sendGoogleMail(username, email);
+            return  new ResponseEntity<>(null, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "/changePassword")
+    public ResponseEntity changePassword(@RequestBody UserModelDto userModelDto) {
+        try {
+            userService.changePassword(userModelDto);
+            return  new ResponseEntity<>(null, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

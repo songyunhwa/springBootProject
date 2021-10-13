@@ -1,15 +1,12 @@
 package com.example.yhwasongtest.youtube.service;
 
-import com.example.yhwasongtest.place.dto.PlaceDto;
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.PlaceService;
-import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,15 +14,13 @@ public class YoutubeService {
 
     private YoutubeRepository youtubeRepostiory;
     private SearchYoutube searchService;
-    private searchMango searchMango;
     private PlaceService placeService;
 
     @Autowired
-    public YoutubeService(YoutubeRepository youtubeRepostiory, SearchYoutube searchService, searchMango searchMango,
+    public YoutubeService(YoutubeRepository youtubeRepostiory, SearchYoutube searchService,
                           PlaceService placeService){
         this.youtubeRepostiory = youtubeRepostiory;
         this.searchService = searchService;
-        this.searchMango = searchMango;
         this.placeService = placeService;
     }
 
@@ -60,17 +55,6 @@ public class YoutubeService {
                 System.err.println("getSearchYoutube Error ==> "+ error);
 
             }
-        }
-        return result;
-    }
-
-    public String getSearchMango(String location) throws  Exception {
-        String result = "";
-        if(location == null) {
-            throw new Exception("message is not exist.");
-        } else {
-            result = searchMango.searchMango(location);
-            System.out.println(result);
         }
         return result;
     }

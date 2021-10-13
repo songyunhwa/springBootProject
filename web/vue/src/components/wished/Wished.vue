@@ -58,14 +58,15 @@ export default {
     currentPage: {
       page: 0,
       size: 3,
-      totalElements: '',
-      totalPages: '',
+      totalElements: 0,
+      totalPages: 0,
     },
   }),
   created() {
     this.username = this.$cookies.get('username');
     this.url = this.resourceHost + '/wished';
     this.getYoutube();
+
   },
   methods: {
     prevPage() {
@@ -154,8 +155,8 @@ li {
   outline : 0px;
 }
 
-button:disabled {
-  background-color: #7C7877;
-  color: gray;
+
+wished-tail:disabled {
+  color: #7C7877;
 }
 </style>

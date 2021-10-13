@@ -3,6 +3,7 @@ import Login from './components/user/Login'
 import Logout from "@/components/user/Logout";
 import WishedHome from "@/components/wished/WishedHome";
 import MyListHome from "@/components/myList/MyListHome";
+import Password from "@/components/user/Password";
 import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
@@ -25,6 +26,10 @@ const routes = [
     {
         path: "/logout",
         component: Logout,
+    },
+    {
+        path: "/password/:email",
+        component: Password,
     }
 ];
 

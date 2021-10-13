@@ -38,20 +38,5 @@ public class YoutubeController {
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/mango")
-    public String getSearchMango(@RequestParam( name = "location",required = true) String location) throws Exception{
-
-        String result = "";
-        try {
-            result = youtubeService.getSearchMango(location);
-        } catch (Exception error) {
-            System.err.println("getSearchMango Error ==> "+ error);
-
-        }
-
-        return result;
-
-    }
-
 
 }
