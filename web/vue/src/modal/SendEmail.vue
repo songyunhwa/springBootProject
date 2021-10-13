@@ -26,14 +26,18 @@
                       <input name="email" v-model="email"/>
                     </td>
                   </tr>
-                  <div class="modal-default-button" style="float:right;">
-                    <button @click="sendEmail">
-                      메일 보내기
-                    </button>
-                    <button @click="$emit('close')">
-                      취소
-                    </button>
-                  </div>
+                  <tr>
+                    <td>
+                      <button @click="sendEmail" :disabled="username.length == 0||email.length == 0">
+                        메일 보내기
+                      </button>
+                    </td>
+                    <td>
+                      <button @click="$emit('close')">
+                        취소
+                      </button>
+                    </td>
+                  </tr>
                   <div style="color:red; margin-top: 10px;">{{ result }}</div>
                 </slot>
               </table>
@@ -80,5 +84,6 @@ export default {
 }
 </script>
 <style>
+
 
 </style>

@@ -28,7 +28,7 @@ const routes = [
         component: Logout,
     },
     {
-        path: "/password",
+        path: "/password/:email",
         component: Password,
     }
 ];
