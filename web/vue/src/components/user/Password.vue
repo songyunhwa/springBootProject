@@ -1,6 +1,6 @@
 <template>
   <div><h2>{{ title }}</h2></div>
-  <Form v-slot="{ errors }">
+  <Form @submit="ChangePassword" v-slot="{ errors }" sub>
     <table style=".td : width: 500px; text-align: center;">
       <tr>
         <td>이메일</td>
@@ -25,7 +25,7 @@
       </tr>
       <tr>
         <td>
-          <button @click="ChangePassword" :disabled="errors.password||checkPassword!==password">확인</button>
+          <input type="submit" value="확인" :disabled="errors.password||checkPassword!==password">
         </td>
       </tr>
     </table>
@@ -79,15 +79,13 @@ export default {
   },
   created() {
     console.log("created");
-    this.email = this.$route.query.email;
+    this.email = this.$route.params.email;
     this.url = this.resourceHost;
   },
   methods: {
     onToggleModal() {
       if (this.showModal) {
         this.showModal = false;
-        // 홈으로 이동
-        this.$router.push({path: '/'});
       } else {
         this.showModal = true;
       }
@@ -101,17 +99,16 @@ export default {
 
       axios
           .post(this.url + '/changePassword', form)
-          .then((data) => {
-            this.result = data.data;
+          .then(() => {
             this.modal.body = '비밀번호를 변경했습니다.';
             this.onToggleModal();
-
+            // 홈으로 이동
+            this.$router.push({path: '/'});
           })
           .catch((error) => {
-
             this.modal.body = '비밀번호를 변경하지 못했습니다.' + error.response.data;
             this.onToggleModal();
-            console.log(error);
+            console.log(error.response);
           })
     }
   }

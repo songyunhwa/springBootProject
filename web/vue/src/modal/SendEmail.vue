@@ -7,7 +7,7 @@
 
             <div class="modal-header">
               <slot name="header">
-                <h3>{{ title }}</h3>
+                <h3>{{title}}</h3>
               </slot>
             </div>
 
@@ -38,10 +38,9 @@
                       </button>
                     </td>
                   </tr>
+                  <div style="color:red; margin-top: 10px;">{{ result }}</div>
                 </slot>
               </table>
-              <div style="color:red; margin-top: 10px;">{{ result }}</div>
-
             </div>
           </div>
         </div>
@@ -63,7 +62,7 @@ export default {
     username: '',
     email: '',
     url: '',
-    result: '',
+    result : '',
   }),
   created() {
     this.url = this.resourceHost;
@@ -71,14 +70,14 @@ export default {
   methods: {
     sendEmail() {
       return axios
-          .get(this.url + '/sendEmail?email=' + this.email + '&username=' + this.username)
+          .get(this.url + '/sendEmail?email=' + this.email +'&username=' + this.username )
           .then(() => {
             this.$emit('close');
           })
-          .catch((error) => {
+          .catch(({error}) => {
             console.log("error");
             console.log(error);
-            this.result = "메일 보내기 실패했습니다." + error.response.data;
+            this.result = error.response;
           })
     }
   }
