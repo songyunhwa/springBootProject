@@ -89,6 +89,7 @@ export default {
     accessToken: null,
   },
   created() {
+    this.url = this.googleLoginHost;
     if (this.$route.query.code) {
       axios
           .get( this.url + '/auth/google/callback?code=' + this.$route.query.code)

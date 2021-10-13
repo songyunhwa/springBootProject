@@ -48,9 +48,11 @@
                 <li v-for="file in select.file"
                     v-bind:key="file"
                     style="float:left; margin-left:10px;">
+                  <div v-if="file.fileName">
                     <img
                         :src="require(`@/assets/images/${file.fileName}`)"
                             class="review-img"/>
+                  </div>
                 </li>
             </ul>
         </table>

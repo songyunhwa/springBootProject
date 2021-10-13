@@ -10,10 +10,6 @@
       오늘 방문자수: {{this.views}}
     </div>
 
-    <router-link to="/myList">
-      <button>내 일기장으로 가기</button>
-    </router-link>
-
   </div>
   <wished-list></wished-list>
 </template>

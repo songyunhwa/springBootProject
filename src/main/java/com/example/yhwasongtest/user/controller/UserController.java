@@ -126,10 +126,12 @@ import javax.servlet.http.HttpSession;
     public ResponseEntity sendGoogleMail(@RequestParam(value = "username", required = true) String username,
                                         @RequestParam(value = "email", required = true) String email) {
         try {
+
+
             userService.sendGoogleMail(username, email);
             return  new ResponseEntity<>(null, HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -139,7 +141,7 @@ import javax.servlet.http.HttpSession;
             userService.changePassword(userModelDto);
             return  new ResponseEntity<>(null, HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 }

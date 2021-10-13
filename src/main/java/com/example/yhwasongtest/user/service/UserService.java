@@ -1,7 +1,6 @@
 package com.example.yhwasongtest.user.service;
 
 import com.example.yhwasongtest.common.ErrorMessage;
-import com.example.yhwasongtest.common.GmailSender;
 import com.example.yhwasongtest.user.dto.UserModelDto;
 import com.example.yhwasongtest.user.model.LoginHistory;
 import com.example.yhwasongtest.user.model.UserModel;
@@ -12,6 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -20,7 +22,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,17 +40,20 @@ public class UserService implements UserDetailsService{
     private final AuthorityRepository authorityRepository;
     private final LoginHistoryRepository loginHistoryRepository;
 
-    private final GmailSender mailSender;
+    private final JavaMailSender javaMailSender;
+
+    @Value(value = "${frontend.api.url}")
+    String front_api;
 
 
     public UserService(UserRepository userRepository,
                        AuthorityRepository authorityRepository,
                        LoginHistoryRepository loginHistoryRepository,
-                       GmailSender mailSender) {
+                       JavaMailSender javaMailSender) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.loginHistoryRepository = loginHistoryRepository;
-        this.mailSender = mailSender;
+        this.javaMailSender = javaMailSender;
     }
 
     @Override
@@ -75,7 +82,9 @@ public class UserService implements UserDetailsService{
             throw new Exception(ErrorMessage.SIGNUP_EMAIL_INVALID.getMessage());
         }
 
-        if(userModel.getPassword().equals(userModelDto.getPassword())) {
+        String resultToken = getToken(userModel.getUsername(), userModelDto.getPassword());
+        resultToken = getHashed(resultToken);
+        if(userModel.getPassword().equals(resultToken)) {
             throw new Exception(ErrorMessage.PASSWORD_EQUIL.getMessage());
         }
         this.insertUser(userModelDto);
@@ -282,11 +291,20 @@ public class UserService implements UserDetailsService{
         }
 
         /* 메일 전송 */
-        String subject = "[맛따라멋따라] 비밀번호 변경 안내";
-        String body  = "비밀번호를 변경하시려면 아래의 url 를 클릭하세요. \n" +
-                "http://localhost:3000/password?email=" + email;
+        MimeMessagePreparator messagePreparator = new MimeMessagePreparator() {
+            @Override
+            public void prepare(MimeMessage mimeMessage) throws Exception {
+                MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                message.setTo(email);
+                message.setFrom("happy0155@naver.com");
+                message.setSubject("[맛따라멋따라] 비밀번호 변경 안내");
+                message.setText("비밀번호를 변경하시려면 아래의 url 를 클릭하세요. \n" +
+                        front_api + "/password/" + email);
+            }
+        };
+
         try {
-            mailSender.sendEmail(email, subject, body);
+            javaMailSender.send(messagePreparator);
         } catch (Exception e) {
             logger.info("sendGoogleMail error => " + e.getMessage());
         }
