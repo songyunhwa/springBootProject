@@ -1,27 +1,27 @@
 package com.example.yhwasongtest.common;
 
-import com.example.yhwasongtest.place.model.DessertModel;
-import com.example.yhwasongtest.place.model.PictureModel;
-import com.example.yhwasongtest.place.model.PlaceModel;
-import com.example.yhwasongtest.place.model.ReviewModel;
+import com.example.yhwasongtest.place.model.*;
+import com.example.yhwasongtest.place.repository.LocationRepository;
 import com.example.yhwasongtest.place.repository.PictureRepository;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import lombok.AllArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
+@Service
 public class CommonCode {
 
-    static PictureRepository pictureRepository;
+    private static LocationRepository locationRepository;
 
     @Autowired
-    public void CommonCode(PictureRepository pictureRepository) {
-        this.pictureRepository = pictureRepository;
+    public void CommonCode(LocationRepository locationRepository) {
+        this.locationRepository = locationRepository;
     }
 
     public static JSONArray convertToJSON(List<PlaceModel> placeModels) {
@@ -30,7 +30,6 @@ public class CommonCode {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", placeModel.getId());
             jsonObject.put("name", placeModel.getName());
-            jsonObject.put("area", placeModel.getArea());
             jsonObject.put("url", placeModel.getUrl());
             jsonObject.put("number", placeModel.getNumber());
             jsonObject.put("subCategory", placeModel.getSubCategory());
@@ -38,8 +37,21 @@ public class CommonCode {
             jsonObject.put("view", placeModel.getView());
             jsonObject.put("fileId", placeModel.getFileId());
 
-            JSONArray subArray = new JSONArray();
+            // 지역정보 가져오기
+            List<LocationModel> locationModels = locationRepository.findByPlaceId(placeModel.getId());
+            JSONArray array = new JSONArray();
+            for (LocationModel locationModel : locationModels) {
+                JSONObject object = new JSONObject();
+                object.put("address" , locationModel.getAddress());
+                object.put("lat" , locationModel.getLat());
+                object.put("lng" , locationModel.getLng());
+                array.add(object);
+            }
+            jsonObject.put("location",array);
 
+
+            // 유투브 가져오기
+            JSONArray subArray = new JSONArray();
             List<YoutubeModel> youtubes = new ArrayList<>();
             youtubes = placeModel.getYoutubes();
             for(YoutubeModel youtube : youtubes){

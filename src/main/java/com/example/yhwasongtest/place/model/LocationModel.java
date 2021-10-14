@@ -17,8 +17,12 @@ public class LocationModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    public String city; //시
-    public String district; // 구
-    public String neighborhood; // 동
+    private String name; // 장소 이름
+    private String address;
+
+    private String lat; // x좌표
+    private String lng; // y좌표
+
+    private Long placeId; // placeModel id
 
 }

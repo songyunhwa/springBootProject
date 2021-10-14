@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
 
-@Component
+//@Component
 public class TokenProvider {
+    /*
     private String secretKey;
     private long validityInMilliseconds;
 
@@ -52,5 +53,5 @@ public class TokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
-    }
+    }*/
 }

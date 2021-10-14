@@ -168,7 +168,6 @@ public class SearchYoutube {
                 placeModel.setSubCategory("etc");
                 placeModel.setView(1);
                 placeModel.setRecommend(0);
-                placeModel.setArea("");
                 placeModel.setNumber("");
                 placeModel.setUrl("");
             } else {
