@@ -13,10 +13,12 @@ public enum ErrorMessage {
     SIGNUP_INVALID(400,  "이메일과 비밀번호가 유효하지 않습니다"),
     SIGNUP_PWD_INVALID(400,  "비밀번호가 틀렸습니다."),
     SIGNUP_EMAIL_INVALID(400,  "등록된 이메일이 없습니다."),
+    SIGNUP_MATCH_INVALID(400,  "등록된 이름과 이메일이 일치하지 않습니다."),
     PUT_PLACE_INVALID(400,  "관리자로 로그인해주세요."),
     SIGNUP_GOOGLE_INVALID(400,  "등록된 사용자가 있습니다."),
     SIGNUP_GOOGLE_PREV_INVALID(400,  "구글로 등록된 사용자가 있습니다."),
-    PUT_FILE_INVALID(400, "등록할 파일이 존재하지 않습니다.");
+    PUT_FILE_INVALID(400, "등록할 파일이 존재하지 않습니다."),
+    PASSWORD_EQUIL(400, "변경할 패스워드가 같습니다.");
 
     int code;
     String message;

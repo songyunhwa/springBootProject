@@ -233,6 +233,7 @@
                 return axios
                     .get(this.url + '/category')
                     .then(({data}) => {
+                      console.log(data);
                         this.categorys = data;
                     })
                     .catch((error) => {

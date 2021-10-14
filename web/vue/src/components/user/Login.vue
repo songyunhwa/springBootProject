@@ -1,26 +1,37 @@
 <template>
   <div><h2>{{ this.title }}</h2></div>
   <Form @submit="Click" v-slot="{ errors }">
-    <table style="width: 300px; text-align: center;">
+    <table style="text-align: center;">
+      <tr v-if="this.title==='회원가입'">
+        <td>이름</td>
+        <td>
+          <Field name="username" rules="required" v-model="this.username"/>
+          <span v-if="errors.username"><div style="color:red;">이름을 적어주세요.</div> </span></td>
+      </tr>
       <tr>
         <td>이메일</td>
-        <Field name="username" rules="required" v-model="this.username"/>
-        <span v-if="errors.email"><div style="color:red;">이메일을 적어주세요.</div> </span>
+        <td>
+          <Field name="email" rules="required" v-model="this.email"/>
+          <span v-if="errors.email"><div style="color:red;">이메일을 적어주세요.</div> </span></td>
       </tr>
       <tr>
         <td>비밀번호</td>
-        <Field name="password" rules="required|alpha_dash" v-model="this.password"/>
-        <span v-if="errors.password"><div style="color:red;">비밀번호를 적어주세요. ** 알파벳, 숫자 밑 대시만이 가능합니다.</div> </span>
+        <td>
+          <Field name="password" rules="required|alpha_dash" v-model="this.password"/>
+        </td>
       </tr>
       <tr></tr>
-      <tr><input type="submit" value="확인" v-if="!errors.email&&!errors.password"></tr>
     </table>
-    <div style="color:red; margin-top: 10px;">{{ result }}</div>
+    <span v-if="errors.password" style="color:red;">비밀번호를 적어주세요.
+        ** 알파벳, 숫자 밑 대시만이 가능합니다.</span>
+    <tr></tr>
+    <input type="submit" value="확인" style="margin-left: 10px;" :disabled="errors.username||errors.email||errors.password">
   </Form>
 
   <div style="margin-top: 10px;">
     <button v-if="this.title==='로그인'" @click="ChangeUrl">회원가입으로 가기</button>
-    <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인</button>
+    <button v-if="this.title==='회원가입'" @click="ChangeUrl">로그인으로 가기</button>
+    <button @click="onToggleEmailModal">비밀번호 찾기</button>
     <button @click="this.$router.push({path: '/'});">홈</button>
   </div>
   <div>
@@ -30,11 +41,15 @@
       Sign in with google</a>
   </div>
 
+  <Modal v-show="showModal" :select_modal="modal" @close="onToggleModal"></Modal>
+  <SendEmail v-show="showEmailModal" :select_modal="modal" @close="onToggleEmailModal"></SendEmail>
 </template>
 <script>
 import axios from 'axios'
 import {Form, Field, defineRule} from 'vee-validate';
 import {required, email, alpha_dash} from '@vee-validate/rules';
+import Modal from "@/modal/Modal";
+import SendEmail from "@/modal/SendEmail";
 
 defineRule('required', required);
 defineRule('email', email);
@@ -45,17 +60,27 @@ export default {
   components: {
     Form,
     Field,
+    Modal,
+    SendEmail
   },
   data: () => ({
     title: '로그인',
     username: '',
+    email: '',
     password: '',
     url: '',
-    result: '',
     userModel: {
       username: '',
+      email: '',
       password: '',
       role: 'ROLE_USER',
+    },
+    showModal: false,
+    showEmailModal: false,
+    modal: {
+      header: '',
+      body: '',
+      footer: ''
     },
     errors: [],
     isLoaded: false,
@@ -95,6 +120,21 @@ export default {
     },
   },
   methods: {
+    onToggleModal() {
+      if (this.showModal) {
+        this.showModal = false;
+      } else {
+        this.showModal = true;
+      }
+    },
+    onToggleEmailModal() {
+      if (this.showEmailModal) {
+        this.showEmailModal = false;
+      } else {
+        this.showEmailModal = true;
+      }
+    },
+
     Click() {
       if (this.title == '로그인')
         this.Login();
@@ -106,10 +146,10 @@ export default {
       if (this.$cookies.get('sessionId') != null) {
         this.url = this.resourceHost + `/login/check?id=${this.$cookies.get('sessionId')}`
       } else {
-        if (!this.username || !this.password) {
+        if (!this.email || !this.password) {
           alert("Your email or password is empty.");
         }
-        this.url = this.resourceHost + `/login?username=${this.username}&password=${this.password}`
+        this.url = this.resourceHost + `/login?username=${this.email}&password=${this.password}`
       }
       axios.defaults.withCredentials = true;
       return axios
@@ -124,7 +164,9 @@ export default {
           })
           .catch(error => {
             console.log(error.response);
-            this.result = error.response.data;
+            this.modal.body = '로그인 실패했습니다.' + error.response.data;
+            this.onToggleModal();
+
             if (this.$cookies.get('SESSION') != null)
               this.$cookies.remove('SESSION');
           })
@@ -139,17 +181,25 @@ export default {
       }
     },
     SignUp() {
-      this.userModel.username = this.username;
-      this.userModel.password = this.password;
+      let form = {
+        username: this.username,
+        email: this.email,
+        password: this.password,
+
+      }
 
       return axios
-          .post(this.resourceHost + '/user', this.userModel)
+          .post(this.resourceHost + '/user', form)
           .then(() => {
             this.title = '로그인';
-            this.result = '회원가입 되었습니다.';
+            this.modal.body = '회원가입 되었습니다.';
+            this.onToggleModal();
+
           })
           .catch((error) => {
-            this.result = error.response.data;
+            this.modal.body = '회원가입 실패했습니다.' + error.response.data;
+            this.onToggleModal();
+
           })
     },
   }
