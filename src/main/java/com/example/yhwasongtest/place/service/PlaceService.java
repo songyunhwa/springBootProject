@@ -100,7 +100,6 @@ public class PlaceService {
             existPlace.setYoutubes(youtubes);
         }
 
-        existPlace.setArea(placeModel.getArea());
         existPlace.setNumber(placeModel.getNumber());
         existPlace.setUrl(placeModel.getUrl());
 

@@ -1,14 +1,8 @@
 package com.example.yhwasongtest.place.service;
 
 import com.example.yhwasongtest.place.dto.ListDto;
-import com.example.yhwasongtest.place.model.MyListModel;
-import com.example.yhwasongtest.place.model.PictureModel;
-import com.example.yhwasongtest.place.model.PlaceModel;
-import com.example.yhwasongtest.place.model.ReviewModel;
-import com.example.yhwasongtest.place.repository.MyListRepository;
-import com.example.yhwasongtest.place.repository.PictureRepository;
-import com.example.yhwasongtest.place.repository.PlaceRepository;
-import com.example.yhwasongtest.place.repository.ReviewRepository;
+import com.example.yhwasongtest.place.model.*;
+import com.example.yhwasongtest.place.repository.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +14,16 @@ import java.util.List;
 public class ListService {
 
     private MyListRepository myListRepository;
-    private ReviewRepository reviewRepository;
     private PlaceRepository placeRepository;
     private PictureRepository pictureRepository;
-    private ReviewService reviewService;
+    private LocationRepository locationRepository;
 
     @Autowired
     public ListService(MyListRepository myListRepository, ReviewRepository reviewRepository, PlaceRepository placeRepository, PictureRepository pictureRepository,
                        ReviewService reviewService) {
         this.myListRepository = myListRepository;
-        this.reviewRepository = reviewRepository;
         this.placeRepository = placeRepository;
         this.pictureRepository = pictureRepository;
-        this.reviewService = reviewService;
     }
 
     public JSONArray getMyList(long userId) {
@@ -45,9 +36,20 @@ public class ListService {
                 JSONObject object = new JSONObject();
                 object.put("id", placeModel.getId());
                 object.put("name", placeModel.getName());
-                if(placeModel.getArea()!=null) {
-                    object.put("area", placeModel.getArea());
-                };
+
+                // 지역정보 가져오기
+                List<LocationModel> locationModels = locationRepository.findByPlaceId(placeModel.getId());
+                JSONArray array = new JSONArray();
+                for (LocationModel locationModel : locationModels) {
+                    JSONObject subObject = new JSONObject();
+                    subObject.put("address" , locationModel.getAddress());
+                    subObject.put("lat" , locationModel.getLat());
+                    subObject.put("lng" , locationModel.getLng());
+                    array.add(subObject);
+                }
+                object.put("location",array);
+
+
                 object.put("subCategory", placeModel.getSubCategory());
                 object.put("content", listModel.getContent());
                 object.put("text", listModel.getText());
