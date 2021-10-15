@@ -33,8 +33,4 @@ export default {
 }
 </script>
 <style>
-
-    .my-list {
-        height:200px;
-    }
 </style>

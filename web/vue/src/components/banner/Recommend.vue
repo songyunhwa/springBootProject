@@ -20,7 +20,11 @@ export default {
     url: '', //
     places: [{
       name: '',
-      area: '',
+      area: {
+        address: '',
+        lat: '',
+        lng: '',
+      },
       number: '',
       subCategory: '',
       recommend: '',
@@ -36,7 +40,11 @@ export default {
     select: {
       id: '',
       name: '',
-      area: '',
+      area: {
+        address: '',
+        lat: '',
+        lng: '',
+      },
       number: '',
       subCategory: '',
       recommend: '',

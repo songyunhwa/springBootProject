@@ -1,10 +1,11 @@
-import Home from "@/components/youtube/Home";
+import Home from "@/components/banner/Home";
 import Login from './components/user/Login'
 import Logout from "@/components/user/Logout";
 import WishedHome from "@/components/wished/WishedHome";
 import MyListHome from "@/components/myList/MyListHome";
 import Password from "@/components/user/Password";
 import { createWebHistory, createRouter } from "vue-router";
+import Map from "@/components/map/Map";
 
 const routes = [
     {
@@ -30,6 +31,10 @@ const routes = [
     {
         path: "/password/:email",
         component: Password,
+    },
+    {
+        path: "/map",
+        component:  Map
     }
 ];
 

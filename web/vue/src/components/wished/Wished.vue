@@ -31,7 +31,11 @@ export default {
     url: '',
     places: [{
       name: '',
-      area: '',
+      area: {
+        address: '',
+        lat: '',
+        lng: '',
+      },
       number: '',
       subCategory: '',
       recommend: '',
@@ -47,7 +51,11 @@ export default {
     select: {
       id: '',
       name: '',
-      area: '',
+      area: {
+        address: '',
+        lat: '',
+        lng: '',
+      },
       number: '',
       subCategory: '',
       recommend: '',
@@ -89,9 +97,6 @@ export default {
 
             this.places = data.placeModels;
             this.places.forEach(place => {
-              place.area = place.area && place.area.length > 0 ? place.area : "-";
-              place.number = place.number && place.number.length > 0 ? place.number : "-";
-
               // 유투브 설정
               let titles = [];
               let youtubes = [];
