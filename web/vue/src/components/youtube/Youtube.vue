@@ -3,7 +3,8 @@
   <div class="youtube">
 
     <h3>{{ select_place.name }}</h3>
-    <div>지역 : {{ select_place.area }}</div>
+    <div v-if="select_place.location.length>0">지역 : {{ select_place.location[0].address }}</div>
+    <div v-if="select_place.location.length==0">지역 : - </div>
     <div>번호 : {{ select_place.number }}</div>
     <div>카테고리 : {{ select_place.subCategory }}</div>
     <div>추천수 : {{ select_place.recommend }}</div>

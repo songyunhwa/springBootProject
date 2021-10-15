@@ -10,7 +10,7 @@
                     </tr>
                     <tr>
                         <th>지역</th>
-                        <td>{{ place.area }}</td>
+                        <td>{{ place.area.address }}</td>
                     </tr>
                     <tr>
                         <th>카테고리</th>
@@ -79,7 +79,11 @@
             places: [{
                 id: '',
                 name: '',
-                area: '',
+                area: {
+                  address: '',
+                  lat: '',
+                  lng: '',
+                },
                 subCategory: '',
                 content: '',
                 text: '',
@@ -91,7 +95,11 @@
             select: {
                 id: '',
                 name: '',
-                area: '',
+                area: {
+                  address: '',
+                  lat: '',
+                  lng: '',
+                },
                 subCategory: '',
                 content: '',
                 text: '',
