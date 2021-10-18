@@ -1,7 +1,21 @@
 <template>
-  <button @click="getPlace">검색</button>
-
-  <div class="map-list-right">
+  <!--
+  <div>
+    <ul style="list-style: none;">
+      <li v-for="city in this.cities"
+          v-bind:key="city"> @click="getPlace(city.name)"
+        {{city}}
+      </li>
+    </ul>
+  </div>-->
+  <div>
+    <input style="float:left; width: 200px; height:30px;" name="address" v-model="address" placeholder="지역을 입력하세요"/>
+    <button @click="getPlace">검색</button>
+  </div>
+  <div class="map-list-left" style="margin-top: 50px;">
+    <youtube-list ref="youtube_list" @selectPlace="selectPlace"></youtube-list>
+  </div>
+  <div class="map-list-mid">
     <div>
       <naver-maps
           :height="height"
@@ -10,22 +24,26 @@
           :initLayers="initLayers"
           @load="onLoad">
 
-        <div v-for="marker in marker_list" :key="marker">
-          <naver-marker :lat="marker.lat" :lng="marker.lng" @click="onMarkerClicked(markers.index)"
+        <div v-for="mark in markers" :key="mark">
+          <naver-marker :lat="mark.location.lat" :lng="mark.location.lng" @click="onMarkerClicked(mark)"
                         @load="onMarkerLoad"/>
-          <naver-info-window :isOpen="isOpen" :marker="marker" @load="onInfoLoad">
-            <h3>{{ test }}</h3>
-          </naver-info-window>
         </div>
-
-        <naver-marker :lat="mapOptions.lat" :lng="mapOptions.lng" @click="onMarkerClicked"/>
       </naver-maps>
+    </div>
+    <div style="margin-top: 10px;">
+      <table>
+        <tr>
+          <th>이름</th>
+          <td>{{ marker.name }}</td>
+        </tr>
+        <tr>
+          <th>주소</th>
+          <td>{{ marker.location.address }}</td>
+        </tr>
+      </table>
     </div>
   </div>
 
-  <div class="map-list-left">
-    <youtube-list ref="youtube_list" @selectPlace="selectPlace"></youtube-list>
-  </div>
 
 </template>
 
@@ -39,7 +57,7 @@ export default {
   data() {
     return {
       width: 800,
-      height: 800,
+      height: 500,
       mark: null,
       count: 1,
       map: null,
@@ -51,21 +69,27 @@ export default {
         zoomControl: true,
         mapTypeControl: true,
       },
-      //https://github.com/Shin-JaeHeon/vue-naver-maps/issues/4 비교
       initLayers: ['BACKGROUND', 'BACKGROUND_DETAIL', 'POI_KOREAN', 'TRANSIT', 'ENGLISH', 'CHINESE', 'JAPANESE'],
       url: '',
       address: '서울특별시',
       isOpen: false,
-      marker: null,
-      marker_list: [],
       markers: [{
         name: '',
-        location: [{
+        location: {
           address: '',
           lat: '',
           lng: '',
-        }],
+        }
       }],
+      marker_list: [],
+      marker: {
+        name: '',
+        location: {
+          address: '',
+          lat: '',
+          lng: '',
+        }
+      },
       places: [{
         name: '',
         location: [{
@@ -85,73 +109,102 @@ export default {
           url: '',
         }],
       }],
+      cities: [{
+        0:'서울특별시'
+      }],
     }
   },
   created() {
     this.url = this.resourceHost;
-    this.getPlace();
+    //this.getCities();
+    //this.getPlace();
   },
-  computed: {
-    hello() {
-      return `Hello, World! × ${this.count}`;
-    }
-  },
+  computed: {},
   methods: {
     onLoad(vue) {
       this.map = vue;
-      },
-    onMarkerClicked() {
-      this.info = !this.info;
     },
-    onMarkerLoad(vue) {
-      this.mark = vue.marker;
-      this.marker_list.push(this.marker);
-    },
-    onInfoLoad() {
+    onMarkerClicked(mark) {
+      this.isOpen = !this.isOpen;
+      this.marker = mark;
+      console.log(this.marker);
 
     },
-    getPlace() {
+    onMarkerLoad(vue) {
+      this.marker = vue.marker;
+      this.marker_list.push(this.marker);
+    },
+    initMarker() {
+      while(this.markers.length !== 0){
+        this.markers.pop();
+      }
+      this.marker = {
+        name: '',
+        location: {
+          address: '',
+          lat: '',
+          lng: '',
+        }
+      };
+    },
+    getPlace(city) {
       return axios
-          .get(this.url + '/location?address=' + this.address)
+          .get(this.url + '/location?address=' + city)
           .then((data) => {
+            this.initMarker();
+
             this.places = data.data;
             this.$refs.youtube_list.setPlace(this.places);
 
+            let sumlat = 0;
+            let sumlng = 0;
+            let sumcnt = 0;
             this.places.forEach(place => {
+              place.location.forEach(location => {
                 let p = {
-                  name : place.name,
-                  location : [{
-                    lat: place.location.lat,
-                    lng: place.location.lng,
-                  }]
+                  name: place.name,
+                  location: {
+                    address: location.address,
+                    lat: location.lat,
+                    lng: location.lng,
+                  }
                 }
                 this.markers.push(p);
-            })
-            console.log(this.markers);
 
+                sumlat += location.lat;
+                sumlng += location.lng;
+                sumcnt++;
+              })
+            })
+            this.mapOptions.lat = sumlat / sumcnt;
+            this.mapOptions.lng = sumlng / sumcnt;
           })
           .catch(({error}) => {
             console.log("error");
             console.log(error);
           })
     },
-    selectPlace(place) {
+    getCities() {
+      return axios
+          .get(this.url + '/city')
+          .then((data) => {
+            this.cities=data.data;
+          })
+          .catch(({error}) => {
+            console.log("error");
+            console.log(error);
+          })
+    },
+    selectPlace() {
+      /*
       this.mapOptions.lat = place.location[0].lat;
-      this.mapOptions.lng = place.location[0].lng;
+      this.mapOptions.lng = place.location[0].lng;*/
     }
-  },
-  mounted() {
-    setInterval(() => this.count++, 1000);
   },
 
 }
 </script>
 <style scoped>
-.info-window-container {
-  padding: 10px;
-  width: 300px;
-  height: 100px;
-}
 
 .map-list-left {
   list-style: none;
@@ -163,10 +216,10 @@ export default {
   width: 30%;
 }
 
-.map-list-right {
+.map-list-mid {
   position: absolute;
   left: 30%;
-  width: 49%;
+  width: 50%;
   text-align: center;
 
 }
