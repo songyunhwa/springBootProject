@@ -8,6 +8,6 @@ import java.util.List;
 public interface LocationRepository extends JpaRepository<LocationModel, Long> {
     List<LocationModel> findByPlaceId(Long placeId);
     LocationModel findByPlaceIdAndAddress(Long placeId, String address);
-    List<LocationModel> findByAddressContaining(String address);
+    List<LocationModel> findByAddressContains(String address);
 
 }

@@ -56,7 +56,7 @@ public class SearchController {
     public ResponseEntity getCities() {
 
         try {
-            JSONArray result = searchService.getCities();
+            JSONObject result = searchService.getCities();
 
             return new ResponseEntity<>(result.toString(), HttpStatus.OK);
         } catch (Exception e) {

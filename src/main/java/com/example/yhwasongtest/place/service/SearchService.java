@@ -122,23 +122,21 @@ public class SearchService {
         }
     }
 
-    public JSONArray getCities() {
+    public JSONObject getCities() {
         String[] city = {"서울특별시","부산광역시","대구광역시","인천광역시","광주광역시","대전광역시","울산광역시",
                 "세종특별자치","경기도","의정부","강원도","충청북도","충청남도","전라북도",
                 "전라남도","경상북도","포항시","경상남도","진주시","제주특별자치"};
 
-        JSONArray jsonArray = new JSONArray();
         JSONObject jsonObj = new JSONObject();
         for(int i=0; i<city.length; i++){
             jsonObj.put(i, city[i]);
-            jsonArray.add(jsonObj);
         }
-        return jsonArray;
+        return jsonObj;
 
     }
 
     public JSONArray getLocationPlaces(String address) {
-        List<LocationModel> locationModels = locationRepository.findByAddressContaining(address);
+        List<LocationModel> locationModels = locationRepository.findByAddressContains(address);
 
         List<PlaceModel> placeModels = new ArrayList<>();
         if (locationModels != null) {
