@@ -189,7 +189,7 @@
                 }
             }
             ,
-            setPlace(place) {
+            setEditorPlace(place) {
                 this.place = place;
 
                 while (this.file_name.length != 0) {

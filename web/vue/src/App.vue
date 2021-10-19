@@ -13,8 +13,10 @@ export default {
 }
 </script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap');
 #app {
-  font-family: "jua";
+  font-family:'Noto Sans KR', sans-serif;
+  #font-family: "jua";
   font-size: 20px;
   height:500px;
 }

@@ -55,10 +55,10 @@ export default {
   }),
   created() {
     this.url = this.resourceHost + '/recommend';
-    this.getYoutube();
+    this.getRecommend();
   },
   methods: {
-    getYoutube() {
+    getRecommend() {
       if(this.username===undefined){
         this.username = 'test1';
       }

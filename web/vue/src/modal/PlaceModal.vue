@@ -141,20 +141,6 @@
             this.getCategory();
         },
         methods: {
-            initialization() {
-                while (this.place.youtubes.length !== 0) {
-                    this.place.youtubes.pop();
-                }
-                this.isModify = false;
-                this.place.name = '';
-                this.place.area = '';
-                this.place.number = '';
-                this.place.subCategory = '';
-                this.addYoutube = false;
-                this.result = '';
-
-                this.getCategory();
-            },
             modifyYoutube(place) {
                 while (this.place.youtubes.length !== 0) {
                     this.place.youtubes.pop();
@@ -233,7 +219,6 @@
                 return axios
                     .get(this.url + '/category')
                     .then(({data}) => {
-                      console.log(data);
                         this.categorys = data;
                     })
                     .catch((error) => {

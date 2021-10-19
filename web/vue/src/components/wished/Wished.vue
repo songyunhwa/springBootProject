@@ -73,20 +73,20 @@ export default {
   created() {
     this.username = this.$cookies.get('username');
     this.url = this.resourceHost + '/wished';
-    this.getYoutube();
+    this.getWished();
 
   },
   methods: {
     prevPage() {
       this.currentPage.page -= 1;
-      this.getYoutube();
+      this.getWished();
     },
     nextPage() {
       this.currentPage.page += 1;
-      this.getYoutube();
+      this.getWished();
 
     },
-    getYoutube() {
+    getWished() {
 
       return axios
           .get(this.url + '?page=' + this.currentPage.page + '&size=' + this.currentPage.size + '&sort=id,DESC')

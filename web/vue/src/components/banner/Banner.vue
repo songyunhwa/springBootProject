@@ -14,6 +14,7 @@
         <button @click="this.$router.push({path: '/'});">홈</button>
         <button @click="goUrl('wished')">찜한 장소</button>
         <button @click="goUrl('myList')">내 일기장으로 가기</button>
+        <button @click="this.$router.push({path: '/map'});" style="background-color:#ABD0CE;">구글지도로 검색하기</button>
         <button  @click="onTogglePlaceModal">
             맛집 추가
         </button>

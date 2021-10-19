@@ -137,7 +137,7 @@
             selectPlace(place) {
                 this.showEditor = !this.showEditor;
                 this.select = place;
-                this.$refs.editor.setPlace(place);
+                this.$refs.editor.setEditorPlace(place);
             },
             getMyList() {
                 while (this.places.length !== 0) {

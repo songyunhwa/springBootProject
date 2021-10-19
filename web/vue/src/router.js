@@ -4,8 +4,9 @@ import Logout from "@/components/user/Logout";
 import WishedHome from "@/components/wished/WishedHome";
 import MyListHome from "@/components/myList/MyListHome";
 import Password from "@/components/user/Password";
+import MapHome from "@/components/map/MapHome";
 import { createWebHistory, createRouter } from "vue-router";
-import Map from "@/components/map/Map";
+
 
 const routes = [
     {
@@ -34,7 +35,7 @@ const routes = [
     },
     {
         path: "/map",
-        component:  Map
+        component:  MapHome
     }
 ];
 

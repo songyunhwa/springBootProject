@@ -1,19 +1,17 @@
 <template>
   <!--
-  <div>
-    <ul style="list-style: none;">
+    <ul>
       <li v-for="city in this.cities"
-          v-bind:key="city"> @click="getPlace(city.name)"
+          v-bind:key="city">
         {{city}}
       </li>
-    </ul>
-  </div>-->
+    </ul>-->
   <div>
-    <input style="float:left; width: 200px; height:30px;" name="address" v-model="address" placeholder="지역을 입력하세요"/>
+    <input class="address_input" name="address" v-model="address" placeholder="지역을 입력하세요"/>
     <button @click="getPlace">검색</button>
   </div>
   <div class="map-list-left" style="margin-top: 50px;">
-    <youtube-list ref="youtube_list" @selectPlace="selectPlace"></youtube-list>
+    <youtube-list ref="youtube_list" @selectPlace="selectPlace" @initCheckBox="initCheckbox"></youtube-list>
   </div>
   <div class="map-list-mid">
     <div>
@@ -24,26 +22,53 @@
           :initLayers="initLayers"
           @load="onLoad">
 
-        <div v-for="mark in markers" :key="mark">
-          <naver-marker :lat="mark.location.lat" :lng="mark.location.lng" @click="onMarkerClicked(mark)"
+        <div v-for="(mark, i) in markers" :key="mark">
+          <naver-marker :lat="mark.location.lat" :lng="mark.location.lng" @click="onMarkerClicked(mark, i)"
                         @load="onMarkerLoad"/>
         </div>
       </naver-maps>
     </div>
-    <div style="margin-top: 10px;">
+    <div style="margin-top: 10px; color:#7C7877;">
       <table>
         <tr>
           <th>이름</th>
-          <td>{{ marker.name }}</td>
+          <td>{{ markers[0].name }}</td>
         </tr>
         <tr>
           <th>주소</th>
-          <td>{{ marker.location.address }}</td>
+          <div v-if="markers[0].location">{{ markers[0].location.address }}</div>
+        </tr>
+
+        <tr>
+          <th>번호</th>
+          <td>{{ markers[0].number }}</td>
+        </tr>
+        <tr>
+          <th>카테고리</th>
+          <td>{{ markers[0].subCategory }}</td>
+        </tr>
+        <tr>
+          <th>추천수</th>
+          <td>{{ markers[0].recommend }}</td>
+        </tr>
+        <tr>
+          <th>조회수</th>
+          <td>{{ markers[0].view }}</td>
+        </tr>
+        <tr>
+          <th>관련 유투버</th>
+          <td>
+            <ul style="list-style: none;">
+              <li v-for="youtube in markers[0].youtube" v-bind:key="youtube">
+                # {{ youtube.channelTitle }}
+              </li>
+            </ul>
+          </td>
         </tr>
       </table>
     </div>
-  </div>
 
+  </div>
 
 </template>
 
@@ -71,16 +96,8 @@ export default {
       },
       initLayers: ['BACKGROUND', 'BACKGROUND_DETAIL', 'POI_KOREAN', 'TRANSIT', 'ENGLISH', 'CHINESE', 'JAPANESE'],
       url: '',
-      address: '서울특별시',
+      address: '서울',
       isOpen: false,
-      markers: [{
-        name: '',
-        location: {
-          address: '',
-          lat: '',
-          lng: '',
-        }
-      }],
       marker_list: [],
       marker: {
         name: '',
@@ -88,8 +105,38 @@ export default {
           address: '',
           lat: '',
           lng: '',
-        }
+        },
+        number: '',
+        subCategory: '',
+        recommend: '',
+        view: '',
+        youtubers: '',
+        youtube: [{
+          videoId: '',
+          channelTitle: '',
+          title: '',
+          url: '',
+        }],
       },
+      markers: [{
+        name: '',
+        location: {
+          address: '',
+          lat: '',
+          lng: '',
+        },
+        number: '',
+        subCategory: '',
+        recommend: '',
+        view: '',
+        youtubers: '',
+        youtube: [{
+          videoId: '',
+          channelTitle: '',
+          title: '',
+          url: '',
+        }],
+      }],
       places: [{
         name: '',
         location: [{
@@ -110,32 +157,33 @@ export default {
         }],
       }],
       cities: [{
-        0:'서울특별시'
+        id: '',
+        name: '',
       }],
     }
   },
   created() {
     this.url = this.resourceHost;
     //this.getCities();
-    //this.getPlace();
+    this.getPlace();
   },
   computed: {},
   methods: {
     onLoad(vue) {
       this.map = vue;
     },
-    onMarkerClicked(mark) {
+    onMarkerClicked(mark, i) {
       this.isOpen = !this.isOpen;
       this.marker = mark;
-      console.log(this.marker);
 
+      this.$refs.youtube_list.selectPlace(mark, i);
     },
     onMarkerLoad(vue) {
       this.marker = vue.marker;
       this.marker_list.push(this.marker);
     },
     initMarker() {
-      while(this.markers.length !== 0){
+      while (this.markers.length !== 0) {
         this.markers.pop();
       }
       this.marker = {
@@ -144,61 +192,122 @@ export default {
           address: '',
           lat: '',
           lng: '',
-        }
+        },
+        number: '',
+        subCategory: '',
+        recommend: '',
+        view: '',
+        youtubers: '',
+        youtube: [{
+          videoId: '',
+          channelTitle: '',
+          title: '',
+          url: '',
+        }],
       };
     },
-    getPlace(city) {
+    initMapPlace() {
+      while(this.places.length >0)  {
+        this.places.pop();
+      }
+      this.places= [{
+        name: '',
+        location: [{
+          address: '',
+          lat: '',
+          lng: '',
+        }],
+        number: '',
+        subCategory: '',
+        recommend: '',
+        view: '',
+        youtubers: '',
+        youtube: [{
+          videoId: '',
+          channelTitle: '',
+          title: '',
+          url: '',
+        }],
+      }];
+    },
+    getPlace() {
       return axios
-          .get(this.url + '/location?address=' + city)
+          .get(this.url + '/location?address=' + this.address)
           .then((data) => {
-            this.initMarker();
-
-            this.places = data.data;
-            this.$refs.youtube_list.setPlace(this.places);
-
-            let sumlat = 0;
-            let sumlng = 0;
-            let sumcnt = 0;
-            this.places.forEach(place => {
-              place.location.forEach(location => {
-                let p = {
-                  name: place.name,
-                  location: {
-                    address: location.address,
-                    lat: location.lat,
-                    lng: location.lng,
-                  }
-                }
-                this.markers.push(p);
-
-                sumlat += location.lat;
-                sumlng += location.lng;
-                sumcnt++;
-              })
-            })
-            this.mapOptions.lat = sumlat / sumcnt;
-            this.mapOptions.lng = sumlng / sumcnt;
+            if (data.data.length > 0) {
+              this.places = data.data;
+              this.$refs.youtube_list.setPlace(this.places);
+              this.initMarker();
+              this.setMarkers();
+            }else {
+             this.initMapPlace();
+              this.initMarker();
+              this.setMarkers();
+            }
           })
           .catch(({error}) => {
             console.log("error");
             console.log(error);
           })
+    },
+    selectPlace(place) {
+      this.initMarker();
+      let sumlat = 0;
+      let sumlng = 0;
+      let sumcnt = 0;
+      let marker = place;
+      place.location.forEach(location => {
+
+        marker.location.address = location.address;
+        marker.location.lat = location.lat;
+        marker.location.lng = location.lng;
+        this.markers.push(marker);
+
+        sumlat += location.lat;
+        sumlng += location.lng;
+        sumcnt++;
+      })
+      if (sumlat / sumcnt > 0) {
+        this.map.setCenter(sumlat / sumcnt, sumlng / sumcnt);
+      }
     },
     getCities() {
       return axios
           .get(this.url + '/city')
           .then((data) => {
-            this.cities=data.data;
+            this.cities = data.data;
+            console.log(this.cities);
           })
           .catch(({error}) => {
             console.log("error");
             console.log(error);
           })
     },
-    selectPlace() {
-      /*
-      this.mapOptions.lat = place.location[0].lat;
-      this.mapOptions.lng = place.location[0].lng;*/
+    initCheckbox() {
+      this.initMarker();
+      this.setMarkers();
+    },
+    setMarkers() {
+      let sumlat = 0;
+      let sumlng = 0;
+      let sumcnt = 0;
+      this.places.forEach(place => {
+        let marker = place;
+        place.location.forEach(location => {
+
+          marker.location.address = location.address;
+          marker.location.lat = location.lat;
+          marker.location.lng = location.lng;
+          this.markers.push(marker);
+
+          sumlat += location.lat;
+          sumlng += location.lng;
+          sumcnt++;
+        })
+      })
+      if (sumlat / sumcnt > 0) {
+        this.map.setCenter(sumlat / sumcnt, sumlng / sumcnt);
+      }
     }
   },
 
@@ -221,11 +330,14 @@ export default {
   left: 30%;
   width: 50%;
   text-align: center;
-
 }
 
-place-name {
-  color: black;
-}
 
+.address_input {
+  float: left;
+  width: 200px;
+  height: 20px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
 </style>

@@ -63,16 +63,19 @@ export default {
     },
   }),
   created() {
+
+  },
+  mounted() {
     this.username = this.$cookies.get('username');
     this.url = this.resourceHost + '/history';
+    this.getYoutube("");
   },
   methods: {
     scrollUp() {
       window.scrollTo(0, 0);
     },
     getYoutube(param) {
-      console.log(param);
-      this.$refs.youtube_list.getYoutube(param);
+      this.$refs.youtube_list.setPlace(param);
     },
     selectPlace(place) {
       this.$refs.youtube.getReview(place.id);
@@ -102,11 +105,6 @@ export default {
   margin-right: 20px;
   font-size: 20px;
   color: #7C7877;
-}
-
-place-name {
-  width: 150px;
-  color: #F0E5DE;
 }
 
 button {
@@ -150,4 +148,6 @@ button:active {
 .search {
   float: right;
 }
+
+
 </style>
