@@ -4,7 +4,7 @@
 
     <h3>{{ select_place.name }}</h3>
     <div v-if="select_place.location.length>0">지역 : {{ select_place.location[0].address }}</div>
-    <div v-if="select_place.location.length==0">지역 : - </div>
+    <div v-if="select_place.location.length==0">지역 : -</div>
     <div>번호 : {{ select_place.number }}</div>
     <div>카테고리 : {{ select_place.subCategory }}</div>
     <div>추천수 : {{ select_place.recommend }}</div>
@@ -16,7 +16,9 @@
           class="youtube-ul">
         <div class="youtube-li">제목 : {{ youtube.title }}</div>
         <div class="youtube-li">유투버 : {{ youtube.channelTitle }}</div>
-        <a :href="youtube.url" target="_blank" style="color: rosybrown">바로가기</a>
+        <div v-if="youtube.videoId!=null && youtube.videoId.length>0">
+          <a :href="'https://www.youtube.com/watch?v=' + youtube.url" target="_blank" style="color: rosybrown">바로가기</a>
+        </div>
       </li>
     </ul>
 
@@ -138,8 +140,8 @@ export default {
       }
 
       let form = {
-        placeId : this.select_place.id,
-        content : ''
+        placeId: this.select_place.id,
+        content: ''
       }
       return axios
           .post(this.url + 'myList', form)

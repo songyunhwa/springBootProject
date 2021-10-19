@@ -75,24 +75,19 @@ export default {
 
             this.places = data;
             this.places.forEach((place, i) => {
-
-              // 유투브 이름과 url 설정
-              let titles = []; // 유투버
-
-              place.youtubers = '';
+              /// 유투브 이름 설정
+              place.youtubers="";
               place.youtube.forEach(youtube => {
-                if (!titles.includes(youtube.channelTitle)) {
-                  titles.push(youtube.channelTitle);
+                if(place.youtubers.indexOf(youtube.channelTitle) === -1) {
                   place.youtubers += "#" + youtube.channelTitle;
                 }
-                youtube.url = "https://www.youtube.com/watch?v=" + youtube.videoId;
-
-              })
-
-              checkbox[i].checked = false;
+              });
+              if(checkbox[i]!=null) {
+                checkbox[i].checked = false;
+              }
             })
           })
-          .catch(({error}) => {
+          .catch((error) => {
             console.log("error");
             console.log(error);
           })
@@ -100,7 +95,7 @@ export default {
     },
     selectPlace(place, index) {
       var checkbox = document.getElementsByName('check');
-      var isCancel =false;
+      var isCancel = false;
       for (var i = 0; i < this.places.length; i++) {
         if (checkbox[i].checked === true && index == i) {
           isCancel = true;
@@ -108,7 +103,7 @@ export default {
         checkbox[i].checked = false;
       }
       // 체크 취소할 때
-      if(isCancel) {
+      if (isCancel) {
         this.$emit("initCheckbox");
         return;
       }
