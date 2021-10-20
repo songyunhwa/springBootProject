@@ -17,7 +17,7 @@ public interface PlaceRepository extends JpaRepository<PlaceModel, Long> {
     List<PlaceModel> findByNameContaining(String name);
 
     // 기본 목록
-    @Query(value = "SELECT * FROM test.place p WHERE p.sub_category != '디저트' And p.view >= 1 Order By p.view Desc;", nativeQuery = true)
+    @Query(value = "SELECT * FROM test.place p WHERE p.sub_category != 'etc' And p.view >= 1 Order By (p.view + p.recommend) Desc;", nativeQuery = true)
     List<PlaceModel> findByViewAndSubCategory();
 
     // 영어로 된 place 는 지운다.

@@ -3,12 +3,12 @@
   <div class="youtube">
 
     <h3>{{ select_place.name }}</h3>
-    <div v-if="select_place.location.length>0">지역 : {{ select_place.location[0].address }}</div>
-    <div v-if="select_place.location.length==0">지역 : -</div>
+    <div v-if="select_place.location[0]">지역 : {{ select_place.location[0].address }}</div>
+    <div v-if="!select_place.location[0]">지역 : -</div>
     <div>번호 : {{ select_place.number }}</div>
     <div>카테고리 : {{ select_place.subCategory }}</div>
     <div>추천수 : {{ select_place.recommend }}</div>
-    <div>조회수 : {{ select_place.view }}</div>
+    <div>찜한수 : {{ select_place.view }}</div>
 
     <div>관련 유투브</div>
     <ul>
@@ -26,7 +26,6 @@
     <div class="tail" @click="setWished">찜</div>
     <div class="tail" @click="setRecommend">추천</div>
     <div class="tail" @click="onTogglePlaceModal">수정</div>
-
   </div>
 
   <Review :select_place="select_place" ref="review"></Review>
@@ -113,7 +112,7 @@ export default {
     onToggleModal() {
       if (this.showModal) {
         this.showModal = false;
-        this.$emit('click', this.select_place.id);
+        this.$emit("getYoutube", this.select_place.id);
       } else {
         this.showModal = true;
       }
@@ -165,14 +164,14 @@ export default {
   padding-bottom: 10px;
 }
 
-.youtube-li {
-  color: rosybrown;
-  margin-bottom: 10px;
-}
-
 .tail {
   float: right;
   margin-right: 40px;
 }
 
+
+.youtube-li {
+  color: rosybrown;
+  margin-bottom: 10px;
+}
 </style>

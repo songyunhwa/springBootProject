@@ -1,5 +1,3 @@
-![Base  width="10%"](./web/vue/src/assets/images/base_image.png)
-
 
 홈화면
 <div> 
@@ -28,6 +26,9 @@
 4) 비밀번호 찾기
     * 구글과 연동
     * smtp 사용
+
+5) 구글지도 검색
+        ![Base  width="10%"](./web/vue/src/assets/images/map_home.png)
 
 * 배너
 
@@ -89,8 +90,5 @@
 
 * 프론트단 수정
 * 테스트코드 집어넣기
-* 지도? 추가
-* place삭제 수정
-* Contains 
-
+* 유투브 수정 확인 필요
 

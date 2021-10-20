@@ -102,35 +102,6 @@ public class ReviewService {
         reviewRepository.delete(reviewModel);
     }
 
-    public byte[] loadFile(String fileName, InputStream is) throws Exception {
-        String savePath = root_path + fileName;
-        //  String savePath = "C:\\Users\\pc\\Documents\\springBootProject_image\\" + fileName;
-        File file = new File(savePath);
-
-        FileInputStream fis = null;
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
-            fis = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        int readCount = 0;
-        byte[] buffer = new byte[1024];
-
-        try {
-            while ((readCount = fis.read(buffer)) != -1) {
-                System.out.write(buffer, 0, readCount);
-            }
-            fis.close();
-            stream.close();
-        } catch (IOException e) {
-            throw new RuntimeException("File Error");
-        }
-
-        return buffer;
-    }
-
     public PictureModel saveFile(MultipartFile file) throws Exception {
         String filename = "";
 

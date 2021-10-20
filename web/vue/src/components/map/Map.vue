@@ -9,11 +9,12 @@
   <div>
     <input class="address_input" name="address" v-model="address" placeholder="지역을 입력하세요"/>
     <button @click="getPlace">검색</button>
+    <button @click="initCheckbox">모두 보기</button>
   </div>
-  <div class="map-list-left" style="margin-top: 50px;">
+  <div class="map-list-left">
     <youtube-list ref="youtube_list" @selectPlace="selectPlace" @initCheckBox="initCheckbox"></youtube-list>
   </div>
-  <div class="map-list-mid">
+  <div class="map-list-right">
     <div>
       <naver-maps
           :height="height"
@@ -237,6 +238,16 @@ export default {
             if (data.data.length > 0) {
               this.places = data.data;
               this.$refs.youtube_list.setPlace(this.places);
+
+              this.places.forEach(place => {
+                place.youtubers="";
+                place.youtube.forEach(youtube => {
+                  if(place.youtubers.indexOf(youtube.channelTitle) === -1) {
+                    place.youtubers += "#" + youtube.channelTitle;
+                  }
+                });
+              })
+
               this.initMarker();
               this.setMarkers();
             }else {
@@ -286,6 +297,7 @@ export default {
     initCheckbox() {
       this.initMarker();
       this.setMarkers();
+      this.$refs.youtube_list.initCheckbox();
     },
     setMarkers() {
       let sumlat = 0;
@@ -317,18 +329,17 @@ export default {
 
 .map-list-left {
   list-style: none;
-  border-collapse: separate;
-  border-spacing: 1px;
   text-align: left;
   line-height: 1.5;
   position: absolute;
-  width: 30%;
+  width: 40%;
+  margin-top: 50px;
 }
 
-.map-list-mid {
+.map-list-right {
   position: absolute;
-  left: 30%;
-  width: 50%;
+  right: 0px;
+  width: 60%;
   text-align: center;
 }
 
@@ -340,4 +351,5 @@ export default {
   margin-top: 10px;
   margin-left: 20px;
 }
+
 </style>

@@ -88,12 +88,9 @@ public class PlaceService {
 
         PlaceModel existPlace = placeRepository.findByNameAndSubCategory(placeModel.getName(), placeModel.getSubCategory());
         if (existPlace != null) {
-            // 있는 장소라면 view +1
-            existPlace.setView(existPlace.getView() + 1);
-        } else {
             existPlace = new PlaceModel();
             existPlace.setName(placeModel.getName());
-            existPlace.setView(1);
+            existPlace.setView(0);
             existPlace.setRecommend(0);
             existPlace.setSubCategory(placeModel.getSubCategory());
             List<YoutubeModel> youtubes = new ArrayList<YoutubeModel>();

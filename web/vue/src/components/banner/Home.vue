@@ -3,17 +3,17 @@
   <recommend class="right-banner"></recommend>
 
   <!-- 배너 -->
-  <Banner @search="getYoutube"></Banner>
+  <Banner></Banner>
 
   <!-- 검색 -->
   <div class="search">
-    <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutube(input)">
-    <button @click="getYoutube(input)">검색</button>
+    <input v-model="input" style="margin: 5px 10px;padding: 5px 10px;" @keyup.enter="getYoutubes(input)">
+    <button @click="getYoutubes(input)">검색</button>
   </div>
 
   <!-- 유투브 -->
   <div class="youtube-list-right">
-    <Youtube :select_place="select" ref="youtube" v-on:click="selectPlace"></Youtube>
+    <Youtube class="youtube-li" :select_place="select" ref="youtube" v-on:click="selectPlace" @getYoutube="getYoutube"></Youtube>
   </div>
   <div class="youtube-list-left">
     <youtube-list :msg="input" ref="youtube_list" @selectPlace="selectPlace"></youtube-list>
@@ -68,18 +68,24 @@ export default {
   mounted() {
     this.username = this.$cookies.get('username');
     this.url = this.resourceHost + '/history';
-    this.getYoutube("");
+    this.getYoutubes("");
   },
   methods: {
     scrollUp() {
       window.scrollTo(0, 0);
     },
-    getYoutube(param) {
+    getYoutubes(param) {
+      // 초기 화면이나 검색할 때 사용 ( 모든 리스트 불러오기)
       this.$refs.youtube_list.setPlace(param);
     },
     selectPlace(place) {
+      // place 선택
       this.$refs.youtube.getReview(place.id);
       this.select = place;
+    },
+    getYoutube(placeId) {
+      // 유투브 수정했을때
+      this.$refs.youtube_list.getYoutube(placeId);
     }
   }
 }
@@ -105,6 +111,7 @@ export default {
   margin-right: 20px;
   font-size: 20px;
   color: #7C7877;
+  border-bottom: 1px solid #DFDFDF;
 }
 
 button {
@@ -149,5 +156,12 @@ button:active {
   float: right;
 }
 
+li {
+  font-size: 20px;
+  color: #ABD0CE;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #DFDFDF;
 
+}
 </style>

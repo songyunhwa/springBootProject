@@ -17,13 +17,16 @@ public class ListService {
     private PlaceRepository placeRepository;
     private PictureRepository pictureRepository;
     private LocationRepository locationRepository;
+    private ReviewService reviewService;
 
     @Autowired
-    public ListService(MyListRepository myListRepository, ReviewRepository reviewRepository, PlaceRepository placeRepository, PictureRepository pictureRepository,
-                       ReviewService reviewService) {
+    public ListService(MyListRepository myListRepository, PlaceRepository placeRepository, PictureRepository pictureRepository,
+                       ReviewService reviewService, LocationRepository locationRepository) {
         this.myListRepository = myListRepository;
         this.placeRepository = placeRepository;
         this.pictureRepository = pictureRepository;
+        this.locationRepository = locationRepository;
+        this.reviewService = reviewService;
     }
 
     public JSONArray getMyList(long userId) {
@@ -42,12 +45,12 @@ public class ListService {
                 JSONArray array = new JSONArray();
                 for (LocationModel locationModel : locationModels) {
                     JSONObject subObject = new JSONObject();
-                    subObject.put("address" , locationModel.getAddress());
-                    subObject.put("lat" , locationModel.getLat());
-                    subObject.put("lng" , locationModel.getLng());
+                    subObject.put("address", locationModel.getAddress());
+                    subObject.put("lat", locationModel.getLat());
+                    subObject.put("lng", locationModel.getLng());
                     array.add(subObject);
                 }
-                object.put("location",array);
+                object.put("location", array);
 
 
                 object.put("subCategory", placeModel.getSubCategory());
@@ -57,7 +60,7 @@ public class ListService {
                 JSONArray files = new JSONArray();
                 List<PictureModel> pictureModels = pictureRepository.findByListId(listModel.getId());
                 if (pictureModels != null) {
-                    for(PictureModel pictureModel : pictureModels) {
+                    for (PictureModel pictureModel : pictureModels) {
                         JSONObject file = new JSONObject();
                         file.put("fileId", pictureModel.getId());
                         file.put("fileName", pictureModel.getFileName());
@@ -86,14 +89,15 @@ public class ListService {
         myListModel = myListRepository.findByUserIdAndPlaceId(userId, listDto.getPlaceId());
 
         /** 파일 수정 **/
-        List<PictureModel> pictureModels= pictureRepository.findByListId(myListModel.getId());
-        for (PictureModel pictureModel : pictureModels) {
-            if (!listDto.getFileId().contains(pictureModel.getId())) {
-                pictureRepository.delete(pictureModel);
+        if (listDto.getFileId() != null) {
+            List<PictureModel> pictureModels = pictureRepository.findByListId(myListModel.getId());
+            for (PictureModel pictureModel : pictureModels) {
+                if (!listDto.getFileId().contains(pictureModel.getId())) {
+                    reviewService.deleteFile(pictureModel.getId());
+                }
             }
-        }
-        if (listDto.getFileId()!=null) {
-            for(long id : listDto.getFileId()) {
+
+            for (long id : listDto.getFileId()) {
                 PictureModel pictureModel = pictureRepository.findById(id);
                 pictureModel.setListId(myListModel.getId());
                 pictureRepository.save(pictureModel);
@@ -105,7 +109,7 @@ public class ListService {
         MyListModel myListModel = myListRepository.findByUserIdAndPlaceId(userId, placeId);
         if (myListModel != null) {
             List<PictureModel> pictureModels = pictureRepository.findByListId(myListModel.getId());
-            if (pictureModels!=null) {
+            if (pictureModels != null) {
                 for (PictureModel pictureModel : pictureModels) {
                     pictureModel.setListId(-1);
                     pictureRepository.save(pictureModel);

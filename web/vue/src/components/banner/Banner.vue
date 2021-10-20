@@ -14,7 +14,8 @@
         <button @click="this.$router.push({path: '/'});">홈</button>
         <button @click="goUrl('wished')">찜한 장소</button>
         <button @click="goUrl('myList')">내 일기장으로 가기</button>
-        <button @click="this.$router.push({path: '/map'});" style="background-color:#ABD0CE;">구글지도로 검색하기</button>
+         <button class="search-youtube-button" @click="this.$router.push({path: '/'});">유투브 검색</button>
+        <button class="search-google-button" @click="this.$router.push({path: '/map'});">구글지도 검색</button>
         <button  @click="onTogglePlaceModal">
             맛집 추가
         </button>
@@ -114,5 +115,18 @@
         float: left;
     }
 
+    .search-google-button{
+      background-color:white;
+      float:right;
+      margin: 0px 0px 0px 0px;
+      height: 50px;
+    }
+
+    .search-youtube-button{
+      background-color:#D9D4CF;
+      float:right;
+      margin: 0px 0px 0px 0px;
+      height: 50px;
+    }
 
 </style>

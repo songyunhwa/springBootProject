@@ -17,13 +17,13 @@
             <div>
               {{ review.userName }} {{ review.contents }}
             </div>
-
+            <!--
             <div v-if="review.fileName">
               <img
                   :src="require(`@/assets/images/${review.fileName}`)"
                   class="review-img"/>
 
-            </div>
+            </div>-->
           </td>
           <div v-show="!review.modify">
             <button @click="onToggle(review)">수정</button>

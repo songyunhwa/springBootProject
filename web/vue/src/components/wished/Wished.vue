@@ -142,13 +142,6 @@ export default {
 }
 </script>
 <style>
-li {
-  font-size: 20px;
-  color: #ABD0CE;
-  border-bottom: 1px solid #DFDFDF;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
 
 .wished-tail {
   font-size: 17px;

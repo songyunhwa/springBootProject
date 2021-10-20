@@ -153,15 +153,23 @@ public class RecommendService {
 
     public String putWished(long userId, long placeId) throws Exception {
         WishedModel wishedModel = wishedRepository.findByUserIdAndPlaceId(userId, placeId);
-
+        PlaceModel placeModel = placeRepository.findById(placeId);
         if (wishedModel == null) {
             wishedModel = new WishedModel();
             wishedModel.setUserId(userId);
             wishedModel.setPlaceId(placeId);
             wishedRepository.save(wishedModel);
+
+            // 찜수 추가
+           placeModel.setView(placeModel.getView()+1);
+            placeRepository.save(placeModel);
             return "찜을 성공했습니다.";
         } else {
             wishedRepository.delete(wishedModel);
+
+            //찜수 삭제
+            placeModel.setView(placeModel.getView()-1);
+            placeRepository.save(placeModel);
             return "찜을 삭제했습니다.";
 
         }

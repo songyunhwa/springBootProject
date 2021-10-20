@@ -1,13 +1,13 @@
 <!-- 왼쪽에 있는 유투브 리스트 -->
 <template>
   <ul style="list-style: none;">
-    <li v-for="(place, i) in this.places"
+    <li v-for="(place, i) in this.places" :class="{'map-youtube-list': isMap === true}"
         v-bind:key="place" @click="selectPlace(place, i)">
 
       <input type="checkbox" name="check" @click="selectPlace(place, i)" style="margin-right: 10px; float:left;"/>
       <place_name>{{ place.name }}</place_name>
       {{ place.subCategory }}
-      <div>{{ place.youtubers }}</div>
+      <div class="youtuber-name">{{ place.youtubers }}</div>
 
     </li>
   </ul>
@@ -22,6 +22,7 @@ export default {
     msg: Object,
   },
   data: () => ({
+    id: '',
     username: '',
     password: '',
     url: '',
@@ -46,6 +47,7 @@ export default {
     }],
     select: [],
     object: [],
+    isMap: '',
   }),
   created() {
     this.url = this.resourceHost + '/places';
@@ -53,15 +55,19 @@ export default {
   methods: {
     setPlace(params) {
       if (Array.isArray(params)) {
+        this.isMap = true;  //Map 화면일때
+
         while (this.places.length > 0) {
           this.places.splice(0, this.places.length);
         }
         this.places = params;
       } else {
-        this.getYoutube();
+        this.isMap = false; // 홈화면일때
+
+        this.getYoutubes();
       }
     },
-    getYoutube(params) {
+    getYoutubes(params) {
 
       if (params && params.length > 0) {
         this.url = this.resourceHost + '/dessert?subCategory=' + params;
@@ -76,13 +82,13 @@ export default {
             this.places = data;
             this.places.forEach((place, i) => {
               /// 유투브 이름 설정
-              place.youtubers="";
+              place.youtubers = "";
               place.youtube.forEach(youtube => {
-                if(place.youtubers.indexOf(youtube.channelTitle) === -1) {
+                if (place.youtubers.indexOf(youtube.channelTitle) === -1) {
                   place.youtubers += "#" + youtube.channelTitle;
                 }
               });
-              if(checkbox[i]!=null) {
+              if (checkbox[i] != null) {
                 checkbox[i].checked = false;
               }
             })
@@ -111,10 +117,35 @@ export default {
       checkbox[index].checked = true;
       this.$emit("selectPlace", place);
     },
+    getYoutube(placeId) {
+      return axios
+          .get(this.resourceHost + '/place?id=' + placeId)
+          .then((data) => {
+            for(let i=0; i<this.places.length; i++){
+              if(this.places[i].id === data.data[0].id) {
+                this.places[i] = data.data[0];
+
+                // 유투브 이름 설정
+                this.places[i].youtubers = "";
+                this.places[i].youtube.forEach((youtube)=>{
+                  if (this.places[i].youtubers.indexOf(youtube.channelTitle) === -1) {
+                    this.places[i].youtubers += "#" + youtube.channelTitle;
+                  }
+                })
+                this.$emit("selectPlace", this.places[i]);
+                break;
+              }
+            }
+          })
+          .catch(({error}) => {
+            console.log(error);
+          })
+    },
     initCheckbox() {
       var checkbox = document.getElementsByName('check');
       for (var i = 0; i < this.places.length; i++) {
-        checkbox[i].checked = false;
+        if (checkbox[i].checked)
+          checkbox[i].checked = false;
       }
     }
   }
@@ -125,6 +156,19 @@ place_name {
   width: 250px;
   color: #F0E5DE;
   float: left;
+}
+
+.map-youtube-list {
+  border: 1px #DADADA solid;
+  padding: 5px 10px;
+  width: 200px;
+  height: 150px;
+  float: left;
+  margin: 10px 10px 10px 10px;
+}
+
+.youtuber-name {
+  font-size: 15px;
 }
 
 </style>

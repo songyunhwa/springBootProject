@@ -48,10 +48,6 @@ export default {
 </script>
 <style>
 
-.banner {
-  height: 50px;
-}
-
 .title {
   font-size: 14px;
   color: #7C7877;
