@@ -38,7 +38,7 @@
               </div>
               <div>
                 <ul>
-                  <li v-for="(youtube) in place.youtube" v-bind:key="youtube">
+                  <li v-for="(youtube) in place.youtubes" v-bind:key="youtube">
                     {{ youtube.title }}
                   </li>
                 </ul>
@@ -103,18 +103,16 @@ export default {
   data: () => ({
     place: {
       name: '',
-      location: [],
-      number: '',
-      subCategory: '',
-      recommend: '',
-      view: '',
-      youtubers: '',
-      youtube: [{
-        videoId: '',
-        channelTitle: '',
-        title: '',
-        url: '',
-      }],
+     location: '', // 지역
+     url: '',  // 유투브 페이지
+      number: '', // 폰 번호
+     subCategory:'', // CategoryModel 과 연결
+      fileId: '', // 파일 아이디
+       youtubes : [{
+       videoId: '',
+       channelTitle: '',
+       title: '',
+     }]
     },
     youtube: {
       videoId: '',
@@ -141,17 +139,22 @@ export default {
   created() {
     this.url = this.resourceHost;
     this.getCategory();
+    this.popPlaceYoutubes();
+
+    axios.defaults.withCredentials = true;
   },
   methods: {
     modifyYoutube(place) {
-      while (this.place.youtube.length !== 0) {
-        this.place.youtube.pop();
-      }
 
+      this.addYoutube = false;
       this.isModify = true;
       this.place.name = place.name;
-      this.place.location = place.location[0].address;
       this.place.number = place.number;
+      this.place.location = '-'
+      if(place.location[0] != null )
+        this.place.location = place.location[0].address;
+
+
       if (place.subCategory != null) {
         let category = {
           id: '-1',
@@ -162,19 +165,15 @@ export default {
         this.place.subCategory = place.subCategory;
       }
 
-      this.addYoutube = false;
-
       // 유투브 집어넣기
-      if (place.youtube != null) {
-        for (let youtube of place.youtube) {
-          this.youtube.url = youtube.url;
-          this.youtube.title = youtube.title;
-          this.youtube.channelTitle = youtube.channelTitle;
-          this.youtube.videoId = youtube.videoId;
-          this.putYoutube();
+      this.popPlaceYoutubes();
+      if(place.youtube!=null) {
+        for(let i=0; i< place.youtube.length ; i++) {
+          this.place.youtubes.push(place.youtube[i]);
         }
       }
-      this.popPlaceYoutubes();
+
+
     },
     putYoutube() {
       if (this.youtube.videoId.length > 0 &&
@@ -187,7 +186,7 @@ export default {
           title: this.youtube.title,
           url: this.youtube.url,
         };
-        this.place.youtube.push(addYoutube);
+        this.place.youtubes.push(addYoutube);
 
         this.youtube.videoId = '';
         this.youtube.channelTitle = '';
@@ -206,14 +205,14 @@ export default {
         this.result = '카테고리를 적어주세요.';
         return;
       }
-      if (this.place.youtube.length === 0) {
+      if (this.place.youtubes.length === 0) {
         this.result = '유투브가 하나 이상이어야 합니다.';
         return;
       }
 
 
       return axios
-          .post(this.url + '/admin/place', this.place)
+          .post(this.url + '/place', this.place)
           .then(() => {
             this.$emit('putPlace');
             this.$emit('close');
@@ -244,8 +243,8 @@ export default {
       }
     },
     popPlaceYoutubes() {
-      while (this.place.youtube.length !== 0) {
-        this.place.youtube.pop();
+      while (this.place.youtubes.length !== 0) {
+        this.place.youtubes.pop();
       }
     }
   }
