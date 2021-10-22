@@ -112,17 +112,22 @@ export default {
     onToggleModal() {
       if (this.showModal) {
         this.showModal = false;
-        this.$emit("getYoutube", this.select_place.id);
+        this.emitGetYoutube();
       } else {
         this.showModal = true;
       }
     },
+    emitGetYoutube(){
+      this.$emit("getYoutube", this.select_place.id);
+    },
     onTogglePlaceModal() {
       if (this.showPlaceModal) {
         this.showPlaceModal = false;
+        this.emitGetYoutube();
       } else {
         this.showPlaceModal = true;
         this.$refs.placeModal.modifyYoutube(this.select_place);
+
       }
     },
     selectPlace() {

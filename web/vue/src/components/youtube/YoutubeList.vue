@@ -129,7 +129,7 @@ export default {
                 this.places[i].youtubers = "";
                 this.places[i].youtube.forEach((youtube)=>{
                   if (this.places[i].youtubers.indexOf(youtube.channelTitle) === -1) {
-                    this.places[i].youtubers += "#" + youtube.channelTitle;
+                    this.places[i].youtubers += " #" + youtube.channelTitle;
                   }
                 })
                 this.$emit("selectPlace", this.places[i]);
