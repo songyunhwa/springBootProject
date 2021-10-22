@@ -33,11 +33,11 @@ import java.util.List;
 public class RecommendController {
     private static final Logger logger = LoggerFactory.getLogger(RecommendController.class);
 
-    private RecommendService recommendService;
-    private UserService userService;
+    private final RecommendService recommendService;
+    private final UserService userService;
 
     @Autowired
-    public void RecommendController(RecommendService recommendService, UserService userService){
+    public RecommendController(RecommendService recommendService, UserService userService){
         this.recommendService = recommendService;
         this.userService = userService;
     }

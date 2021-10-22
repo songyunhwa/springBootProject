@@ -7,6 +7,7 @@ import com.example.yhwasongtest.place.repository.*;
 import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
+import com.example.yhwasongtest.youtube.service.YoutubeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,22 +32,22 @@ public class PlaceService {
     private static final Logger logger = LoggerFactory.getLogger(PlaceService.class);
 
     private PlaceRepository placeRepository;
-    private LocationRepository locationRepository;
+    private LocationService locationService;
     private FoodRepository foodRepository;
     private DessertRepository dessertRepository;
-    private YoutubeRepository youtubeRepository;
+    private YoutubeService youtubeService;
 
     @Autowired
     public PlaceService(PlaceRepository placeRepository,
-                        LocationRepository locationRepository,
+                        LocationService locationService,
                         FoodRepository foodRepository,
                         DessertRepository dessertRepository,
-                        YoutubeRepository youtubeRepository) {
+                        YoutubeService youtubeService) {
         this.placeRepository = placeRepository;
-        this.locationRepository = locationRepository;
+        this.locationService = locationService;
         this.foodRepository = foodRepository;
         this.dessertRepository = dessertRepository;
-        this.youtubeRepository = youtubeRepository;
+        this.youtubeService = youtubeService;
     }
 
     public List<PlaceModel> getPlaces() {
@@ -73,72 +74,59 @@ public class PlaceService {
         return placeModelList;
     }
 
-    public PlaceModel putPlace(PlaceDto placeModel) throws Exception {
-        if (placeModel.getSubCategory() == null) {
+    public PlaceModel putPlace(PlaceDto placeDto) throws Exception {
+        if (placeDto.getSubCategory() == null) {
             throw new Exception("sub_category 가 없습니다.");
         }
-        if (placeModel.getName() == null) {
+        if (placeDto.getName() == null) {
             throw new Exception("name 이 없습니다.");
         }
 
         // 이름이 영어면 저장 x
         String pattern = "/^[a-zA-Z]*$/";
-        boolean isMatch = Pattern.matches(pattern, placeModel.getName());
-        if (isMatch) return null;
+        boolean isMatch = Pattern.matches(pattern, placeDto.getName());
+        if (isMatch) throw new Exception("장소 이름이 한글이 아닙니다.");
 
-        PlaceModel existPlace = placeRepository.findByNameAndSubCategory(placeModel.getName(), placeModel.getSubCategory());
-        if (existPlace != null) {
+        PlaceModel existPlace = placeRepository.findByNameAndSubCategory(placeDto.getName(), placeDto.getSubCategory());
+        if (existPlace == null) {
             existPlace = new PlaceModel();
-            existPlace.setName(placeModel.getName());
+            existPlace.setName(placeDto.getName());
             existPlace.setView(0);
             existPlace.setRecommend(0);
-            existPlace.setSubCategory(placeModel.getSubCategory());
+            existPlace.setSubCategory(placeDto.getSubCategory());
             List<YoutubeModel> youtubes = new ArrayList<YoutubeModel>();
             existPlace.setYoutubes(youtubes);
+            existPlace = placeRepository.save(existPlace);
         }
 
-        existPlace.setNumber(placeModel.getNumber());
-        existPlace.setUrl(placeModel.getUrl());
-
-
         List<YoutubeModel> youtubeModels = new ArrayList<>();
-        // 유투브에 대한 정보 저장
-        if (placeModel.getYoutubes() != null) {
-            for (YoutubeDto youtube : placeModel.getYoutubes()) {
-                YoutubeModel youtubeModel = youtubeRepository.findByVideoId(youtube.getVideoId());
-                // 포함하고 있는 유투브라면 넘어가기
-                if (youtubeModel == null) {
+        // 장소와 관련된 유투브 정보 저장
+        if (placeDto.getYoutubes() != null) {
+            for (YoutubeDto youtube : placeDto.getYoutubes()) {
+                YoutubeModel youtubeModel = youtubeService.getYoutubeModel(youtube.getVideoId());
+                if(youtubeModel == null) {
                     youtubeModel = new YoutubeModel();
-                    youtubeModel.setPublishedAt("");
-                    youtubeModel.setChannelId("");
                     youtubeModel.setTitle(youtube.getTitle());
-                    youtubeModel.setDescription("");
                     youtubeModel.setChannelTitle(youtube.getChannelTitle());
                     youtubeModel.setVideoId(youtube.getVideoId());
                     youtubeModel.setPlace(existPlace);
-
                 }
                 youtubeModels.add(youtubeModel);
             }
         }
-
+        // 장소와 관련되지 않은 유투브 삭제
         for (YoutubeModel youtubeModel : existPlace.getYoutubes()) {
             if(!youtubeModels.contains(youtubeModel)){
-                youtubeRepository.delete(youtubeModel);
+                youtubeService.deleteYoutube(youtubeModel.getVideoId());
+                existPlace.getYoutubes().remove(youtubeModel);
             }
         }
         existPlace.getYoutubes().clear();
         existPlace.setYoutubes(youtubeModels);
         existPlace = placeRepository.save(existPlace);
 
-        for (YoutubeModel youtubeModel : existPlace.getYoutubes()) {
-            YoutubeModel youtube = youtubeRepository.findByVideoId(youtubeModel.getVideoId());
-            if (youtube == null) {
-                youtubeModel.setPlace(existPlace);
-                youtubeRepository.save(youtubeModel);
-            }
-        }
-
+        // 지역 저장
+        locationService.saveLocation(existPlace, placeDto);
 
         return existPlace;
     }

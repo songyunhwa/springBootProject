@@ -2,8 +2,10 @@ package com.example.yhwasongtest.youtube.service;
 
 import com.example.yhwasongtest.place.model.PlaceModel;
 import com.example.yhwasongtest.place.service.PlaceService;
+import com.example.yhwasongtest.youtube.dto.YoutubeDto;
 import com.example.yhwasongtest.youtube.model.YoutubeModel;
 import com.example.yhwasongtest.youtube.repository.YoutubeRepository;
+import com.google.api.services.youtube.YouTube;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,17 +13,11 @@ import java.util.List;
 
 @Service
 public class YoutubeService {
-
     private YoutubeRepository youtubeRepostiory;
-    private SearchYoutube searchService;
-    private PlaceService placeService;
 
     @Autowired
-    public YoutubeService(YoutubeRepository youtubeRepostiory, SearchYoutube searchService,
-                          PlaceService placeService){
+    public YoutubeService(YoutubeRepository youtubeRepostiory){
         this.youtubeRepostiory = youtubeRepostiory;
-        this.searchService = searchService;
-        this.placeService = placeService;
     }
 
     @Autowired
@@ -30,33 +26,32 @@ public class YoutubeService {
 
     }
 
-    public YoutubeModel insertYoutubeModel(YoutubeModel youtubemodel){
-        youtubeRepostiory.save(youtubemodel);
+    public YoutubeModel insertYoutubeModel(YoutubeDto youtubeDto, PlaceModel placeModel){
 
-        return youtubemodel;
-    }
-
-    public String getSearchYoutube(String msg, String category) {
-        String result = "";
-        if(msg == null) {
-            System.err.println("getSearchYoutube Error ==> "+ "message is not exist.");
-            return "message is not exist.";
-        } else {
-            try {
-            result = searchService.searchYoutube(msg, category, null);
-
-            // 분류하기
-            List<PlaceModel> placeModelList = placeService.getPlaceListBySubCategory("etc");
-            if(placeModelList!=null){
-            placeService.getDessertCategory();
-            placeService.getFoodCategory();
-            }
-            } catch (Exception error) {
-                System.err.println("getSearchYoutube Error ==> "+ error);
-
-            }
+        YoutubeModel youtubeModel = youtubeRepostiory.findByVideoId(youtubeDto.getVideoId());
+        // 포함하고 있는 유투브라면 넘어가기
+        if (youtubeModel == null) {
+            YoutubeModel youtube = new YoutubeModel();
+            youtube.setTitle(youtubeDto.getTitle());
+            youtube.setChannelTitle(youtubeDto.getChannelTitle());
+            youtube.setVideoId(youtubeDto.getVideoId());
+            youtube.setPlace(placeModel);
+            youtubeRepostiory.save(youtube);
+            return youtube;
         }
-        return result;
+
+        return youtubeModel;
     }
 
+    public YoutubeModel getYoutubeModel(String videoId){
+        YoutubeModel youTubeModel = youtubeRepostiory.findByVideoId(videoId);
+        return youTubeModel;
+    }
+
+    public void deleteYoutube(String videoId) {
+        YoutubeModel youtubeModel = youtubeRepostiory.findByVideoId(videoId);
+        if(youtubeModel != null) {
+            youtubeRepostiory.delete(youtubeModel);
+        }
+    }
 }

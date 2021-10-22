@@ -41,16 +41,12 @@ public class ReviewController {
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
     private final ReviewService reviewService;
-    private final ReviewRepository reviewRepository;
     private final PictureRepository pictureRepository;
-    private final PlaceService placeService;
 
     @Autowired
-    public ReviewController(ReviewService reviewService, ReviewRepository reviewRepository, PictureRepository pictureRepository, PlaceService placeService) {
+    public ReviewController(ReviewService reviewService,PictureRepository pictureRepository ) {
         this.reviewService = reviewService;
-        this.reviewRepository = reviewRepository;
         this.pictureRepository = pictureRepository;
-        this.placeService = placeService;
     }
 
     @ApiOperation(value="장소 리뷰 검색")

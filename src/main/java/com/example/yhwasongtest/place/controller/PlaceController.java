@@ -37,12 +37,10 @@ public class PlaceController {
     private static final Logger logger = LoggerFactory.getLogger(PlaceController.class);
 
     private final PlaceService placeService;
-    private final YoutubeService youtubeService;
 
     @Autowired
-    public PlaceController(PlaceService placeService, YoutubeService youtubeService) {
+    public PlaceController(PlaceService placeService) {
         this.placeService = placeService;
-        this.youtubeService = youtubeService;
     }
 
     @ApiOperation(value="모든 장소 검색")
@@ -98,7 +96,8 @@ public class PlaceController {
         }
     }
 
-    @PostMapping(value = "/admin/place")
+    @ApiOperation(value="장소 수정")
+    @PostMapping(value = "/place")
     public ResponseEntity putPlace(@RequestBody PlaceDto placeDto) {
 
         try {

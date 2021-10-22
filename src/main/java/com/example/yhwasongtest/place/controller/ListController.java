@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping(value = "/api/v1")
 public class ListController {
 
-    private ListService listService;
+    private final ListService listService;
 
     @Autowired
     public ListController(ListService listService) {
