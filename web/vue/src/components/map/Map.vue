@@ -208,10 +208,10 @@ export default {
       };
     },
     initMapPlace() {
-      while(this.places.length >0)  {
+      while (this.places.length > 0) {
         this.places.pop();
       }
-      this.places= [{
+      this.places = [{
         name: '',
         location: [{
           address: '',
@@ -240,9 +240,9 @@ export default {
               this.$refs.youtube_list.setPlace(this.places);
 
               this.places.forEach(place => {
-                place.youtubers="";
+                place.youtubers = "";
                 place.youtube.forEach(youtube => {
-                  if(place.youtubers.indexOf(youtube.channelTitle) === -1) {
+                  if (place.youtubers.indexOf(youtube.channelTitle) === -1) {
                     place.youtubers += "#" + youtube.channelTitle;
                   }
                 });
@@ -250,8 +250,8 @@ export default {
 
               this.initMarker();
               this.setMarkers();
-            }else {
-             this.initMapPlace();
+            } else {
+              this.initMapPlace();
               this.initMarker();
               this.setMarkers();
             }
@@ -265,7 +265,6 @@ export default {
       this.initMarker();
       let sumlat = 0;
       let sumlng = 0;
-      let sumcnt = 0;
       let marker = place;
       place.location.forEach(location => {
 
@@ -274,12 +273,13 @@ export default {
         marker.location.lng = location.lng;
         this.markers.push(marker);
 
-        sumlat += location.lat;
-        sumlng += location.lng;
-        sumcnt++;
+        sumlat = location.lat;
+        sumlng = location.lng;
       })
-      if (sumlat / sumcnt > 0) {
-        this.map.setCenter(sumlat / sumcnt, sumlng / sumcnt);
+      if (sumlat > 0) {
+        console.log(sumlat);
+        console.log(sumlng);
+        this.map.setCenter(sumlat, sumlng);
       }
     },
     getCities() {
@@ -300,28 +300,23 @@ export default {
       this.$refs.youtube_list.initCheckbox();
     },
     setMarkers() {
-      let sumlat = 0;
-      let sumlng = 0;
-      let sumcnt = 0;
       this.places.forEach(place => {
         let marker = place;
         place.location.forEach(location => {
-
           marker.location.address = location.address;
           marker.location.lat = location.lat;
           marker.location.lng = location.lng;
           this.markers.push(marker);
 
-          sumlat += location.lat;
-          sumlng += location.lng;
-          sumcnt++;
+          if (location.lat != null && location.lng != null) {
+            this.map.setCenter(location.lat, location.lng);
+          }
+
         })
       })
-      if (sumlat / sumcnt > 0) {
-        this.map.setCenter(sumlat / sumcnt, sumlng / sumcnt);
-      }
-    }
+    },
   },
+
 
 }
 </script>

@@ -219,7 +219,7 @@ export default {
           })
           .catch((error) => {
             console.log(error);
-            this.modal.body = error.response;
+            this.modal.body = error.response.data;
             this.onToggleResultModal();
           })
 
