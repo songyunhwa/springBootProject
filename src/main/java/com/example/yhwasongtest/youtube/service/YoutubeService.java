@@ -48,6 +48,11 @@ public class YoutubeService {
         return youTubeModel;
     }
 
+    public List<YoutubeModel> getYoutubeModelByPlaceId(long placeId) {
+        List<YoutubeModel> youtubeModels = youtubeRepostiory.findByPlaceId(placeId);
+        return youtubeModels;
+    }
+
     public void deleteYoutube(String videoId) {
         YoutubeModel youtubeModel = youtubeRepostiory.findByVideoId(videoId);
         if(youtubeModel != null) {

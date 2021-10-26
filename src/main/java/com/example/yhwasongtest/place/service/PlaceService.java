@@ -52,6 +52,14 @@ public class PlaceService {
 
     public List<PlaceModel> getPlaces() {
         List<PlaceModel> placeModelList = this.placeRepository.findByViewAndSubCategory();
+        for(PlaceModel placeModel : placeModelList) {
+            // 유투브가 없으면 확인해보기
+            // 변경 이전 정보들은 연계가 안되어 있음.
+            List<YoutubeModel> youtubeModels = youtubeService.getYoutubeModelByPlaceId(placeModel.getId());
+            if (youtubeModels.size() != placeModel.getYoutubes().size()) {
+                placeModel.setYoutubes(youtubeModels);
+            }
+        }
         return placeModelList;
     }
 
@@ -90,7 +98,7 @@ public class PlaceService {
         PlaceModel existPlace = placeRepository.findByNameAndSubCategory(placeDto.getName(), placeDto.getSubCategory());
         if (existPlace == null) {
             existPlace = new PlaceModel();
-            existPlace.setName(placeDto.getName());
+            existPlace.setName(placeDto.getName().replace(" ", ""));
             existPlace.setView(0);
             existPlace.setRecommend(0);
             existPlace.setSubCategory(placeDto.getSubCategory());
